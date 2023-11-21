@@ -1,5 +1,7 @@
 import { createReducer } from "@reduxjs/toolkit";
 
+import { setTheme } from "../actions/user.action";
+
 import {
   PendingAction,
   FulfilledAction,
@@ -12,6 +14,7 @@ interface UserState {
   username: string;
   password: string;
   name: string;
+  isDarkMode: boolean;
   isLoading: boolean; // global variable
   isError: boolean; // global variable
 }
@@ -24,12 +27,17 @@ const initialState: UserState = {
   username: "",
   password: "",
   name: "",
+  isDarkMode: false,
   isLoading: false,
   isError: false,
 };
 
 const userReducer = createReducer(initialState, (builder) => {
   builder
+    .addCase(setTheme, (state) => {
+      state.isDarkMode = !state.isDarkMode;
+      localStorage.setItem("isDarkMode", JSON.stringify(state.isDarkMode));
+    })
     .addMatcher(
       (action): action is PendingAction => action.type.endsWith("/pending"),
       (state, action) => {
