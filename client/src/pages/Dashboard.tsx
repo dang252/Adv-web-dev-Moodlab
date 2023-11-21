@@ -51,7 +51,7 @@ const Dashboard = () => {
       setNavValue("1");
     }
     if (e.domEvent.target.textContent === "Classes") {
-      document.title = "Slearninglab | Classes";
+      document.title = "Moodlab | Classes";
       navigate("/dashboard/classes");
       setNavValue("2");
     }
@@ -74,7 +74,9 @@ const Dashboard = () => {
       <MobileNav
         triggerOpen={triggerOpen}
         setTriggerOpen={setTriggerOpen}
+        setNav={setNav}
         navLabel={navLabel}
+        navValue={navValue}
       />
       <Layout hasSider>
         <Navigation
