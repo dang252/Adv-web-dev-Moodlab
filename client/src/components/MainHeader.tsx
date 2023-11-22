@@ -68,20 +68,28 @@ const MainHeader = (props: propType) => {
       >
         <div className="w-[100%] flex justify-between items-center sm:hidden sm:w-auto">
           <IoLogoOctocat className="text-3xl" />
-          <div
-            className="border border-solid border-gray-500 rounded-md border-white w-[30px] h-[30px] flex justify-center items-center p-5 hover:border-blue-500 hover:text-blue-500 hover:cursor-pointer"
-            onClick={() => {
-              setTriggerOpen(!triggerOpen);
-            }}
-          >
-            <MenuOutlined className="text-xl" />
+          <div className="flex items-center gap-14">
+            <Badge
+              count={1}
+              className="hover:cursor-pointer hover:text-blue-500"
+            >
+              <BellOutlined className="text-2xl" onClick={() => {}} />
+            </Badge>
+            <div
+              className="border border-solid border-gray-500 rounded-md border-white w-[30px] h-[30px] flex justify-center items-center p-5 hover:border-blue-500 hover:text-blue-500 hover:cursor-pointer"
+              onClick={() => {
+                setTriggerOpen(!triggerOpen);
+              }}
+            >
+              <MenuOutlined className="text-xl" />
+            </div>
           </div>
         </div>
         <div className="hidden sm:flex">
           <p className="text-xl font-bold text-center">Your Workspace</p>
         </div>
         <Space className="px-10 hidden sm:flex" size="large">
-          <Space>
+          <div className="flex gap-5">
             <Switch
               checkedChildren={<IoSunny className="text-md mt-[5px]" />}
               unCheckedChildren={<FiMoon className="text-md mt-[5px]" />}
@@ -90,11 +98,11 @@ const MainHeader = (props: propType) => {
             />
             <Badge
               count={1}
-              className="mt-6 ml-5 mr-12 hover:cursor-pointer hover:text-blue-500"
+              className="ml-5 mr-12 hover:cursor-pointer hover:text-blue-500"
             >
               <BellOutlined className="text-2xl" onClick={() => {}} />
             </Badge>
-          </Space>
+          </div>
           <Dropdown
             menu={{
               onClick: onClick,

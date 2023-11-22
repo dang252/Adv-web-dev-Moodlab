@@ -77,6 +77,7 @@ const Dashboard = () => {
         setNav={setNav}
         navLabel={navLabel}
         navValue={navValue}
+        switchMode={switchMode}
       />
       <Layout hasSider>
         <Navigation

@@ -1,10 +1,12 @@
 import { createElement } from "react";
 import { useEffect, useState } from "react";
-import { Menu, Drawer, MenuProps } from "antd";
+import { Menu, Drawer, MenuProps, Switch } from "antd";
 import { useSelector } from "react-redux";
 import { HomeOutlined } from "@ant-design/icons";
 import { SiGoogleclassroom } from "react-icons/si";
 import { IoLogoOctocat } from "react-icons/io";
+import { IoSunny } from "react-icons/io5";
+import { FiMoon } from "react-icons/fi";
 
 import { RootState } from "../redux/store";
 
@@ -14,10 +16,18 @@ interface PropType {
   setNav: any;
   navLabel: string[];
   navValue: string;
+  switchMode: (_checked: boolean) => void;
 }
 
 const MobileNav = (props: PropType) => {
-  const { triggerOpen, setTriggerOpen, setNav, navLabel, navValue } = props;
+  const {
+    triggerOpen,
+    setTriggerOpen,
+    setNav,
+    navLabel,
+    navValue,
+    switchMode,
+  } = props;
 
   const items: MenuProps["items"] = [HomeOutlined, SiGoogleclassroom].map(
     (icon, index) => ({
@@ -56,6 +66,14 @@ const MobileNav = (props: PropType) => {
         <div className="flex gap-3 justify-center">
           <IoLogoOctocat className="text-3xl" />
           <p className="text-xl font-bold">Moolab</p>
+        </div>
+        <div className="my-10 flex gap-5 justify-end">
+          <Switch
+            checkedChildren={<IoSunny className="text-md mt-[5px]" />}
+            unCheckedChildren={<FiMoon className="text-md mt-[5px]" />}
+            defaultChecked
+            onChange={switchMode}
+          />
         </div>
         <Menu
           className={`mt-5 ${isDarkMode ? "bg-[#1f1f1f]" : "bg-white"}`}
