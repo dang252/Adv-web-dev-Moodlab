@@ -1,5 +1,6 @@
 import { Layout, theme } from "antd";
 import { useSelector } from "react-redux";
+import { useTitle } from "../hooks/useTitle";
 import { Link } from "react-router-dom";
 import { FaYoutube } from "react-icons/fa";
 import { GithubOutlined } from "@ant-design/icons";
@@ -24,6 +25,8 @@ const Landing = (props: PropType) => {
   const isDarkMode = useSelector<RootState, boolean>(
     (state) => state.users.isDarkMode
   );
+
+  useTitle("Moodlab | Welcome");
 
   const {
     token: { colorBgContainer },

@@ -2,6 +2,8 @@ import { Layout, theme, Button, Form, Input } from "antd";
 import { useSelector } from "react-redux";
 import { useTitle } from "../hooks/useTitle";
 
+import { GoogleOutlined } from "@ant-design/icons";
+import { FaFacebook } from "react-icons/fa";
 import { IoLogoOctocat } from "react-icons/io";
 
 import { RootState } from "../redux/store";
@@ -77,13 +79,13 @@ const Login = (props: PropType) => {
       />
       <Layout className={`${isDarkMode ? "bg-zinc-900" : ""}`}>
         <Content
-          className="mt-[80px] mb-0 mx-[10px] sm:mt-[100px] sm:mx-[40px]"
+          className="mt-[30px] mb-[30px] mx-[10px] sm:mt-[100px] sm:mx-[40px]"
           style={{ overflow: "initial" }}
         >
           <div
             className={`rounded-md ${isDarkMode ? "" : ""}`}
             style={{
-              minHeight: "90vh",
+              minHeight: "100vh",
               padding: 24,
               color: isDarkMode ? "#fff" : undefined,
               // background: !isDarkMode ? colorBgContainer : undefined,
@@ -128,9 +130,28 @@ const Login = (props: PropType) => {
 
               <Form.Item {...tailLayout}>
                 <Button type="primary" htmlType="submit">
-                  Register
+                  Login
                 </Button>
               </Form.Item>
+
+              <div className="mt-10 flex flex-col items-center">
+                <div className="relative w-[90%] mx-auto bg-gray-200 h-[1px]"></div>
+                <div
+                  className={`absolute flex justify-center top-[540px] sm:top-[480px] text-[15px] text-gray-400 font-semibold w-[40px] ${
+                    isDarkMode ? "bg-zinc-800" : "bg-white"
+                  }`}
+                >
+                  or
+                </div>
+                <div className="mt-10 w-[100%] flex flex-col gap-5 sm:w-[65%]">
+                  <Button type="primary" danger icon={<GoogleOutlined />}>
+                    Login with Google
+                  </Button>
+                  <Button type="primary" icon={<FaFacebook />}>
+                    Login with Facebook
+                  </Button>
+                </div>
+              </div>
             </Form>
           </div>
         </Content>

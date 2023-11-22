@@ -18,7 +18,9 @@ interface PropType {
 
 type FieldType = {
   username?: string;
+  email?: string;
   password?: string;
+  confirm?: string;
 };
 
 const layout = {
@@ -77,13 +79,13 @@ const Register = (props: PropType) => {
       />
       <Layout className={`${isDarkMode ? "bg-zinc-900" : ""}`}>
         <Content
-          className="mt-[80px] mb-0 mx-[10px] sm:mt-[100px] sm:mx-[40px]"
+          className="mt-[30px] mb-[30px] mx-[10px] sm:mt-[100px] sm:mx-[40px]"
           style={{ overflow: "initial" }}
         >
           <div
             className={`rounded-md ${isDarkMode ? "" : ""}`}
             style={{
-              minHeight: "90vh",
+              minHeight: "100vh",
               padding: 24,
               color: isDarkMode ? "#fff" : undefined,
               // background: !isDarkMode ? colorBgContainer : undefined,
@@ -117,10 +119,47 @@ const Register = (props: PropType) => {
               </Form.Item>
 
               <Form.Item<FieldType>
+                label="Email"
+                name="email"
+                rules={[
+                  { required: true, message: "Please input your username!" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+
+              <Form.Item<FieldType>
                 label="Password"
                 name="password"
                 rules={[
                   { required: true, message: "Please input your password!" },
+                ]}
+              >
+                <Input.Password />
+              </Form.Item>
+
+              <Form.Item
+                name="confirm"
+                label="Confirm Password"
+                dependencies={["password"]}
+                hasFeedback
+                rules={[
+                  {
+                    required: true,
+                    message: "Please confirm your password!",
+                  },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue("password") === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error(
+                          "The new password that you entered do not match!"
+                        )
+                      );
+                    },
+                  }),
                 ]}
               >
                 <Input.Password />
