@@ -8,6 +8,7 @@ import { RootState } from "../redux/store";
 
 import LandingHeader from "../components/LandingHeader";
 import MainFooter from "../components/MainFooter";
+import ContributorCard from "../components/ContributorCard";
 
 const { Header, Content, Footer } = Layout;
 
@@ -62,9 +63,9 @@ const Landing = () => {
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        fill-rule="evenodd"
+                        fillRule="evenodd"
                         d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                        clip-rule="evenodd"
+                        clipRule="evenodd"
                       ></path>
                     </svg>
                   </Link>
@@ -104,6 +105,34 @@ const Landing = () => {
                     </a>
                   </div>
                 </div>
+              </div>
+            </section>
+            <section className="my-40">
+              <h1 className="mb-20 text-2xl text-blue-500 text-center font-bold tracking-tight leading-none">
+                Contributors
+              </h1>
+              <div className="flex flex-col flex-wrap gap-[150px] items-center justify-around sm:gap-0 md:flex-row">
+                <ContributorCard
+                  name="Nguyễn Nhật Đăng"
+                  src="./avatar/nhatdang.jpg"
+                  role="Leader, Developer"
+                  fb="https://www.facebook.com/dageng.252"
+                  github="https://github.com/dang252"
+                />
+                <ContributorCard
+                  name="Lê Minh Trí"
+                  src="./avatar/minhtri.jpg"
+                  role="Developer"
+                  fb="https://www.facebook.com/minhtrifit"
+                  github="https://github.com/minhtrifit"
+                />
+                <ContributorCard
+                  name="Trần Gia Bảo"
+                  src="./avatar/giabao.jpg"
+                  role="Developer"
+                  fb="https://www.facebook.com/profile.php?id=100010425813591"
+                  github="https://github.com/trangiabao2702"
+                />
               </div>
             </section>
           </div>
