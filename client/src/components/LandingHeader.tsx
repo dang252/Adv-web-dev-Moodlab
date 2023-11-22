@@ -39,7 +39,7 @@ const LandingHeader = (props: PropType) => {
         style={{
           background: !isDarkMode ? colorBgContainer : undefined,
           position: "fixed",
-          zIndex: 1,
+          zIndex: 30,
         }}
         className="fixed w-[100%] flex items-center px-[20px] py-[30px] sm:px-[40px] sm:py-[40px] sm:justify-between"
       >

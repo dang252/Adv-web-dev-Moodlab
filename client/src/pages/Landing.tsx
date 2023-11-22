@@ -49,7 +49,7 @@ const Landing = (props: PropType) => {
       />
       <Layout className={`${isDarkMode ? "bg-zinc-900" : ""}`}>
         <Content
-          className="mt-[80px] mb-0 mx-[10px] sm:mt-[100px] sm:mx-[40px]"
+          className="mt-[80px] mb-0 mx-[10px] xl:mt-[0px] sm:mx-[40px]"
           style={{ overflow: "initial" }}
         >
           <div
@@ -61,18 +61,33 @@ const Landing = (props: PropType) => {
               // background: !isDarkMode ? colorBgContainer : undefined,
             }}
           >
-            <section>
+            <div
+              className={`hidden xl:block absolute z-10 mt-100 w-[100%] h-[750px] left-0 ${
+                isDarkMode ? "bg-zinc-800" : "bg-blue-500"
+              }`}
+            ></div>
+            <section className="relative z-20">
               <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-12">
-                <h1 className="mb-4 text-[50px] text-blue-500 font-extrabold tracking-tight leading-none md:text-5xl lg:text-6xl">
-                  Welcome to Moodlab
-                </h1>
-                <p className="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">
-                  Here we provide the best solution for your learning process.
-                </p>
+                <div className="flex justify-center items-center">
+                  <div>
+                    <h1 className="mb-4 text-[50px] text-blue-500 xl:text-white font-extrabold tracking-tight leading-none md:text-5xl lg:text-6xl">
+                      Welcome to Moodlab
+                    </h1>
+                    <p className="mb-8 text-lg font-normal text-gray-400 xl:text-gray-300 lg:text-xl">
+                      Here we provide the best solution for your learning
+                      process.
+                    </p>
+                  </div>
+                  <img
+                    src="./landing hero.png"
+                    alt="hero"
+                    className="hidden w-[600px] xl:block"
+                  />
+                </div>
                 <div className="flex flex-col mb-8 lg:mb-16 space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4">
                   <Link
                     to="/login"
-                    className="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-500 hover:bg-blue-600 hover:text-white"
+                    className="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-600 hover:bg-blue-700 hover:text-white"
                   >
                     Learn more
                     <svg
@@ -91,7 +106,7 @@ const Landing = (props: PropType) => {
                   <a
                     href="#"
                     className={`inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center rounded-lg border border-solid border-gray-400 hover:border-blue-500 hover:text-blue-500 ${
-                      isDarkMode ? "text-white" : "text-black"
+                      isDarkMode ? "text-white" : "text-black xl:bg-white"
                     }`}
                   >
                     <svg
