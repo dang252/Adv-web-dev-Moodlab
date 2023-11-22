@@ -36,7 +36,7 @@ const Navigation = (props: propType) => {
           }`}
         >
           <Link
-            to="/home"
+            to="/dashboard"
             className={`${
               isDarkMode
                 ? "text-white hover:cursor-pointer flex hover:text-white"

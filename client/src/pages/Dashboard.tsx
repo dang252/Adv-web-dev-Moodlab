@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { HomeOutlined } from "@ant-design/icons";
 import { SiGoogleclassroom } from "react-icons/si";
@@ -43,6 +43,10 @@ const Dashboard = () => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
+
+  useEffect(() => {
+    document.title = "Moodlab | Dashboard";
+  }, []);
 
   const setNav: MenuProps["onClick"] = (e: any) => {
     if (e.domEvent.target.textContent === "Home") {
