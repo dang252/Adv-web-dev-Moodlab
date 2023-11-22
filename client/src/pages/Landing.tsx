@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Layout, theme } from "antd";
 import { useSelector } from "react-redux";
 import { useTitle } from "../hooks/useTitle";
@@ -27,6 +28,10 @@ const Landing = (props: PropType) => {
   );
 
   useTitle("Moodlab | Welcome");
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const {
     token: { colorBgContainer },

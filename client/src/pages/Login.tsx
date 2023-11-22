@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Layout, theme, Button, Form, Input } from "antd";
 import { useSelector } from "react-redux";
 import { useTitle } from "../hooks/useTitle";
@@ -54,6 +55,10 @@ const Login = (props: PropType) => {
   );
 
   useTitle("Moodlab | Login");
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const {
     token: { colorBgContainer },
@@ -143,7 +148,7 @@ const Login = (props: PropType) => {
                 >
                   or
                 </div>
-                <div className="mt-10 w-[100%] flex flex-col gap-5 sm:w-[65%]">
+                <div className="mt-10 mb-10 w-[100%] flex flex-col gap-5 sm:w-[65%]">
                   <Button type="primary" danger icon={<GoogleOutlined />}>
                     Login with Google
                   </Button>

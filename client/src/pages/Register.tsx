@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Layout, theme, Button, Form, Input } from "antd";
 import { useSelector } from "react-redux";
 import { useTitle } from "../hooks/useTitle";
@@ -54,6 +55,10 @@ const Register = (props: PropType) => {
   );
 
   useTitle("Moodlab | Register");
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const {
     token: { colorBgContainer },
