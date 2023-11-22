@@ -12,7 +12,15 @@ import ContributorCard from "../components/ContributorCard";
 
 const { Header, Content, Footer } = Layout;
 
-const Landing = () => {
+interface PropType {
+  triggerOpen: boolean;
+  setTriggerOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  switchMode: (_checked: boolean) => void;
+}
+
+const Landing = (props: PropType) => {
+  const { triggerOpen, setTriggerOpen, switchMode } = props;
+
   const isDarkMode = useSelector<RootState, boolean>(
     (state) => state.users.isDarkMode
   );
@@ -27,6 +35,9 @@ const Landing = () => {
         Header={Header}
         isDarkMode={isDarkMode}
         colorBgContainer={colorBgContainer}
+        triggerOpen={triggerOpen}
+        setTriggerOpen={setTriggerOpen}
+        switchMode={switchMode}
       />
       <Layout className={`${isDarkMode ? "bg-zinc-900" : ""}`}>
         <Content

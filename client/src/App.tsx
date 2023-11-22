@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ConfigProvider, theme } from "antd";
 import { Routes, Route } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,6 +16,8 @@ import { useEffect } from "react";
 const { defaultAlgorithm, darkAlgorithm } = theme;
 
 const App = () => {
+  const [triggerOpen, setTriggerOpen] = useState<boolean>(false);
+
   const dispatch = useDispatch();
 
   const isDarkMode = useSelector<RootState, boolean | undefined>(
@@ -40,6 +43,11 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const switchMode = (_checked: boolean) => {
+    dispatch({ type: "users/setTheme" });
+    sessionStorage.setItem("mode", JSON.stringify(!isDarkMode));
+  };
+
   return (
     <ConfigProvider
       theme={{
@@ -47,9 +55,36 @@ const App = () => {
       }}
     >
       <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            <Landing
+              triggerOpen={triggerOpen}
+              setTriggerOpen={setTriggerOpen}
+              switchMode={switchMode}
+            />
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <Register
+              triggerOpen={triggerOpen}
+              setTriggerOpen={setTriggerOpen}
+              switchMode={switchMode}
+            />
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <Login
+              triggerOpen={triggerOpen}
+              setTriggerOpen={setTriggerOpen}
+              switchMode={switchMode}
+            />
+          }
+        />
         <Route path="/dashboard/*" element={<Dashboard />} />
       </Routes>
     </ConfigProvider>
