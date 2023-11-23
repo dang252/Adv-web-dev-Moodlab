@@ -23,10 +23,10 @@ const NotiDropdown = (props: PropType) => {
           isDarkMode
             ? "text-white bg-zinc-700"
             : "bg-white border border-solid border-gray-200"
-        } absolute top-[60px] right-[120px] sm:right-[200px] rounded-md px-4 py-2 flex flex-col justify-center`}
+        } absolute top-[60px] right-[60px] sm:right-[200px] rounded-md px-4 py-2 flex flex-col justify-center`}
       >
         <p className="text-xl font-bold mb-5">Notification</p>
-        <div className="mb-2 flex max-w-[250px] sm:max-w-[400px]">
+        <div className="mb-2 flex max-w-[320px] sm:max-w-[400px]">
           <div className="flex flex-col gap-5">
             <div
               className={`p-2 rounded-md flex items-center justify-between hover:cursor-pointer ${

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { HomeOutlined } from "@ant-design/icons";
+import { HomeOutlined, SettingOutlined } from "@ant-design/icons";
 import { SiGoogleclassroom } from "react-icons/si";
 import { Layout, MenuProps, theme, Switch } from "antd";
 import { Routes, Route } from "react-router-dom";
@@ -16,18 +16,21 @@ import MobileNav from "../components/MobileNav";
 import Home from "./Home";
 import Classes from "./Classes";
 import Profile from "./Profile";
+import Settings from "./Settings";
 
 const { Header, Content, Footer, Sider } = Layout;
 
-const navLabel = ["Home", "Classes"];
+const navLabel = ["Home", "Classes", "Settings"];
 
-const items: MenuProps["items"] = [HomeOutlined, SiGoogleclassroom].map(
-  (icon, index) => ({
-    key: String(index + 1),
-    icon: React.createElement(icon),
-    label: navLabel[index],
-  })
-);
+const items: MenuProps["items"] = [
+  HomeOutlined,
+  SiGoogleclassroom,
+  SettingOutlined,
+].map((icon, index) => ({
+  key: String(index + 1),
+  icon: React.createElement(icon),
+  label: navLabel[index],
+}));
 
 const Dashboard = () => {
   const [navValue, setNavValue] = useState<string>("1");
@@ -48,6 +51,15 @@ const Dashboard = () => {
     document.title = "Moodlab | Dashboard";
   }, []);
 
+  useEffect(() => {
+    if (window.location.href.includes("/dashboard/classes")) {
+      setNavValue("2");
+    }
+    if (window.location.href.includes("/dashboard/settings")) {
+      setNavValue("3");
+    }
+  }, []);
+
   const setNav: MenuProps["onClick"] = (e: any) => {
     if (e.domEvent.target.textContent === "Home") {
       document.title = "Moodlab | Dashboard";
@@ -58,6 +70,11 @@ const Dashboard = () => {
       document.title = "Moodlab | Classes";
       navigate("/dashboard/classes");
       setNavValue("2");
+    }
+    if (e.domEvent.target.textContent === "Settings") {
+      document.title = "Moodlab | Settings";
+      navigate("/dashboard/settings");
+      setNavValue("3");
     }
   };
 
@@ -126,6 +143,15 @@ const Dashboard = () => {
                 path="/profile"
                 element={
                   <Profile
+                    isDarkMode={isDarkMode}
+                    colorBgContainer={colorBgContainer}
+                  />
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <Settings
                     isDarkMode={isDarkMode}
                     colorBgContainer={colorBgContainer}
                   />

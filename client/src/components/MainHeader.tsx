@@ -113,7 +113,9 @@ const MainHeader = (props: propType) => {
               />
             </Badge>
             <div
-              className="border border-solid z-30 border-gray-500 rounded-md border-white w-[30px] h-[30px] flex justify-center items-center p-5 hover:border-blue-500 hover:text-blue-500 hover:cursor-pointer"
+              className={`z-30 border border-solid rounded-md border-white w-[30px] h-[30px] flex justify-center items-center p-5 hover:border-blue-500 hover:text-blue-500 hover:cursor-pointer ${
+                isDarkMode ? "border-gray-500" : "border-gray-700"
+              }`}
               onClick={() => {
                 setTriggerOpen(!triggerOpen);
               }}

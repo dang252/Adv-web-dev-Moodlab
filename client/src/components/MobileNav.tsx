@@ -1,10 +1,11 @@
 import { createElement } from "react";
 import { useEffect, useState } from "react";
-import { Menu, Drawer, MenuProps, Switch } from "antd";
+import { Menu, Drawer, MenuProps, Switch, Button } from "antd";
 import { useSelector } from "react-redux";
-import { HomeOutlined } from "@ant-design/icons";
+import { HomeOutlined, SettingOutlined } from "@ant-design/icons";
+import { AiOutlineAppstoreAdd } from "react-icons/ai";
 import { SiGoogleclassroom } from "react-icons/si";
-import { IoLogoOctocat } from "react-icons/io";
+import { IoLogoOctocat, IoMdArrowRoundForward } from "react-icons/io";
 import { IoSunny } from "react-icons/io5";
 import { FiMoon } from "react-icons/fi";
 
@@ -29,13 +30,15 @@ const MobileNav = (props: PropType) => {
     switchMode,
   } = props;
 
-  const items: MenuProps["items"] = [HomeOutlined, SiGoogleclassroom].map(
-    (icon, index) => ({
-      key: String(index + 1),
-      icon: createElement(icon),
-      label: navLabel[index],
-    })
-  );
+  const items: MenuProps["items"] = [
+    HomeOutlined,
+    SiGoogleclassroom,
+    SettingOutlined,
+  ].map((icon, index) => ({
+    key: String(index + 1),
+    icon: createElement(icon),
+    label: navLabel[index],
+  }));
 
   const isDarkMode = useSelector<RootState, boolean>(
     (state) => state.users.isDarkMode
@@ -74,6 +77,12 @@ const MobileNav = (props: PropType) => {
             defaultChecked
             onChange={switchMode}
           />
+        </div>
+        <div className="flex gap-5 mb-10">
+          <Button type="primary" icon={<AiOutlineAppstoreAdd />}>
+            Create class
+          </Button>
+          <Button icon={<IoMdArrowRoundForward />}>Join class</Button>
         </div>
         <Menu
           className={`mt-5 ${isDarkMode ? "bg-[#1f1f1f]" : "bg-white"}`}
