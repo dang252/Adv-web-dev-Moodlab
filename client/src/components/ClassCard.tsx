@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
-import { Avatar } from "antd";
+import { Avatar, Dropdown } from "antd";
+import type { MenuProps } from "antd";
 import { UserOutlined } from "@ant-design/icons";
+import { SlOptionsVertical } from "react-icons/sl";
 import { IoMdFolderOpen } from "react-icons/io";
 import { TfiStatsUp } from "react-icons/tfi";
 
@@ -14,6 +16,24 @@ interface PropType {
 
 const ClassCard = (props: PropType) => {
   const { id, theme, isDarkMode, name, teacher } = props;
+
+  const teacherItems: MenuProps["items"] = [
+    {
+      label: <p>Copy URL</p>,
+      key: "1",
+    },
+    {
+      label: <p>Setting</p>,
+      key: "2",
+    },
+  ];
+
+  //   const studentItems: MenuProps["items"] = [
+  //     {
+  //       label: <p>Quit</p>,
+  //       key: "1",
+  //     },
+  //   ];
 
   return (
     <div
@@ -42,6 +62,17 @@ const ClassCard = (props: PropType) => {
           style={{ backgroundColor: "#4a8fe8", verticalAlign: "middle" }}
           icon={<UserOutlined />}
         />
+        <Dropdown
+          className="absolute right-[15px] top-[15px]"
+          menu={{ items: teacherItems }}
+          trigger={["click"]}
+        >
+          <a onClick={(e) => e.preventDefault()}>
+            <div className="p-3 rounded-full text-white flex justify-center items-center hover:bg-gray-200 hover:text-black">
+              <SlOptionsVertical />
+            </div>
+          </a>
+        </Dropdown>
       </header>
       <footer className="border-t-[1px] border-l-0 border-r-0 border-b-0 border-solid border-gray-200 py-3 px-5 flex justify-end gap-5">
         <div className="flex justify-center items-center p-[8px] rounded-full hover:bg-gray-200 hover:text-black hover:cursor-pointer">
