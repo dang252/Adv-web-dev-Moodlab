@@ -17,6 +17,7 @@ import Home from "./Home";
 import Classes from "./Classes";
 import Profile from "./Profile";
 import Settings from "./Settings";
+import DetailClass from "./DetailClass";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -152,6 +153,15 @@ const Dashboard = () => {
                 path="/settings"
                 element={
                   <Settings
+                    isDarkMode={isDarkMode}
+                    colorBgContainer={colorBgContainer}
+                  />
+                }
+              />
+              <Route
+                path="/classes/:id"
+                element={
+                  <DetailClass
                     isDarkMode={isDarkMode}
                     colorBgContainer={colorBgContainer}
                   />

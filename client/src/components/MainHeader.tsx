@@ -22,7 +22,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 
 import NotiDropdown from "./NotiDropdown";
-import { useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 const { Header } = Layout;
 
@@ -79,14 +79,29 @@ const MainHeader = (props: propType) => {
   } = props;
 
   const [triggerNoti, setTriggerNoti] = useState<boolean>(false);
+  const headerRef = useRef<any>(null);
 
   const isDarkMode = useSelector<RootState, boolean>(
     (state) => state.users.isDarkMode
   );
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY >= 45) headerRef.current.style.zIndex = 20;
+      else headerRef.current.style.zIndex = 0;
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
     <>
       <Header
+        ref={headerRef}
         style={{
           background: !isDarkMode ? colorBgContainer : undefined,
           position: "fixed",
