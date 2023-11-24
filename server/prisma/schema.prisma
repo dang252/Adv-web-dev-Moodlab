@@ -11,11 +11,22 @@ datasource db {
 }
 
 model User {
-  id        Int    @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   firstName String
   lastName  String
   email     String
   role      String
+  Account   Account?
 
   @@map("users")
+}
+
+model Account {
+  userId   Int    @unique
+  user     User   @relation(fields: [userId], references: [id])
+  username String
+  password String
+  status   String
+
+  @@map("accounts")
 }
