@@ -55,9 +55,11 @@ const Dashboard = () => {
   useEffect(() => {
     if (window.location.href.includes("/dashboard/classes")) {
       setNavValue("2");
+      document.title = "Moodlab | Classes";
     }
     if (window.location.href.includes("/dashboard/settings")) {
       setNavValue("3");
+      document.title = "Moodlab | Settings";
     }
   }, []);
 

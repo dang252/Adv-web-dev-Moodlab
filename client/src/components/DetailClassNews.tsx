@@ -13,6 +13,8 @@ import { RootState } from "../redux/store";
 import { Post } from "../types/classroom";
 
 import PostCard from "./PostCard";
+import ClassNewEditModal from "./ClassNewEditModal";
+import { Link } from "react-router-dom";
 
 const { TextArea } = Input;
 
@@ -47,19 +49,54 @@ const DetailClassNews = (props: PropType) => {
   const [openInfor, setOpenInfor] = useState<boolean>(false);
   const [openCreateNoti, setOpenCreateNoti] = useState<boolean>(false);
 
+  const [open, setOpen] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [themeUrl, setThemeUrl] = useState<string>("1a.jpg");
+
   const isDarkMode = useSelector<RootState, boolean | undefined>(
     (state) => state.users.isDarkMode
   );
 
+  //==================== Post form
   const onFinish = (values: any) => {
     console.log(values);
     form.resetFields();
     setOpenCreateNoti(false);
   };
 
+  //==================== Edit modal
+  const showModal = () => {
+    setOpen(true);
+  };
+
+  const handleOk = () => {
+    setConfirmLoading(true);
+    console.log(themeUrl);
+    setTimeout(() => {
+      setOpen(false);
+      setConfirmLoading(false);
+    }, 2000);
+  };
+
+  const handleCancel = () => {
+    console.log("Clicked cancel button");
+    setOpen(false);
+  };
+
   return (
-    <div className="z-10 w-[100%] md:w-[80%] xl:w-[70%] mx-auto flex flex-col items-center">
+    <div className="z-10 w-[100%] mb-20 md:w-[80%] xl:w-[70%] mx-auto flex flex-col items-center">
+      <Link to="/dashboard/classes" className="mb-5 self-end">
+        <Button type="primary">Back</Button>
+      </Link>
       <div className="w-[100%] relative">
+        <ClassNewEditModal
+          open={open}
+          confirmLoading={confirmLoading}
+          handleOk={handleOk}
+          handleCancel={handleCancel}
+          themeUrl={themeUrl}
+          setThemeUrl={setThemeUrl}
+        />
         <img
           className={`w-[100%] h-[120px] md:h-[150px] xl:h-[200px] object-cover ${
             openInfor ? "rounded-t-xl" : "rounded-xl"
@@ -74,6 +111,9 @@ const DetailClassNews = (props: PropType) => {
           type="primary"
           icon={<MdOutlineModeEdit />}
           className="absolute right-[10px] top-[10px] sm:right-[30px] sm:top-[20px]"
+          onClick={() => {
+            showModal();
+          }}
         >
           Edit
         </Button>

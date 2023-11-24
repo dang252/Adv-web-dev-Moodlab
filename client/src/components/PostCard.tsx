@@ -85,9 +85,11 @@ const PostCard = (props: PropType) => {
               />
             </Form.Item>
 
-            <Button type="primary" htmlType="submit">
-              Comment
-            </Button>
+            <div className="flex justify-end">
+              <Button type="primary" htmlType="submit">
+                Comment
+              </Button>
+            </div>
           </Form>
         </div>
       </div>

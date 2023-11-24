@@ -3,6 +3,8 @@ import { Tabs } from "antd";
 import type { TabsProps } from "antd";
 
 import DetailClassNews from "../components/DetailClassNews";
+import DetailClassMembers from "../components/DetailClassMembers";
+import DetailClassResults from "../components/DetailClassResults";
 
 interface PropType {
   isDarkMode: boolean;
@@ -28,26 +30,22 @@ const DetailClass = (props: PropType) => {
       label: "News",
       children: <DetailClassNews className={className} />,
     },
+    // {
+    //   key: "2",
+    //   label: "Assignments",
+    //   children: (
+    //     <div className="w-[100%] 2xl:w-[70%] mx-auto flex flex-col items-center"></div>
+    //   ),
+    // },
     {
       key: "2",
-      label: "Assignments",
-      children: (
-        <div className="w-[100%] 2xl:w-[70%] mx-auto flex flex-col items-center"></div>
-      ),
+      label: "Members",
+      children: <DetailClassMembers />,
     },
     {
       key: "3",
-      label: "Members",
-      children: (
-        <div className="w-[100%] 2xl:w-[70%] mx-auto flex flex-col items-center"></div>
-      ),
-    },
-    {
-      key: "4",
       label: "Results",
-      children: (
-        <div className="w-[100%] 2xl:w-[70%] mx-auto flex flex-col items-center"></div>
-      ),
+      children: <DetailClassResults />,
     },
   ];
 
