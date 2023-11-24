@@ -1,16 +1,7 @@
-import {
-  Layout,
-  Switch,
-  Space,
-  Dropdown,
-  MenuProps,
-  Badge,
-  Avatar,
-} from "antd";
+import { Layout, Switch, Space, Dropdown, MenuProps, Avatar } from "antd";
 import {
   UserOutlined,
   PoweroffOutlined,
-  BellOutlined,
   MenuOutlined,
 } from "@ant-design/icons";
 import { IoSunny } from "react-icons/io5";
@@ -22,7 +13,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 
 import NotiDropdown from "./NotiDropdown";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useEffect } from "react";
 
 const { Header } = Layout;
 
@@ -78,7 +69,6 @@ const MainHeader = (props: propType) => {
     setTriggerOpen,
   } = props;
 
-  const [triggerNoti, setTriggerNoti] = useState<boolean>(false);
   const headerRef = useRef<any>(null);
 
   const isDarkMode = useSelector<RootState, boolean>(
@@ -108,25 +98,10 @@ const MainHeader = (props: propType) => {
         }}
         className="fixed w-[100%] flex items-center px-[20px] py-[30px] sm:py-[40px] sm:w-[calc(100%-200px)] sm:justify-between"
       >
-        <NotiDropdown
-          triggerNoti={triggerNoti}
-          setTriggerNoti={setTriggerNoti}
-          isDarkMode={isDarkMode}
-        />
         <div className="w-[100%] flex justify-between items-center sm:hidden sm:w-auto">
           <IoLogoOctocat className="text-3xl" />
           <div className="flex items-center gap-14">
-            <Badge
-              count={1}
-              className="hover:cursor-pointer hover:text-blue-500"
-            >
-              <BellOutlined
-                className="text-2xl"
-                onClick={() => {
-                  setTriggerNoti(!triggerNoti);
-                }}
-              />
-            </Badge>
+            <NotiDropdown />
             <div
               className={`z-30 border border-solid rounded-md border-white w-[30px] h-[30px] flex justify-center items-center p-5 hover:border-blue-500 hover:text-blue-500 hover:cursor-pointer ${
                 isDarkMode ? "border-gray-500" : "border-gray-700"
@@ -150,17 +125,7 @@ const MainHeader = (props: propType) => {
               defaultChecked
               onChange={switchMode}
             />
-            <Badge
-              count={1}
-              className="relative hover:cursor-pointer hover:text-blue-500"
-            >
-              <BellOutlined
-                className="text-2xl"
-                onClick={() => {
-                  console.log(setTriggerNoti(!triggerNoti));
-                }}
-              />
-            </Badge>
+            <NotiDropdown />
             <Dropdown
               menu={{ items: createItems }}
               className="z-30"
