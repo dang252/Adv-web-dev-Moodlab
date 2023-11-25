@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ConfigProvider, theme } from "antd";
 import { Routes, Route } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { ToastContainer } from "react-toastify";
 
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
@@ -55,6 +56,18 @@ const App = () => {
         algorithm: isDarkMode ? darkAlgorithm : defaultAlgorithm,
       }}
     >
+      <ToastContainer
+        position="bottom-left"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
       <Routes>
         <Route
           path="/"
