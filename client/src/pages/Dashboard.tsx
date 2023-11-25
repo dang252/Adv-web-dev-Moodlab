@@ -18,6 +18,7 @@ import Classes from "./Classes";
 import Profile from "./Profile";
 import Settings from "./Settings";
 import DetailClass from "./DetailClass";
+import NotFound from "./NotFound";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -168,6 +169,12 @@ const Dashboard = () => {
                     isDarkMode={isDarkMode}
                     colorBgContainer={colorBgContainer}
                   />
+                }
+              />
+              <Route
+                path="/*"
+                element={
+                  <NotFound baseUrl="/dashboard" isDarkMode={isDarkMode} />
                 }
               />
             </Routes>

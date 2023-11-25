@@ -7,6 +7,7 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import NotFound from "./pages/NotFound";
 
 import { RootState } from "./redux/store";
 
@@ -86,6 +87,10 @@ const App = () => {
           }
         />
         <Route path="/dashboard/*" element={<Dashboard />} />
+        <Route
+          path="/*"
+          element={<NotFound baseUrl="/" isDarkMode={isDarkMode} />}
+        />
       </Routes>
     </ConfigProvider>
   );
