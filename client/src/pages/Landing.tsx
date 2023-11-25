@@ -141,6 +141,7 @@ const Landing = (props: PropType) => {
                 </div>
               </div>
             </section>
+
             <section className="my-40">
               <h1 className="mb-20 text-2xl text-blue-500 text-center font-bold tracking-tight leading-none">
                 Contributors
