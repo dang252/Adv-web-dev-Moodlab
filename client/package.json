@@ -12,6 +12,11 @@
   "dependencies": {
     "@ant-design/icons": "^5.2.6",
     "@emotion/react": "^11.11.1",
+    "@fullcalendar/core": "^6.1.9",
+    "@fullcalendar/daygrid": "^6.1.9",
+    "@fullcalendar/interaction": "^6.1.9",
+    "@fullcalendar/react": "^6.1.9",
+    "@fullcalendar/timegrid": "^6.1.9",
     "@reduxjs/toolkit": "^1.9.7",
     "antd": "^5.11.2",
     "axios": "^1.6.2",

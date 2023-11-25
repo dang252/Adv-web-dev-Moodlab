@@ -10,7 +10,7 @@ import {
   art,
   sport,
   more,
-} from "../utils/utils";
+} from "../utils/theme";
 
 interface PropType {
   open: boolean;
