@@ -13,7 +13,10 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 
 import NotiDropdown from "./NotiDropdown";
-import { useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
+
+import CreateClassModal from "./CreateClassModal";
+import JoinClassModal from "./JoinClassModal";
 
 const { Header } = Layout;
 
@@ -23,27 +26,6 @@ const userItems: MenuProps["items"] = [
     danger: true,
     label: "Đăng xuất",
     icon: <PoweroffOutlined />,
-  },
-];
-
-const createItems: MenuProps["items"] = [
-  {
-    key: "create",
-    danger: false,
-    label: "Create class",
-    icon: <AiOutlineAppstoreAdd />,
-    onClick: () => {
-      console.log("Add class");
-    },
-  },
-  {
-    key: "join",
-    danger: false,
-    label: "Join class",
-    icon: <IoMdArrowRoundForward />,
-    onClick: () => {
-      console.log("Join class");
-    },
   },
 ];
 
@@ -75,6 +57,9 @@ const MainHeader = (props: propType) => {
     (state) => state.users.isDarkMode
   );
 
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+  const [isModalJoinOpen, setIsModalJoinOpen] = useState<boolean>(false);
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY >= 45) headerRef.current.style.zIndex = 20;
@@ -88,8 +73,61 @@ const MainHeader = (props: propType) => {
     };
   }, []);
 
+  //==================== Create Class modal
+  const showCreateClassModal = () => {
+    setIsCreateModalOpen(true);
+  };
+
+  const handleCreateClassCancel = () => {
+    setIsCreateModalOpen(false);
+  };
+
+  //==================== Join Class modal
+  const showJoinClassModal = () => {
+    setIsModalJoinOpen(true);
+  };
+
+  const handleJoinClassCancel = () => {
+    setIsModalJoinOpen(false);
+  };
+
+  //====================
+
+  const createItems: MenuProps["items"] = [
+    {
+      key: "create",
+      danger: false,
+      label: "Create class",
+      icon: <AiOutlineAppstoreAdd />,
+      onClick: () => {
+        // console.log("Add class");
+        showCreateClassModal();
+      },
+    },
+    {
+      key: "join",
+      danger: false,
+      label: "Join class",
+      icon: <IoMdArrowRoundForward />,
+      onClick: () => {
+        // console.log("Join class");
+        showJoinClassModal();
+      },
+    },
+  ];
+
   return (
     <>
+      <CreateClassModal
+        isModalOpen={isCreateModalOpen}
+        setIsCreateModalOpen={setIsCreateModalOpen}
+        handleCancel={handleCreateClassCancel}
+      />
+      <JoinClassModal
+        isModalOpen={isModalJoinOpen}
+        setIsModalJoinOpen={setIsModalJoinOpen}
+        handleCancel={handleJoinClassCancel}
+      />
       <Header
         ref={headerRef}
         style={{

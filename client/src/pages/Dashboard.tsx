@@ -110,6 +110,7 @@ const Dashboard = () => {
           items={items}
           onClick={setNav}
           navValue={navValue}
+          setNavValue={setNavValue}
         />
         <Layout className={`sm:ml-[230px] ${isDarkMode ? "bg-zinc-900" : ""}`}>
           <MainHeader

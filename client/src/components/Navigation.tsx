@@ -8,10 +8,11 @@ interface propType {
   items: MenuProps["items"];
   onClick: MenuProps["onClick"];
   navValue: string;
+  setNavValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const Navigation = (props: propType) => {
-  const { Sider, isDarkMode, items, onClick, navValue } = props;
+  const { Sider, isDarkMode, items, onClick, navValue, setNavValue } = props;
 
   return (
     <div className="hidden sm:block">
@@ -42,6 +43,9 @@ const Navigation = (props: propType) => {
                 ? "text-white hover:cursor-pointer flex hover:text-white"
                 : "text-black hover:cursor-pointer flex hover:text-black"
             }`}
+            onClick={() => {
+              setNavValue("1");
+            }}
           >
             <IoLogoOctocat className="text-3xl" />
             <p className="hidden text-xl font-bold ml-4 sm:block">Moodlab</p>
