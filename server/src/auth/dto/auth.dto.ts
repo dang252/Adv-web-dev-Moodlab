@@ -25,3 +25,13 @@ export class AuthDto {
   @IsString()
   role: string;
 }
+
+export class AccountDto {
+  @IsNotEmpty()
+  @IsString()
+  username: string;
+
+  @IsNotEmpty()
+  @IsString()
+  password: string;
+}
