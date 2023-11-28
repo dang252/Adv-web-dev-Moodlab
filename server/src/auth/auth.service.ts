@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto, AccountDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
@@ -105,7 +105,9 @@ export class AuthService {
         dto.password,
         account.password,
       );
-      if (!passwordMatches) throw new ForbiddenException('Access Denied');
+      if (!passwordMatches) {
+        throw new HttpException('Access Denied', HttpStatus.FORBIDDEN);
+      }
 
       const tokens = await this.getTokens(account.userId, user.role);
       await this.hashRefreshToken(user.id, tokens.refresh_token);
@@ -116,7 +118,47 @@ export class AuthService {
     }
   }
 
-  logout() {}
+  async logout(userId: string) {
+    try {
+      await this.prisma.user.update({
+        where: {
+          id: parseInt(userId),
+          refreshToken: {
+            not: '',
+          },
+        },
+        data: {
+          refreshToken: '',
+        },
+      });
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 
-  refresh() {}
+  async refresh(userId: string, refreshToken: string) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: parseInt(userId),
+        },
+      });
+
+      const refreshTokenMatches = await bcrypt.compare(
+        refreshToken,
+        user.refreshToken,
+      );
+
+      if (!refreshTokenMatches) {
+        throw new HttpException('Access Denied', HttpStatus.FORBIDDEN);
+      }
+
+      const tokens = await this.getTokens(user.id, user.role);
+      await this.hashRefreshToken(user.id, tokens.refresh_token);
+
+      return tokens;
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }

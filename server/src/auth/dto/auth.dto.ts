@@ -35,3 +35,8 @@ export class AccountDto {
   @IsString()
   password: string;
 }
+
+export class RefreshDto {
+  @IsString()
+  refresh_token: string;
+}
