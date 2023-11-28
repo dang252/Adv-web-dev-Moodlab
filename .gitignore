@@ -1,3 +1,8 @@
 /client/node_modules
 /client/.env
+<<<<<<< HEAD
 /client/dist
+=======
+
+/server/.env
+>>>>>>> bbe2a6bc61783c298aef65c54c4f7486fee047a7
