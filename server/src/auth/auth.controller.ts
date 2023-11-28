@@ -1,6 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
+import { Tokens } from './types';
 
 @Controller('auth')
 export class AuthController {
@@ -13,7 +14,7 @@ export class AuthController {
 
   @Post('/auth/register')
   register(@Body() dto: AuthDto): Promise<Tokens> {
-    this.authService.register(dto);
+    return this.authService.register(dto);
   }
 
   @Post('/auth/logout')

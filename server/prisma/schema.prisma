@@ -11,22 +11,25 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  firstName String
-  lastName  String
-  email     String
-  role      String
-  Account   Account?
+  id           Int    @id @default(autoincrement())
+  firstName    String
+  lastName     String
+  email        String
+  role         String
+  refreshToken String
+
+  Account Account?
 
   @@map("users")
 }
 
 model Account {
   userId   Int    @unique
-  user     User   @relation(fields: [userId], references: [id])
   username String
   password String
   status   String
+
+  user User @relation(fields: [userId], references: [id])
 
   @@map("accounts")
 }
