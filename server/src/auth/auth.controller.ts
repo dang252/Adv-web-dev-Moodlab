@@ -46,4 +46,10 @@ export class AuthController {
   refresh(@Param('id') id: string, @Body() dto: RefreshDto) {
     return this.authService.refresh(id, dto.refresh_token);
   }
+
+  @Get('/verify/:email/:token')
+  @HttpCode(HttpStatus.OK)
+  verify(@Param('email') email: string, @Param('token') token: string) {
+    return this.authService.verifyEmail(email, token);
+  }
 }

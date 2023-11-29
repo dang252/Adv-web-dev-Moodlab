@@ -87,12 +87,18 @@ export class AuthService {
     const tokens = await this.getTokens(newAccount.userId, newUser.role);
     await this.hashRefreshToken(newUser.id, tokens.refresh_token);
 
+    const hashedEmail = await this.hashData(newUser.email);
     await this.mailerService.sendMail({
       to: newUser.email,
       subject: 'Active your account',
       template: './activate_email',
       context: {
-        link: newUser.firstName,
+        verifyUrl:
+          process.env.APP_URL +
+          '/auth/verify/' +
+          newUser.email +
+          '/' +
+          hashedEmail,
       },
     });
 
@@ -178,6 +184,30 @@ export class AuthService {
       return tokens;
     } catch (error) {
       throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async verifyEmail(email: string, token: string) {
+    console.log('Verify Email');
+    const emailMatches = await bcrypt.compare(email, token);
+    if (emailMatches) {
+      console.log('Email matches');
+      const user = await this.prisma.user.findFirst({
+        where: {
+          email: email,
+        },
+      });
+      console.log('User found');
+
+      await this.prisma.account.update({
+        where: {
+          userId: user.id,
+        },
+        data: {
+          status: ACCOUNT_STATUS_ACTIVED,
+        },
+      });
+      console.log("Updated account's status");
     }
   }
 }
