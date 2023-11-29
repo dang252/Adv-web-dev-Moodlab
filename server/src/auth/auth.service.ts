@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { Tokens } from './types';
 import { ACCOUNT_STATUS_ACTIVED, ACCOUNT_STATUS_PENDING } from 'src/constants';
 import { MailerService } from '@nest-modules/mailer';
+import { Request, Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -187,8 +188,9 @@ export class AuthService {
     }
   }
 
-  async verifyEmail(email: string, token: string) {
-    console.log('Verify Email');
+  async verifyEmail(email: string, token: string, res: Response) {
+    console.log('[Begin] Verify Email');
+
     const emailMatches = await bcrypt.compare(email, token);
     if (emailMatches) {
       console.log('Email matches');
@@ -209,5 +211,13 @@ export class AuthService {
       });
       console.log("Updated account's status");
     }
+
+    // res.set('Location', process.env.CLIENT_HOME_PAGE);
+    // res.status(200);
+    // res.send();
+    res.redirect(process.env.CLIENT_HOME_PAGE);
+    console.log('[End] Verify Email');
   }
+
+  // async resetPassword();
 }

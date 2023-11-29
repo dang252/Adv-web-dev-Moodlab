@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -14,7 +15,7 @@ import { AuthDto, AccountDto, RefreshDto } from './dto';
 import { Tokens } from './types';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiParam } from '@nestjs/swagger';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -49,7 +50,11 @@ export class AuthController {
 
   @Get('/verify/:email/:token')
   @HttpCode(HttpStatus.OK)
-  verify(@Param('email') email: string, @Param('token') token: string) {
-    return this.authService.verifyEmail(email, token);
+  verify(
+    @Param('email') email: string,
+    @Param('token') token: string,
+    @Res() res: Response,
+  ) {
+    return this.authService.verifyEmail(email, token, res);
   }
 }
