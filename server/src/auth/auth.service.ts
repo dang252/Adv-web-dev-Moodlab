@@ -5,12 +5,14 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Tokens } from './types';
 import { ACCOUNT_STATUS_ACTIVED, ACCOUNT_STATUS_PENDING } from 'src/constants';
+import { MailerService } from '@nest-modules/mailer';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private mailerService: MailerService,
   ) {}
 
   hashData(data: string) {
@@ -84,6 +86,15 @@ export class AuthService {
 
     const tokens = await this.getTokens(newAccount.userId, newUser.role);
     await this.hashRefreshToken(newUser.id, tokens.refresh_token);
+
+    await this.mailerService.sendMail({
+      to: newUser.email,
+      subject: 'Active your account',
+      template: './activate_email',
+      context: {
+        link: newUser.firstName,
+      },
+    });
 
     return tokens;
   }
