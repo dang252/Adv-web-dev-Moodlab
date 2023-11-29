@@ -48,13 +48,30 @@ export class AuthController {
     return this.authService.refresh(id, dto.refresh_token);
   }
 
-  @Get('/verify/:email/:token')
+  @Get('/verify/:type/:email/:token')
   @HttpCode(HttpStatus.OK)
   verify(
+    @Param('type') type: string,
     @Param('email') email: string,
     @Param('token') token: string,
     @Res() res: Response,
   ) {
-    return this.authService.verifyEmail(email, token, res);
+    return this.authService.verifyEmail(type, email, token, res);
+  }
+
+  @Post('/forgot_password')
+  @HttpCode(HttpStatus.OK)
+  forgotPassword(@Body() email: string) {
+    return this.authService.forgotPassword(email);
+  }
+
+  @Post('/reset_password')
+  @HttpCode(HttpStatus.OK)
+  resetPassword(
+    @Body() email: string,
+    @Body() new_password: string,
+    @Body() token: string,
+  ) {
+    return this.authService.resetPassword(email, new_password, token);
   }
 }

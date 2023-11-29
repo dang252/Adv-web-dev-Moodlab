@@ -4,7 +4,12 @@ import { AuthDto, AccountDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Tokens } from './types';
-import { ACCOUNT_STATUS_ACTIVED, ACCOUNT_STATUS_PENDING } from 'src/constants';
+import {
+  ACCOUNT_STATUS_ACTIVED,
+  ACCOUNT_STATUS_PENDING,
+  EMAIL_VERIFICATION_ACTIVATE_ACCOUNT,
+  EMAIL_VERIFICATION_RESET_PASSWORD,
+} from 'src/constants';
 import { MailerService } from '@nest-modules/mailer';
 import { Request, Response } from 'express';
 
@@ -97,6 +102,8 @@ export class AuthService {
         verifyUrl:
           process.env.APP_URL +
           '/auth/verify/' +
+          EMAIL_VERIFICATION_ACTIVATE_ACCOUNT +
+          '/' +
           newUser.email +
           '/' +
           hashedEmail,
@@ -188,7 +195,7 @@ export class AuthService {
     }
   }
 
-  async verifyEmail(email: string, token: string, res: Response) {
+  async verifyEmail(type: string, email: string, token: string, res: Response) {
     console.log('[Begin] Verify Email');
 
     const emailMatches = await bcrypt.compare(email, token);
@@ -201,23 +208,79 @@ export class AuthService {
       });
       console.log('User found');
 
-      await this.prisma.account.update({
-        where: {
-          userId: user.id,
-        },
-        data: {
-          status: ACCOUNT_STATUS_ACTIVED,
-        },
-      });
-      console.log("Updated account's status");
+      switch (type) {
+        case EMAIL_VERIFICATION_ACTIVATE_ACCOUNT: {
+          await this.prisma.account.update({
+            where: {
+              userId: user.id,
+            },
+            data: {
+              status: ACCOUNT_STATUS_ACTIVED,
+            },
+          });
+          console.log("Updated account's status");
+
+          res.redirect(process.env.CLIENT_HOME_PAGE);
+        }
+        case EMAIL_VERIFICATION_RESET_PASSWORD: {
+          const hashedId = await this.hashData(user.id.toString());
+
+          res.redirect(
+            process.env.CLIENT_RESET_PASSWORD_PAGE +
+              '/' +
+              user.email +
+              '/' +
+              hashedId,
+          );
+        }
+        default: {
+          res.redirect(process.env.CLIENT_HOME_PAGE);
+        }
+      }
     }
 
-    // res.set('Location', process.env.CLIENT_HOME_PAGE);
-    // res.status(200);
-    // res.send();
-    res.redirect(process.env.CLIENT_HOME_PAGE);
     console.log('[End] Verify Email');
   }
 
-  // async resetPassword();
+  async forgotPassword(email: string) {
+    const hashedEmail = await this.hashData(email);
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Reset your password',
+      template: './reset_password',
+      context: {
+        verifyUrl:
+          process.env.APP_URL +
+          '/auth/verify/' +
+          EMAIL_VERIFICATION_RESET_PASSWORD +
+          '/' +
+          email +
+          '/' +
+          hashedEmail,
+      },
+    });
+  }
+
+  async resetPassword(email: string, new_password: string, token: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        email: email,
+      },
+    });
+
+    const idMatches = await bcrypt.compare(user.id, token);
+    if (!idMatches) {
+      throw new HttpException('Access Denied', HttpStatus.FORBIDDEN);
+    }
+
+    const newPassword = await this.hashData(new_password);
+    await this.prisma.account.update({
+      where: {
+        userId: user.id,
+      },
+      data: {
+        password: newPassword,
+      },
+    });
+  }
 }
