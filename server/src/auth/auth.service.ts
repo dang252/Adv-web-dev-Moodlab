@@ -4,6 +4,7 @@ import { AuthDto, AccountDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Tokens } from './types';
+import { ACCOUNT_STATUS_ACTIVED, ACCOUNT_STATUS_PENDING } from 'src/constants';
 
 @Injectable()
 export class AuthService {
@@ -77,7 +78,7 @@ export class AuthService {
         userId: newUser.id,
         username: dto.username,
         password: hashPassword,
-        status: 'ACTIVED',
+        status: ACCOUNT_STATUS_PENDING,
       },
     });
 
@@ -94,6 +95,13 @@ export class AuthService {
           username: dto.username,
         },
       });
+      if (!account) {
+        throw new HttpException("Account doesn't exist", HttpStatus.NOT_FOUND);
+      }
+
+      if (account.status != ACCOUNT_STATUS_ACTIVED) {
+        throw new HttpException('Account is inactived', HttpStatus.FORBIDDEN);
+      }
 
       const user = await this.prisma.user.findUnique({
         where: {
