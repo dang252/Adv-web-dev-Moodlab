@@ -38,6 +38,7 @@ const layout = {
     lg: { span: 12 },
   },
 };
+
 const tailLayout = {
   wrapperCol: {
     xs: { span: 24 },
@@ -127,7 +128,7 @@ const Register = (props: PropType) => {
                 label="Email"
                 name="email"
                 rules={[
-                  { required: true, message: "Please input your username!" },
+                  { required: true, message: "Please input your email!" },
                 ]}
               >
                 <Input />

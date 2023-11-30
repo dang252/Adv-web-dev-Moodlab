@@ -3,11 +3,14 @@ import { ConfigProvider, theme } from "antd";
 import { Routes, Route } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 import { RootState } from "./redux/store";
@@ -93,6 +96,26 @@ const App = () => {
           path="/login"
           element={
             <Login
+              triggerOpen={triggerOpen}
+              setTriggerOpen={setTriggerOpen}
+              switchMode={switchMode}
+            />
+          }
+        />
+        <Route
+          path="/forgot"
+          element={
+            <ForgotPassword
+              triggerOpen={triggerOpen}
+              setTriggerOpen={setTriggerOpen}
+              switchMode={switchMode}
+            />
+          }
+        />
+        <Route
+          path="/forgot/:token"
+          element={
+            <ResetPassword
               triggerOpen={triggerOpen}
               setTriggerOpen={setTriggerOpen}
               switchMode={switchMode}

@@ -1,16 +1,14 @@
 import { useEffect } from "react";
-import { Layout, theme, Button, Form, Input } from "antd";
 import { useSelector } from "react-redux";
-import { useTitle } from "../hooks/useTitle";
-
-import { GoogleOutlined } from "@ant-design/icons";
-import { FaFacebook } from "react-icons/fa";
-import { IoLogoOctocat } from "react-icons/io";
+import { toast } from "react-toastify";
 
 import { RootState } from "../redux/store";
+import { Layout, theme, Form, Input, Button } from "antd";
+import { useTitle } from "../hooks/useTitle";
+
+import { IoLogoOctocat } from "react-icons/io";
 
 import LandingHeader from "../components/LandingHeader";
-import { Link } from "react-router-dom";
 
 const { Header, Content } = Layout;
 
@@ -21,8 +19,7 @@ interface PropType {
 }
 
 type FieldType = {
-  username?: string;
-  password?: string;
+  email?: string;
 };
 
 const layout = {
@@ -49,14 +46,14 @@ const tailLayout = {
   },
 };
 
-const Login = (props: PropType) => {
+const ForgotPassword = (props: PropType) => {
   const { triggerOpen, setTriggerOpen, switchMode } = props;
 
   const isDarkMode = useSelector<RootState, boolean>(
     (state) => state.users.isDarkMode
   );
 
-  useTitle("Moodlab | Login");
+  useTitle("Moodlab | Forgot Password");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -68,6 +65,7 @@ const Login = (props: PropType) => {
 
   const onFinish = (values: any) => {
     console.log("Success:", values);
+    toast.info("Please check your email");
   };
 
   const onFinishFailed = (errorInfo: any) => {
@@ -112,55 +110,24 @@ const Login = (props: PropType) => {
               <div className="text-blue-500 flex gap-5 justify-center items-center mb-10">
                 <IoLogoOctocat className="text-3xl" />
                 <p className="text-3xl font-bold">|</p>
-                <h1 className="text-center font-bold">Login</h1>
+                <h1 className="text-center font-bold">Forgot Password</h1>
               </div>
 
               <Form.Item<FieldType>
-                label="Username"
-                name="username"
+                label="Email"
+                name="email"
                 rules={[
-                  { required: true, message: "Please input your username!" },
+                  { required: true, message: "Please input your email!" },
                 ]}
               >
                 <Input />
               </Form.Item>
 
-              <Form.Item<FieldType>
-                label="Password"
-                name="password"
-                rules={[
-                  { required: true, message: "Please input your password!" },
-                ]}
-              >
-                <Input.Password />
-              </Form.Item>
-
               <Form.Item {...tailLayout}>
-                <Link to="/forgot">
-                  <p className="mb-3 text-right text-gray-400 hover:cursor-pointer hover:underline hover:underline-offset-2">
-                    Forgot password?
-                  </p>
-                </Link>
                 <Button type="primary" htmlType="submit">
-                  Login
+                  Get Verify Email
                 </Button>
               </Form.Item>
-
-              <div className="mt-10 flex flex-col items-center">
-                <div className="relative w-[90%] mx-auto bg-gray-200 h-[1px]"></div>
-
-                <div className="mt-5 mb-10 w-[100%] flex flex-col gap-5 sm:w-[65%]">
-                  <p className="text-center text-gray-400">
-                    Or Connect with Social Media
-                  </p>
-                  <Button type="primary" danger icon={<GoogleOutlined />}>
-                    Login with Google
-                  </Button>
-                  <Button type="primary" icon={<FaFacebook />}>
-                    Login with Facebook
-                  </Button>
-                </div>
-              </div>
             </Form>
           </div>
         </Content>
@@ -169,4 +136,4 @@ const Login = (props: PropType) => {
   );
 };
 
-export default Login;
+export default ForgotPassword;

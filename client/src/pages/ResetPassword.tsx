@@ -1,16 +1,16 @@
 import { useEffect } from "react";
-import { Layout, theme, Button, Form, Input } from "antd";
 import { useSelector } from "react-redux";
-import { useTitle } from "../hooks/useTitle";
+import { toast } from "react-toastify";
 
-import { GoogleOutlined } from "@ant-design/icons";
-import { FaFacebook } from "react-icons/fa";
-import { IoLogoOctocat } from "react-icons/io";
+import { useParams } from "react-router-dom";
 
 import { RootState } from "../redux/store";
+import { Layout, theme, Form, Input, Button } from "antd";
+import { useTitle } from "../hooks/useTitle";
+
+import { IoLogoOctocat } from "react-icons/io";
 
 import LandingHeader from "../components/LandingHeader";
-import { Link } from "react-router-dom";
 
 const { Header, Content } = Layout;
 
@@ -21,8 +21,8 @@ interface PropType {
 }
 
 type FieldType = {
-  username?: string;
   password?: string;
+  confirm?: string;
 };
 
 const layout = {
@@ -49,14 +49,18 @@ const tailLayout = {
   },
 };
 
-const Login = (props: PropType) => {
+const ResetPassword = (props: PropType) => {
   const { triggerOpen, setTriggerOpen, switchMode } = props;
+
+  const params = useParams();
+
+  console.log(params);
 
   const isDarkMode = useSelector<RootState, boolean>(
     (state) => state.users.isDarkMode
   );
 
-  useTitle("Moodlab | Login");
+  useTitle("Moodlab | Reset Password");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -68,6 +72,7 @@ const Login = (props: PropType) => {
 
   const onFinish = (values: any) => {
     console.log("Success:", values);
+    toast.success("Reset password successfully");
   };
 
   const onFinishFailed = (errorInfo: any) => {
@@ -112,21 +117,11 @@ const Login = (props: PropType) => {
               <div className="text-blue-500 flex gap-5 justify-center items-center mb-10">
                 <IoLogoOctocat className="text-3xl" />
                 <p className="text-3xl font-bold">|</p>
-                <h1 className="text-center font-bold">Login</h1>
+                <h1 className="text-center font-bold">Reset Password</h1>
               </div>
 
               <Form.Item<FieldType>
-                label="Username"
-                name="username"
-                rules={[
-                  { required: true, message: "Please input your username!" },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-
-              <Form.Item<FieldType>
-                label="Password"
+                label="New Password"
                 name="password"
                 rules={[
                   { required: true, message: "Please input your password!" },
@@ -135,32 +130,38 @@ const Login = (props: PropType) => {
                 <Input.Password />
               </Form.Item>
 
-              <Form.Item {...tailLayout}>
-                <Link to="/forgot">
-                  <p className="mb-3 text-right text-gray-400 hover:cursor-pointer hover:underline hover:underline-offset-2">
-                    Forgot password?
-                  </p>
-                </Link>
-                <Button type="primary" htmlType="submit">
-                  Login
-                </Button>
+              <Form.Item
+                name="confirm"
+                label="Confirm New Password"
+                dependencies={["password"]}
+                hasFeedback
+                rules={[
+                  {
+                    required: true,
+                    message: "Please confirm your password!",
+                  },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue("password") === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error(
+                          "The new password that you entered do not match!"
+                        )
+                      );
+                    },
+                  }),
+                ]}
+              >
+                <Input.Password />
               </Form.Item>
 
-              <div className="mt-10 flex flex-col items-center">
-                <div className="relative w-[90%] mx-auto bg-gray-200 h-[1px]"></div>
-
-                <div className="mt-5 mb-10 w-[100%] flex flex-col gap-5 sm:w-[65%]">
-                  <p className="text-center text-gray-400">
-                    Or Connect with Social Media
-                  </p>
-                  <Button type="primary" danger icon={<GoogleOutlined />}>
-                    Login with Google
-                  </Button>
-                  <Button type="primary" icon={<FaFacebook />}>
-                    Login with Facebook
-                  </Button>
-                </div>
-              </div>
+              <Form.Item {...tailLayout}>
+                <Button type="primary" htmlType="submit">
+                  Reset
+                </Button>
+              </Form.Item>
             </Form>
           </div>
         </Content>
@@ -169,4 +170,4 @@ const Login = (props: PropType) => {
   );
 };
 
-export default Login;
+export default ResetPassword;

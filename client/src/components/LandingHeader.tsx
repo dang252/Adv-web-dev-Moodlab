@@ -76,8 +76,14 @@ const LandingHeader = (props: PropType) => {
           {window.location.href.includes("/register") && (
             <p className="text-xl font-bold text-center">Moodlab | Register</p>
           )}
+          {window.location.href.includes("/forgot") && (
+            <p className="text-xl font-bold text-center">
+              Moodlab | Forgot Password
+            </p>
+          )}
           {!window.location.href.includes("/login") &&
-            !window.location.href.includes("/register") && (
+            !window.location.href.includes("/register") &&
+            !window.location.href.includes("/forgot") && (
               <p className="text-xl font-bold text-center">Moodlab</p>
             )}
         </div>
