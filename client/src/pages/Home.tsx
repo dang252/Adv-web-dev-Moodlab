@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
 import DndCalendar from "../components/DndCalendar";
+import Board from "../components/Kanban/Board";
 
 interface PropType {
   isDarkMode: boolean;
@@ -16,7 +17,7 @@ const Home = (props: PropType) => {
 
   return (
     <div
-      className={`rounded-md ${isDarkMode ? "" : ""}`}
+      className={`rounded-md flex flex-col gap-[200px] ${isDarkMode ? "" : ""}`}
       style={{
         minHeight: "100vh",
         padding: 24,
@@ -25,6 +26,7 @@ const Home = (props: PropType) => {
       }}
     >
       <DndCalendar />
+      <Board />
     </div>
   );
 };
