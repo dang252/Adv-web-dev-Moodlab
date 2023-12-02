@@ -32,7 +32,7 @@ import { join } from 'path';
       },
     }),
   ],
-  controllers: [AppController, TestController],
+  controllers: [],
   providers: [AppService],
 })
 export class AppModule {}
