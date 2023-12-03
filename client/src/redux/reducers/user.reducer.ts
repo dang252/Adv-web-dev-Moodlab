@@ -15,7 +15,8 @@ interface UserState {
   currentId: string; // id for state action
   username: string;
   password: string;
-  name: string;
+  firstname: string;
+  lastname: string;
   isDarkMode: boolean;
   isLoading: boolean; // global variable
   isError: boolean; // global variable
@@ -35,6 +36,9 @@ export const registerAccount = createAsyncThunk(
           username: account.username,
           email: account.email,
           password: account.password,
+          first_name: account.firstname,
+          last_name: account.lastname,
+          role: "STUDENT"
         }
       );
 
@@ -53,7 +57,8 @@ const initialState: UserState = {
   currentId: "",
   username: "",
   password: "",
-  name: "",
+  firstname: "",
+  lastname: "",
   isDarkMode: false,
   isLoading: false,
   isError: false,

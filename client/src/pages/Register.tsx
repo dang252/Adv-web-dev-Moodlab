@@ -27,6 +27,8 @@ interface PropType {
 type FieldType = {
   username?: string;
   email?: string;
+  firstname?: string;
+  lastname?: string;
   password?: string;
   confirm?: string;
 };
@@ -78,6 +80,8 @@ const Register = (props: PropType) => {
       username: values.username,
       password: values.password,
       email: values.email,
+      firstname: values.firstname,
+      lastname: values.lastname,
     };
 
     const promise = dispathAsync(registerAccount(UserAccount));
@@ -141,7 +145,7 @@ const Register = (props: PropType) => {
                 label="Username"
                 name="username"
                 rules={[
-                  { required: true, message: "Please input your username!" },
+                  { required: true, message: "Please Enter your username!" },
                 ]}
               >
                 <Input />
@@ -151,7 +155,29 @@ const Register = (props: PropType) => {
                 label="Email"
                 name="email"
                 rules={[
-                  { required: true, type: "email", message: "Please input your email!" },
+                  { required: true, type: "email", message: "Please Enter your email!" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+
+
+              <Form.Item<FieldType>
+                label="Firstname"
+                name="firstname"
+                rules={[
+                  { required: true, message: "Please Enter your firstname!" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+
+
+              <Form.Item<FieldType>
+                label="Lastname"
+                name="lastname"
+                rules={[
+                  { required: true, message: "Please Enter your lastname!" },
                 ]}
               >
                 <Input />
@@ -161,7 +187,7 @@ const Register = (props: PropType) => {
                 label="Password"
                 name="password"
                 rules={[
-                  { required: true, message: "Please input your password!" },
+                  { required: true, message: "Please Enter your password!" },
                 ]}
               >
                 <Input.Password />
