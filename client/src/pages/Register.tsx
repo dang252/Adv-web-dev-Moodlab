@@ -8,8 +8,15 @@ import { IoLogoOctocat } from "react-icons/io";
 import { RootState } from "../redux/store";
 
 import LandingHeader from "../components/LandingHeader";
+import { toast } from "react-toastify";
 
 const { Header, Content } = Layout;
+
+import { UserAccount } from "../types/user";
+import { registerAccount } from "../redux/reducers/user.reducer";
+
+import { Store } from 'antd/lib/form/interface';
+import { useAppDispatch } from "../redux/hooks";
 
 interface PropType {
   triggerOpen: boolean;
@@ -49,6 +56,7 @@ const tailLayout = {
 };
 
 const Register = (props: PropType) => {
+  const dispathAsync = useAppDispatch();
   const { triggerOpen, setTriggerOpen, switchMode } = props;
 
   const isDarkMode = useSelector<RootState, boolean>(
@@ -65,9 +73,25 @@ const Register = (props: PropType) => {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  const onFinish = (values: any) => {
-    console.log("Success:", values);
-  };
+  const onSubmit = (values: Store) => {
+    const UserAccount: UserAccount = {
+      username: values.username,
+      password: values.password,
+      email: values.email,
+    };
+
+    const promise = dispathAsync(registerAccount(UserAccount));
+
+    promise.unwrap().then((res) => {
+      console.log("check res:", res);
+      toast.success("Register account successfully");
+    });
+
+    promise.unwrap().catch((err) => {
+      console.log("Check err:", err);
+      toast.error("Register account failed");
+    });
+  }
 
   const onFinishFailed = (errorInfo: any) => {
     console.log("Failed:", errorInfo);
@@ -98,12 +122,11 @@ const Register = (props: PropType) => {
             }}
           >
             <Form
-              className={`w-[100%] mx-auto mt-20 p-5 rounded-md sm:max-w-[600px] ${
-                isDarkMode ? "bg-zinc-800" : "bg-white"
-              }`}
+              className={`w-[100%] mx-auto mt-20 p-5 rounded-md sm:max-w-[600px] ${isDarkMode ? "bg-zinc-800" : "bg-white"
+                }`}
               name="basic"
               initialValues={{ remember: true }}
-              onFinish={onFinish}
+              onFinish={onSubmit}
               onFinishFailed={onFinishFailed}
               autoComplete="off"
               {...layout}
@@ -128,7 +151,7 @@ const Register = (props: PropType) => {
                 label="Email"
                 name="email"
                 rules={[
-                  { required: true, message: "Please input your email!" },
+                  { required: true, type: "email", message: "Please input your email!" },
                 ]}
               >
                 <Input />

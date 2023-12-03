@@ -1,4 +1,4 @@
-import { createReducer } from "@reduxjs/toolkit";
+import { createAsyncThunk, createReducer } from "@reduxjs/toolkit";
 
 import { setTheme } from "../actions/user.action";
 
@@ -7,6 +7,8 @@ import {
   FulfilledAction,
   RejectedAction,
 } from "../../types/reduxthunk.type";
+import { UserAccount } from "../../types/user";
+import axios from "axios";
 
 // Interface declair
 interface UserState {
@@ -20,6 +22,31 @@ interface UserState {
 }
 
 // createAsyncThunk middleware
+export const registerAccount = createAsyncThunk(
+  "user/register_account",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+  async (account: UserAccount, thunkAPI) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/auth/register`,
+        {
+          // signal: thunkAPI.signal,
+          username: account.username,
+          email: account.email,
+          password: account.password,
+        }
+      );
+
+      return response.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+
 
 // InitialState value
 const initialState: UserState = {
@@ -37,6 +64,18 @@ const userReducer = createReducer(initialState, (builder) => {
     .addCase(setTheme, (state) => {
       state.isDarkMode = !state.isDarkMode;
       localStorage.setItem("isDarkMode", JSON.stringify(state.isDarkMode));
+    })
+    .addCase(registerAccount.pending, (state) => {
+      state.isLoading = true;
+    })
+    .addCase(registerAccount.fulfilled, (state, action) => {
+      if (action.payload) {
+        // console.log("CHECK register from redux: ", action.payload);
+      }
+      state.isLoading = false;
+    })
+    .addCase(registerAccount.rejected, (state) => {
+      state.isLoading = false;
     })
     .addMatcher(
       (action): action is PendingAction => action.type.endsWith("/pending"),
