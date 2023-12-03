@@ -122,7 +122,7 @@ export class AuthController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard(process.env.JWT_ACCESS_TOKEN))
-  @Post('/logout/:id')
+  @Post('/logout')
   @ApiResponse({
     status: 200,
     schema: {
@@ -138,8 +138,9 @@ export class AuthController {
     status: 500,
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
-  logout(@Param('id') id: string, @Res() res: Response) {
-    return this.authService.logout(id, res);
+  logout(@Req() req: Request, @Res() res: Response) {
+    console.log(req.user['sub']);
+    return this.authService.logout(req.user['sub'], res);
   }
 
   @ApiBearerAuth()
@@ -182,14 +183,14 @@ export class AuthController {
     return this.authService.refresh(req.user['sub'], dto.refresh_token, res);
   }
 
-  @Get('/verify/:type/:email/:token')
+  @Get('/verify/:type/:id')
   verify(
     @Param('type') type: string,
-    @Param('email') email: string,
-    @Param('token') token: string,
+    @Param('id') id: string,
     @Res() res: Response,
   ) {
-    return this.authService.verifyEmail(type, email, token, res);
+    this.authService.verifyEmail(type, id, res);
+    res.redirect(process.env.CLIENT_HOME_PAGE);
   }
 
   @Post('/forgot_password')

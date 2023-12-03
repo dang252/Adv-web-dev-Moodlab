@@ -1,10 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  Res,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto, AccountDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
@@ -22,6 +16,7 @@ import {
 } from 'src/constants';
 import { MailerService } from '@nest-modules/mailer';
 import { Request, Response } from 'express';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -131,20 +126,20 @@ export class AuthService {
       });
 
       // send email for user to activate his account (hash email and verify by email)
-      const hashedEmail = await this.hashData(newUser.email);
+      const hashedId = await this.hashData(newUser.id.toString());
       await this.mailerService.sendMail({
         to: newUser.email,
         subject: 'Active your account',
         template: './activate_email',
         context: {
           verifyUrl:
-            process.env.APP_URL +
+            process.env.HOST_URL +
             '/auth/verify/' +
             EMAIL_VERIFICATION_ACTIVATE_ACCOUNT +
             '/' +
-            newUser.email +
-            '/' +
-            hashedEmail,
+            newUser.id, //+
+          // '/' +
+          // encodeURIComponent(hashedId),
         },
       });
     } catch (error) {
@@ -207,12 +202,13 @@ export class AuthService {
     }
   }
 
-  // [POST] /logout/:id
-  async logout(userId: string, res: Response) {
+  // [POST] /logout
+  async logout(userId: number, res: Response) {
     try {
+      console.log(111);
       await this.prisma.user.update({
         where: {
-          id: parseInt(userId),
+          id: userId,
           refreshToken: {
             not: '',
           },
@@ -236,7 +232,7 @@ export class AuthService {
     }
   }
 
-  // [POST] /refresh/:id
+  // [POST] /refresh
   async refresh(userId: number, refreshToken: string, res: Response) {
     try {
       const user = await this.prisma.user.findUnique({
@@ -277,17 +273,19 @@ export class AuthService {
     }
   }
 
-  // [POST] /verify/:type/:email/:token
-  async verifyEmail(type: string, email: string, token: string, res: Response) {
+  // [GET] /verify/:type/:id
+  async verifyEmail(type: string, id: string, res: Response) {
     try {
       console.log('[Begin] Verify Email');
 
-      const emailMatches = await bcrypt.compare(email, token);
-      if (emailMatches) {
-        console.log('Email matches');
+      // const hashedEmail = await this.hashData(id);
+      // const emailMatches = await bcrypt.compare(hashedEmail, token);
+      // if (emailMatches) {
+      //   console.log('Email matches');
+      if (1) {
         const user = await this.prisma.user.findFirst({
           where: {
-            email: email,
+            id: parseInt(id),
           },
         });
 
@@ -297,6 +295,19 @@ export class AuthService {
         }
 
         console.log('User found');
+
+        const account = await this.prisma.account.findFirst({
+          where: {
+            userId: parseInt(id),
+            status: ACCOUNT_STATUS_PENDING,
+          },
+        });
+
+        if (account == null) {
+          return res
+            .status(HttpStatus.UNAUTHORIZED)
+            .send(HTTP_MSG_UNAUTHORIZED);
+        }
 
         switch (type) {
           case EMAIL_VERIFICATION_ACTIVATE_ACCOUNT: {
@@ -353,7 +364,7 @@ export class AuthService {
         template: './reset_password',
         context: {
           verifyUrl:
-            process.env.APP_URL +
+            process.env.HOST_URL +
             '/auth/verify/' +
             EMAIL_VERIFICATION_RESET_PASSWORD +
             '/' +
