@@ -6,6 +6,7 @@ import {
   Post,
   Req,
   Res,
+  UseFilters,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -20,9 +21,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
+import {
+  HTTP_MSG_INTERNAL_SERVER_ERROR,
+  HTTP_MSG_SUCCESS,
+} from 'src/constants';
 
-@ApiTags('/auth')
 @Controller('auth')
+@ApiTags('/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
@@ -62,7 +67,7 @@ export class AuthController {
     status: 200,
     schema: {
       type: 'string',
-      example: 'Success',
+      example: HTTP_MSG_SUCCESS,
     },
   })
   @ApiResponse({
@@ -71,10 +76,10 @@ export class AuthController {
   })
   @ApiResponse({
     status: 500,
-    description: 'Internal server error',
+    description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
-  register(@Body() dto: AuthDto): Promise<Tokens> {
-    return this.authService.register(dto);
+  register(@Body() dto: AuthDto, @Res() res: Response) {
+    return this.authService.register(dto, res);
   }
 
   @Post('/login')
@@ -112,11 +117,15 @@ export class AuthController {
     description: 'Fobidden',
   })
   @ApiResponse({
-    status: 500,
-    description: 'Internal server error',
+    status: 404,
+    description: "Account doesn't exist",
   })
-  login(@Body() dto: AccountDto): Promise<Tokens> {
-    return this.authService.login(dto);
+  @ApiResponse({
+    status: 500,
+    description: HTTP_MSG_INTERNAL_SERVER_ERROR,
+  })
+  login(@Body() dto: AccountDto, @Res() res: Response) {
+    return this.authService.login(dto, res);
   }
 
   @ApiBearerAuth()
@@ -126,7 +135,7 @@ export class AuthController {
     status: 200,
     schema: {
       type: 'string',
-      example: 'Success',
+      example: HTTP_MSG_SUCCESS,
     },
   })
   @ApiResponse({
@@ -135,10 +144,10 @@ export class AuthController {
   })
   @ApiResponse({
     status: 500,
-    description: 'Internal server error',
+    description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
-  logout(@Param('id') id: string) {
-    return this.authService.logout(id);
+  logout(@Param('id') id: string, @Res() res: Response) {
+    return this.authService.logout(id, res);
   }
 
   @UseGuards(AuthGuard('jwt-refresh'))
@@ -163,7 +172,7 @@ export class AuthController {
   })
   @ApiResponse({
     status: 500,
-    description: 'Internal server error',
+    description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   @ApiBody({
     schema: {
@@ -176,8 +185,12 @@ export class AuthController {
       },
     },
   })
-  refresh(@Param('id') id: string, @Body() dto: RefreshDto) {
-    return this.authService.refresh(id, dto.refresh_token);
+  refresh(
+    @Param('id') id: string,
+    @Body() dto: RefreshDto,
+    @Res() res: Response,
+  ) {
+    return this.authService.refresh(id, dto.refresh_token, res);
   }
 
   @Get('/verify/:type/:email/:token')
@@ -195,7 +208,7 @@ export class AuthController {
     status: 200,
     schema: {
       type: 'string',
-      example: 'Success',
+      example: HTTP_MSG_SUCCESS,
     },
   })
   @ApiResponse({
@@ -204,7 +217,7 @@ export class AuthController {
   })
   @ApiResponse({
     status: 500,
-    description: 'Internal server error',
+    description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   @ApiBody({
     schema: {
@@ -217,8 +230,8 @@ export class AuthController {
       },
     },
   })
-  forgotPassword(@Body() email: string) {
-    return this.authService.forgotPassword(email);
+  forgotPassword(@Body() email: string, @Res() res: Response) {
+    return this.authService.forgotPassword(email, res);
   }
 
   @Post('/reset_password')
@@ -245,7 +258,7 @@ export class AuthController {
     status: 200,
     schema: {
       type: 'string',
-      example: 'Success',
+      example: HTTP_MSG_SUCCESS,
     },
   })
   @ApiResponse({
@@ -254,13 +267,14 @@ export class AuthController {
   })
   @ApiResponse({
     status: 500,
-    description: 'Internal server error',
+    description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   resetPassword(
     @Body() email: string,
     @Body() new_password: string,
     @Body() token: string,
+    @Res() res: Response,
   ) {
-    return this.authService.resetPassword(email, new_password, token);
+    return this.authService.resetPassword(email, new_password, token, res);
   }
 }
