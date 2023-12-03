@@ -50,7 +50,27 @@ export const registerAccount = createAsyncThunk(
   }
 );
 
+export const loginAccount = createAsyncThunk(
+  "user/login_account",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
+  async (account: UserAccount, thunkAPI) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/auth/login`,
+        {
+          // signal: thunkAPI.signal,
+          username: account.username,
+          password: account.password,
+        }
+      );
+      return response.data
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
 
 // InitialState value
 const initialState: UserState = {
