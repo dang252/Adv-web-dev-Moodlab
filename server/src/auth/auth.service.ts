@@ -45,8 +45,8 @@ export class AuthService {
           role,
         },
         {
-          secret: 'at-secret',
-          expiresIn: 60 * 15,
+          secret: process.env.JWT_ACCESS_TOKEN_SECRET_KEY,
+          expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRE_TIME,
         },
       ),
       this.jwtService.signAsync(
@@ -55,8 +55,8 @@ export class AuthService {
           role,
         },
         {
-          secret: 'rt-secret',
-          expiresIn: 60 * 60 * 24 * 7,
+          secret: process.env.JWT_REFRESH_TOKEN_SECRET_KEY,
+          expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRE_TIME,
         },
       ),
     ]);
@@ -237,11 +237,11 @@ export class AuthService {
   }
 
   // [POST] /refresh/:id
-  async refresh(userId: string, refreshToken: string, res: Response) {
+  async refresh(userId: number, refreshToken: string, res: Response) {
     try {
       const user = await this.prisma.user.findUnique({
         where: {
-          id: parseInt(userId),
+          id: userId,
         },
       });
 

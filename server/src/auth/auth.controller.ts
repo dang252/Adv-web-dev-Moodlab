@@ -6,20 +6,12 @@ import {
   Post,
   Req,
   Res,
-  UseFilters,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto, AccountDto, RefreshDto } from './dto';
-import { Tokens } from './types';
 import { AuthGuard } from '@nestjs/passport';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiParam,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import {
   HTTP_MSG_INTERNAL_SERVER_ERROR,
@@ -129,7 +121,7 @@ export class AuthController {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard(process.env.JWT_ACCESS_TOKEN))
   @Post('/logout/:id')
   @ApiResponse({
     status: 200,
@@ -150,8 +142,9 @@ export class AuthController {
     return this.authService.logout(id, res);
   }
 
-  @UseGuards(AuthGuard('jwt-refresh'))
-  @Post('/refresh/:id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(process.env.JWT_REFRESH_TOKEN))
+  @Post('/refresh')
   @ApiResponse({
     status: 200,
     schema: {
@@ -185,12 +178,8 @@ export class AuthController {
       },
     },
   })
-  refresh(
-    @Param('id') id: string,
-    @Body() dto: RefreshDto,
-    @Res() res: Response,
-  ) {
-    return this.authService.refresh(id, dto.refresh_token, res);
+  refresh(@Req() req: Request, @Body() dto: RefreshDto, @Res() res: Response) {
+    return this.authService.refresh(req.user['sub'], dto.refresh_token, res);
   }
 
   @Get('/verify/:type/:email/:token')

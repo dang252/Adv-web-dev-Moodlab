@@ -1,13 +1,16 @@
-import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { AllExceptionsFilter } from './utils/HttpExceptionFilter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.enableCors();
+  app.enableCors({
+    origin: process.env.CLIENT_URL,
+    methods: 'GET,PUT,POST,DELETE',
+    allowedHeaders: 'Content-Type,Authorization',
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Swagger Test')
@@ -20,9 +23,6 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.useGlobalPipes(new ValidationPipe());
-
-  // const { httpAdapter } = app.get(HttpAdapterHost);
-  // app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
 
   await app.listen(5000);
 }
