@@ -323,7 +323,7 @@ export class AuthService {
             });
             console.log("Updated account's status");
 
-            res.redirect(process.env.CLIENT_HOME_PAGE);
+            return res.redirect(process.env.CLIENT_HOME_PAGE);
           }
           case EMAIL_VERIFICATION_RESET_PASSWORD: {
             const hashedId = await this.hashData(user.id.toString());
@@ -359,6 +359,13 @@ export class AuthService {
   // [POST] /forgot_password
   async forgotPassword(email: string, res: Response) {
     try {
+      // need refactor
+      const user = await this.prisma.user.findFirst({
+        where: {
+          email: email,
+        },
+      });
+
       const hashedEmail = await this.hashData(email);
       await this.mailerService.sendMail({
         to: email,
@@ -370,9 +377,9 @@ export class AuthService {
             '/auth/verify/' +
             EMAIL_VERIFICATION_RESET_PASSWORD +
             '/' +
-            email +
-            '/' +
-            hashedEmail,
+            user.id, //+
+          // '/' +
+          // hashedEmail,
         },
       });
 
