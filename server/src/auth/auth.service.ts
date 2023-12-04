@@ -142,6 +142,8 @@ export class AuthService {
           // encodeURIComponent(hashedId),
         },
       });
+
+      return res.status(HttpStatus.OK).send(HTTP_MSG_SUCCESS);
     } catch (error) {
       // If the error has a status property, set the corresponding HTTP status code
       if (error.status) {

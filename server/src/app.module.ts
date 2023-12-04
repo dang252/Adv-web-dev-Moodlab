@@ -6,6 +6,9 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { HandlebarsAdapter, MailerModule } from '@nest-modules/mailer';
 import { join } from 'path';
+import { UserController } from './user/user.controller';
+import { UserService } from './user/user.service';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -31,8 +34,9 @@ import { join } from 'path';
         },
       },
     }),
+    UserModule,
   ],
-  controllers: [],
-  providers: [AppService],
+  controllers: [UserController],
+  providers: [AppService, UserService],
 })
 export class AppModule {}

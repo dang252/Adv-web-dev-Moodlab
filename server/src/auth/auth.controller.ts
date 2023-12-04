@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthDto, AccountDto, RefreshDto } from './dto';
+import { AuthDto, AccountDto, RefreshDto, EmailDto } from './dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
@@ -120,7 +120,7 @@ export class AuthController {
     return this.authService.login(dto, res);
   }
 
-  @ApiBearerAuth()
+  // @ApiBearerAuth()
   @UseGuards(AuthGuard(process.env.JWT_ACCESS_TOKEN))
   @Post('/logout')
   @ApiResponse({
@@ -139,7 +139,6 @@ export class AuthController {
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   logout(@Req() req: Request, @Res() res: Response) {
-    console.log(req.user['sub']);
     return this.authService.logout(req.user['sub'], res);
   }
 
@@ -220,8 +219,8 @@ export class AuthController {
       },
     },
   })
-  forgotPassword(@Body() email: string, @Res() res: Response) {
-    return this.authService.forgotPassword(email, res);
+  forgotPassword(@Body() dto: EmailDto, @Res() res: Response) {
+    return this.authService.forgotPassword(dto.email, res);
   }
 
   @Post('/reset_password')

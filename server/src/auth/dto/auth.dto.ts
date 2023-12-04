@@ -40,3 +40,8 @@ export class RefreshDto {
   @IsString()
   refresh_token: string;
 }
+
+export class EmailDto {
+  @IsString()
+  email: string;
+}
