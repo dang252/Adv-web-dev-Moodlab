@@ -65,11 +65,9 @@ const ForgotPassword = (props: PropType) => {
   } = theme.useToken();
 
   const onFinish = async (values: any) => {
-    console.log("Success:", values);
-    toast.info("Please check your email");
     try {
       await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/login`,
+        `${import.meta.env.VITE_API_URL}/auth/forgot_password`,
         {
           email: values.email,
         }
