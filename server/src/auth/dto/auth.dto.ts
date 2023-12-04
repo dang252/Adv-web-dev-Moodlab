@@ -45,3 +45,11 @@ export class EmailDto {
   @IsString()
   email: string;
 }
+
+export class ResetPasswordDto {
+  @IsString()
+  id: string;
+
+  @IsString()
+  new_password: string;
+}

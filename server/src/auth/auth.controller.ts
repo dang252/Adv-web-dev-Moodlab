@@ -9,7 +9,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthDto, AccountDto, RefreshDto, EmailDto } from './dto';
+import {
+  AuthDto,
+  AccountDto,
+  RefreshDto,
+  EmailDto,
+  ResetPasswordDto,
+} from './dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
@@ -259,13 +265,8 @@ export class AuthController {
     status: 500,
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
-  resetPassword(
-    @Body() userId: string,
-    @Body() new_password: string,
-    // @Body() token: string,
-    @Res() res: Response,
-  ) {
+  resetPassword(@Body() dto: ResetPasswordDto, @Res() res: Response) {
     // return this.authService.resetPassword(userId, new_password, token, res);
-    return this.authService.resetPassword(userId, new_password, res);
+    return this.authService.resetPassword(dto.id, dto.new_password, res);
   }
 }
