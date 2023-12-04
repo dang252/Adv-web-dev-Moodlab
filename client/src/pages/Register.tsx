@@ -88,7 +88,7 @@ const Register = (props: PropType) => {
 
     promise.unwrap().then((res) => {
       console.log("check res:", res);
-      toast.success("Register account successfully");
+      toast.success("Register account successfully, please check your email to active your account");
     });
 
     promise.unwrap().catch((err) => {

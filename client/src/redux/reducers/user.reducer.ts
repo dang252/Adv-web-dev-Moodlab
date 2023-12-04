@@ -7,7 +7,8 @@ import {
   FulfilledAction,
   RejectedAction,
 } from "../../types/reduxthunk.type";
-import { UserAccount } from "../../types/user";
+import { JwtPayload, UserAccount } from "../../types/user";
+import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 
 // Interface declair
@@ -72,6 +73,28 @@ export const loginAccount = createAsyncThunk(
   }
 );
 
+export const forgotpassword = createAsyncThunk(
+  "user/login_account",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+  async (account: UserAccount, thunkAPI) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/auth/login`,
+        {
+          // signal: thunkAPI.signal,
+          username: account.username,
+          password: account.password,
+        }
+      );
+      return response.data
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
 // InitialState value
 const initialState: UserState = {
   currentId: "",
@@ -100,6 +123,28 @@ const userReducer = createReducer(initialState, (builder) => {
       state.isLoading = false;
     })
     .addCase(registerAccount.rejected, (state) => {
+      state.isLoading = false;
+    })
+     .addCase(loginAccount.pending, (state) => {
+      state.isLoading = true;
+    })
+    .addCase(loginAccount.fulfilled, (state, action) => {
+      if (action.payload) {
+        // console.log("CHECK login from redux: ", action.payload);
+        const accessToken: string = action.payload.access_token;
+        const refreshToken: string = action.payload.refresh_token;
+        console.log(accessToken, refreshToken)
+
+        const decodedToken = jwtDecode(accessToken) as JwtPayload
+        state.currentId = decodedToken.user_id;
+
+        sessionStorage.setItem("accessToken", JSON.stringify(accessToken));
+        sessionStorage.setItem("refreshToken", JSON.stringify(refreshToken));
+
+      }
+      state.isLoading = false;
+    })
+    .addCase(loginAccount.rejected, (state) => {
       state.isLoading = false;
     })
     .addMatcher(

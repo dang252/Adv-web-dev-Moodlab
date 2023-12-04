@@ -9,6 +9,7 @@ import { useTitle } from "../hooks/useTitle";
 import { IoLogoOctocat } from "react-icons/io";
 
 import LandingHeader from "../components/LandingHeader";
+import axios from "axios";
 
 const { Header, Content } = Layout;
 
@@ -63,9 +64,21 @@ const ForgotPassword = (props: PropType) => {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  const onFinish = (values: any) => {
+  const onFinish = async (values: any) => {
     console.log("Success:", values);
     toast.info("Please check your email");
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/auth/login`,
+        {
+          email: values.email,
+        }
+      );
+      toast.success("We have emailed you password reset link! Please check your email");
+    }
+    catch (err:any) {
+      toast.error("Can't send password reset link! please try again later!");
+    }
   };
 
   const onFinishFailed = (errorInfo: any) => {
@@ -117,7 +130,7 @@ const ForgotPassword = (props: PropType) => {
                 label="Email"
                 name="email"
                 rules={[
-                  { required: true, message: "Please input your email!" },
+                  { required: true, type: "email", message: "Please input your email!" },
                 ]}
               >
                 <Input />
