@@ -400,7 +400,7 @@ export class AuthService {
 
   // [POST] /reset_password
   async resetPassword(
-    userId: number,
+    userId: string,
     new_password: string,
     // token: string,
     res: Response,
@@ -408,7 +408,7 @@ export class AuthService {
     try {
       const user = await this.prisma.user.findUnique({
         where: {
-          id: userId,
+          id: parseInt(userId),
         },
       });
 

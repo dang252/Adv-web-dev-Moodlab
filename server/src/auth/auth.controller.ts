@@ -120,8 +120,8 @@ export class AuthController {
     return this.authService.login(dto, res);
   }
 
-  // @ApiBearerAuth()
-  @UseGuards(AuthGuard(process.env.JWT_ACCESS_TOKEN))
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @Post('/logout')
   @ApiResponse({
     status: 200,
@@ -139,6 +139,7 @@ export class AuthController {
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   logout(@Req() req: Request, @Res() res: Response) {
+    console.log(req.user['sub']);
     return this.authService.logout(req.user['sub'], res);
   }
 
@@ -179,6 +180,7 @@ export class AuthController {
     },
   })
   refresh(@Req() req: Request, @Body() dto: RefreshDto, @Res() res: Response) {
+    console.log(req);
     return this.authService.refresh(req.user['sub'], dto.refresh_token, res);
   }
 
@@ -258,7 +260,7 @@ export class AuthController {
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   resetPassword(
-    @Body() userId: number,
+    @Body() userId: string,
     @Body() new_password: string,
     // @Body() token: string,
     @Res() res: Response,
