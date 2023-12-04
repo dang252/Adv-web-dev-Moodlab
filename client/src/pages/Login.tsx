@@ -10,7 +10,7 @@ import { IoLogoOctocat } from "react-icons/io";
 import { RootState } from "../redux/store";
 
 import LandingHeader from "../components/LandingHeader";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { loginAccount } from "../redux/reducers/user.reducer";
 import { useAppDispatch } from "../redux/hooks";
 import { UserAccount } from "../types/user";
@@ -56,6 +56,7 @@ const tailLayout = {
 
 const Login = (props: PropType) => {
   const dispathAsync = useAppDispatch();
+  const navigate = useNavigate();
   const { triggerOpen, setTriggerOpen, switchMode } = props;
 
   const isDarkMode = useSelector<RootState, boolean>(
@@ -83,6 +84,7 @@ const Login = (props: PropType) => {
     promise.unwrap().then((res) => {
       console.log("check res:", res);
       toast.success("Login successfully");
+      navigate("/dashboard")
     });
 
     promise.unwrap().catch((err) => {

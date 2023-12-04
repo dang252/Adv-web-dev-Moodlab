@@ -58,6 +58,7 @@ const tailLayout = {
 };
 
 const Register = (props: PropType) => {
+  const [form] = Form.useForm();
   const dispathAsync = useAppDispatch();
   const { triggerOpen, setTriggerOpen, switchMode } = props;
 
@@ -89,11 +90,12 @@ const Register = (props: PropType) => {
     promise.unwrap().then((res) => {
       console.log("check res:", res);
       toast.success("Register account successfully, please check your email to active your account");
+      form.resetFields()
     });
 
     promise.unwrap().catch((err) => {
       console.log("Check err:", err);
-      toast.error("Register account failed");
+      toast.error("Register account failed! Please try again later!");
     });
   }
 
