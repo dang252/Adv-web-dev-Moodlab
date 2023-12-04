@@ -258,11 +258,12 @@ export class AuthController {
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   resetPassword(
-    @Body() email: string,
+    @Body() userId: number,
     @Body() new_password: string,
-    @Body() token: string,
+    // @Body() token: string,
     @Res() res: Response,
   ) {
-    return this.authService.resetPassword(email, new_password, token, res);
+    // return this.authService.resetPassword(userId, new_password, token, res);
+    return this.authService.resetPassword(userId, new_password, res);
   }
 }

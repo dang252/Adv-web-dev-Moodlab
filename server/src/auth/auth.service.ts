@@ -332,7 +332,7 @@ export class AuthService {
             const hashedId = await this.hashData(user.id.toString());
 
             return res.redirect(
-              process.env.CLIENT_RESET_PASSWORD_PAGE, //+ '/' + user.id.toString(), // +
+              process.env.CLIENT_RESET_PASSWORD_PAGE + '/' + user.id.toString(), // +
               // '/' +
               // hashedId,
             );
@@ -400,15 +400,15 @@ export class AuthService {
 
   // [POST] /reset_password
   async resetPassword(
-    email: string,
+    userId: number,
     new_password: string,
-    token: string,
+    // token: string,
     res: Response,
   ) {
     try {
-      const user = await this.prisma.user.findFirst({
+      const user = await this.prisma.user.findUnique({
         where: {
-          email: email,
+          id: userId,
         },
       });
 
@@ -416,10 +416,10 @@ export class AuthService {
         return res.status(HttpStatus.NOT_FOUND).send(HTTP_MSG_NOTFOUND);
       }
 
-      const idMatches = await bcrypt.compare(user.id, token);
-      if (!idMatches) {
-        return res.status(HttpStatus.UNAUTHORIZED).send(HTTP_MSG_UNAUTHORIZED);
-      }
+      // const idMatches = await bcrypt.compare(user.id, token);
+      // if (!idMatches) {
+      //   return res.status(HttpStatus.UNAUTHORIZED).send(HTTP_MSG_UNAUTHORIZED);
+      // }
 
       const newPassword = await this.hashData(new_password);
       await this.prisma.account.update({
