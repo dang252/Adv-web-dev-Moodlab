@@ -17,17 +17,9 @@ import { useState, useRef, useEffect } from "react";
 
 import CreateClassModal from "./CreateClassModal";
 import JoinClassModal from "./JoinClassModal";
-
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify"
 const { Header } = Layout;
-
-const userItems: MenuProps["items"] = [
-  {
-    key: "logout",
-    danger: true,
-    label: "Đăng xuất",
-    icon: <PoweroffOutlined />,
-  },
-];
 
 interface propType {
   Header: typeof Header;
@@ -41,6 +33,7 @@ interface propType {
 }
 
 const MainHeader = (props: propType) => {
+  const navigate = useNavigate();
   const {
     Header,
     colorBgContainer,
@@ -116,6 +109,20 @@ const MainHeader = (props: propType) => {
     },
   ];
 
+  
+  const userItems: MenuProps["items"] = [
+    {
+      key: "logout",
+      danger: true,
+      label: "Đăng xuất",
+      icon: <PoweroffOutlined />,
+      onClick: () => {
+        navigate("/")
+        toast.success("Logout successfully")
+      }
+    },
+  ];
+  
   return (
     <>
       <CreateClassModal

@@ -74,15 +74,16 @@ const ResetPassword = (props: PropType) => {
   const onFinish = async (values: any) => {
     try {
       await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/forgot_password`,
+        `${import.meta.env.VITE_API_URL}/auth/reset_password`,
         {
-          email: values.email,
+          id: params.token,
+          new_password: values.password
         }
       );
-      toast.success("We have emailed you password reset link! Please check your email");
+      toast.success("Reset password successfully! Redirect to Login!");
     }
     catch (err:any) {
-      toast.error("Can't send password reset link! please try again later!");
+      toast.error("Can't reset password! please try again later!");
     }
   };
 
