@@ -8,8 +8,15 @@ import { IoLogoOctocat } from "react-icons/io";
 import { RootState } from "../redux/store";
 
 import LandingHeader from "../components/LandingHeader";
+import { toast } from "react-toastify";
 
 const { Header, Content } = Layout;
+
+import { UserAccount } from "../types/user";
+import { registerAccount } from "../redux/reducers/user.reducer";
+
+import { Store } from 'antd/lib/form/interface';
+import { useAppDispatch } from "../redux/hooks";
 
 interface PropType {
   triggerOpen: boolean;
@@ -20,6 +27,8 @@ interface PropType {
 type FieldType = {
   username?: string;
   email?: string;
+  firstname?: string;
+  lastname?: string;
   password?: string;
   confirm?: string;
 };
@@ -49,6 +58,8 @@ const tailLayout = {
 };
 
 const Register = (props: PropType) => {
+  const [form] = Form.useForm();
+  const dispathAsync = useAppDispatch();
   const { triggerOpen, setTriggerOpen, switchMode } = props;
 
   const isDarkMode = useSelector<RootState, boolean>(
@@ -65,9 +76,28 @@ const Register = (props: PropType) => {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  const onFinish = (values: any) => {
-    console.log("Success:", values);
-  };
+  const onSubmit = (values: Store) => {
+    const UserAccount: UserAccount = {
+      username: values.username,
+      password: values.password,
+      email: values.email,
+      firstname: values.firstname,
+      lastname: values.lastname,
+    };
+
+    const promise = dispathAsync(registerAccount(UserAccount));
+
+    promise.unwrap().then((res) => {
+      console.log("check res:", res);
+      toast.success("Register account successfully, please check your email to active your account");
+      form.resetFields()
+    });
+
+    promise.unwrap().catch((err) => {
+      console.log("Check err:", err);
+      toast.error("Register account failed! Please try again later!");
+    });
+  }
 
   const onFinishFailed = (errorInfo: any) => {
     console.log("Failed:", errorInfo);
@@ -98,12 +128,11 @@ const Register = (props: PropType) => {
             }}
           >
             <Form
-              className={`w-[100%] mx-auto mt-20 p-5 rounded-md sm:max-w-[600px] ${
-                isDarkMode ? "bg-zinc-800" : "bg-white"
-              }`}
+              className={`w-[100%] mx-auto mt-20 p-5 rounded-md sm:max-w-[600px] ${isDarkMode ? "bg-zinc-800" : "bg-white"
+                }`}
               name="basic"
               initialValues={{ remember: true }}
-              onFinish={onFinish}
+              onFinish={onSubmit}
               onFinishFailed={onFinishFailed}
               autoComplete="off"
               {...layout}
@@ -118,7 +147,7 @@ const Register = (props: PropType) => {
                 label="Username"
                 name="username"
                 rules={[
-                  { required: true, message: "Please input your username!" },
+                  { required: true, message: "Please Enter your username!" },
                 ]}
               >
                 <Input />
@@ -128,7 +157,29 @@ const Register = (props: PropType) => {
                 label="Email"
                 name="email"
                 rules={[
-                  { required: true, message: "Please input your email!" },
+                  { required: true, type: "email", message: "Please Enter your email!" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+
+
+              <Form.Item<FieldType>
+                label="Firstname"
+                name="firstname"
+                rules={[
+                  { required: true, message: "Please Enter your firstname!" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+
+
+              <Form.Item<FieldType>
+                label="Lastname"
+                name="lastname"
+                rules={[
+                  { required: true, message: "Please Enter your lastname!" },
                 ]}
               >
                 <Input />
@@ -138,7 +189,7 @@ const Register = (props: PropType) => {
                 label="Password"
                 name="password"
                 rules={[
-                  { required: true, message: "Please input your password!" },
+                  { required: true, message: "Please Enter your password!" },
                 ]}
               >
                 <Input.Password />
