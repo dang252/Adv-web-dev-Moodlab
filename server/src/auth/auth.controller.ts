@@ -189,7 +189,6 @@ export class AuthController {
     @Res() res: Response,
   ) {
     this.authService.verifyEmail(type, id, res);
-    res.redirect(process.env.CLIENT_HOME_PAGE);
   }
 
   @Post('/forgot_password')

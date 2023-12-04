@@ -301,18 +301,19 @@ export class AuthService {
         const account = await this.prisma.account.findFirst({
           where: {
             userId: parseInt(id),
-            status: ACCOUNT_STATUS_PENDING,
           },
         });
 
-        if (account == null) {
-          return res
-            .status(HttpStatus.UNAUTHORIZED)
-            .send(HTTP_MSG_UNAUTHORIZED);
-        }
-
         switch (type) {
           case EMAIL_VERIFICATION_ACTIVATE_ACCOUNT: {
+            console.log('Activate Account');
+
+            if (account.status == ACCOUNT_STATUS_PENDING) {
+              return res
+                .status(HttpStatus.UNAUTHORIZED)
+                .send(HTTP_MSG_UNAUTHORIZED);
+            }
+
             await this.prisma.account.update({
               where: {
                 userId: user.id,
@@ -326,18 +327,18 @@ export class AuthService {
             return res.redirect(process.env.CLIENT_HOME_PAGE);
           }
           case EMAIL_VERIFICATION_RESET_PASSWORD: {
+            console.log('Reset Password');
+
             const hashedId = await this.hashData(user.id.toString());
 
-            res.redirect(
-              process.env.CLIENT_RESET_PASSWORD_PAGE +
-                '/' +
-                user.email +
-                '/' +
-                hashedId,
+            return res.redirect(
+              process.env.CLIENT_RESET_PASSWORD_PAGE, //+ '/' + user.id.toString(), // +
+              // '/' +
+              // hashedId,
             );
           }
           default: {
-            res.redirect(process.env.CLIENT_HOME_PAGE);
+            return res.redirect(process.env.CLIENT_HOME_PAGE);
           }
         }
       }
