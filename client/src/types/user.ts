@@ -13,5 +13,5 @@ export interface UserAccount {
 export interface JwtPayload {
     exp: number;
     iat: number;
-    user_id: string;
+    sub: string;
 }

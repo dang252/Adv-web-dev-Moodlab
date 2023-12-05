@@ -136,7 +136,7 @@ const userReducer = createReducer(initialState, (builder) => {
         console.log(accessToken, refreshToken)
 
         const decodedToken = jwtDecode(accessToken) as JwtPayload
-        state.currentId = decodedToken.user_id;
+        state.currentId = decodedToken.sub;
 
         sessionStorage.setItem("accessToken", JSON.stringify(accessToken));
         sessionStorage.setItem("refreshToken", JSON.stringify(refreshToken));

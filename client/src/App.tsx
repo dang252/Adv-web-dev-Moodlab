@@ -13,6 +13,8 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+
 import { RootState } from "./redux/store";
 
 import "./App.css";
@@ -122,7 +124,7 @@ const App = () => {
             />
           }
         />
-        <Route path="/dashboard/*" element={<Dashboard />} />
+        <Route path="/dashboard/*" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route
           path="/*"
           element={<NotFound baseUrl="/" isDarkMode={isDarkMode} />}
