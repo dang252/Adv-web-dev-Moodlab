@@ -62,6 +62,10 @@ const Login = (props: PropType) => {
   const isDarkMode = useSelector<RootState, boolean>(
     (state) => state.users.isDarkMode
   );
+  
+  const isLoading = useSelector<RootState, boolean>(
+    (state) => state.users.isLoading
+  );
 
   useTitle("Moodlab | Login");
 
@@ -164,7 +168,7 @@ const Login = (props: PropType) => {
                     Forgot password?
                   </p>
                 </Link>
-                <Button type="primary" htmlType="submit">
+                <Button type="primary" htmlType="submit" loading={isLoading}>
                   Login
                 </Button>
               </Form.Item>
