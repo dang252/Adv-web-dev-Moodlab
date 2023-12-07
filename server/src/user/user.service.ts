@@ -21,7 +21,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  // [GET] /profile
+  // [GET] /
   async profile(userId: number, res: Response) {
     try {
       const user = await this.prisma.user.findUnique({
@@ -34,7 +34,8 @@ export class UserService {
         return res.status(HttpStatus.NOT_FOUND).send(HTTP_MSG_NOTFOUND);
       }
 
-      return res.status(HttpStatus.OK).send(user);
+      const { refreshToken, ...userInfo } = user;
+      return res.status(HttpStatus.OK).send(userInfo);
     } catch (error) {
       // If the error has a status property, set the corresponding HTTP status code
       if (error.status) {

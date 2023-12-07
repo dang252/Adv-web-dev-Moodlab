@@ -7,6 +7,7 @@ import {
   HTTP_MSG_INTERNAL_SERVER_ERROR,
 } from 'src/constants';
 import { Request, Response } from 'express';
+import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
 
 @Controller('user')
 @ApiTags('/user')
@@ -14,8 +15,8 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard(process.env.JWT_ACCESS_TOKEN))
-  @Get('/profile')
+  @UseGuards(AccessTokenGuard)
+  @Get()
   @ApiResponse({
     status: 200,
     schema: {
@@ -32,7 +33,6 @@ export class UserController {
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   profile(@Req() req: Request, @Res() res: Response) {
-    console.log(req.user['sub']);
     return this.userService.profile(req.user['sub'], res);
   }
 }
