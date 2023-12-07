@@ -16,7 +16,6 @@ import {
 } from 'src/constants';
 import { MailerService } from '@nest-modules/mailer';
 import { Request, Response } from 'express';
-import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -207,7 +206,6 @@ export class AuthService {
   // [POST] /logout
   async logout(userId: number, res: Response) {
     try {
-      console.log(111);
       await this.prisma.user.update({
         where: {
           id: userId,

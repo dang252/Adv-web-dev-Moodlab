@@ -1,35 +1,30 @@
 import {
-  Body,
   Controller,
-  Get,
-  Param,
   Post,
-  Req,
+  Body,
   Res,
   UseGuards,
+  Req,
+  Get,
+  Param,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { ApiTags, ApiBody, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
+import { RefreshTokenGuard } from 'src/common/guards/refreshToken.guard';
 import {
-  AuthDto,
-  AccountDto,
-  RefreshDto,
-  EmailDto,
-  ResetPasswordDto,
-} from './dto';
-import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Request, Response } from 'express';
-import {
-  HTTP_MSG_INTERNAL_SERVER_ERROR,
   HTTP_MSG_SUCCESS,
+  HTTP_MSG_INTERNAL_SERVER_ERROR,
 } from 'src/constants';
+import { AuthService } from './auth.service';
+import { AuthDto, AccountDto, EmailDto, ResetPasswordDto } from './dto';
+import { Request, Response } from 'express';
 
 @Controller('auth')
-@ApiTags('/auth')
+@ApiTags('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('/register')
+  @Post('register')
   @ApiBody({
     schema: {
       type: 'object',
@@ -80,7 +75,7 @@ export class AuthController {
     return this.authService.register(dto, res);
   }
 
-  @Post('/login')
+  @Post('login')
   @ApiBody({
     schema: {
       type: 'object',
@@ -127,8 +122,8 @@ export class AuthController {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  @Post('/logout')
+  @UseGuards(AccessTokenGuard)
+  @Post('logout')
   @ApiResponse({
     status: 200,
     schema: {
@@ -145,13 +140,12 @@ export class AuthController {
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   logout(@Req() req: Request, @Res() res: Response) {
-    console.log(req.user['sub']);
-    return this.authService.logout(req.user['sub'], res);
+    this.authService.logout(req.user['sub'], res);
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard(process.env.JWT_REFRESH_TOKEN))
-  @Post('/refresh')
+  @UseGuards(RefreshTokenGuard)
+  @Post('refresh')
   @ApiResponse({
     status: 200,
     schema: {
@@ -185,12 +179,15 @@ export class AuthController {
       },
     },
   })
-  refresh(@Req() req: Request, @Body() dto: RefreshDto, @Res() res: Response) {
-    console.log(req);
-    return this.authService.refresh(req.user['sub'], dto.refresh_token, res);
+  refresh(@Req() req: Request, @Res() res: Response) {
+    return this.authService.refresh(
+      req.user['sub'],
+      req.user['refreshToken'],
+      res,
+    );
   }
 
-  @Get('/verify/:type/:id')
+  @Get('verify/:type/:id')
   verify(
     @Param('type') type: string,
     @Param('id') id: string,
@@ -199,7 +196,7 @@ export class AuthController {
     this.authService.verifyEmail(type, id, res);
   }
 
-  @Post('/forgot_password')
+  @Post('forgot_password')
   @ApiResponse({
     status: 200,
     schema: {
@@ -230,7 +227,7 @@ export class AuthController {
     return this.authService.forgotPassword(dto.email, res);
   }
 
-  @Post('/reset_password')
+  @Post('reset_password')
   @ApiBody({
     schema: {
       type: 'object',
