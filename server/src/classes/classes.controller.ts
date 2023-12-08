@@ -17,7 +17,7 @@ import {
 } from 'src/constants';
 import { ClassesService } from './classes.service';
 import { Request, Response } from 'express';
-import { ClassDto } from './dto';
+import { ClassDto, InviteEmailDto } from './dto';
 
 @Controller('classes')
 @ApiTags('/classes')
@@ -133,5 +133,58 @@ export class ClassesController {
   })
   classMembers(@Param('id') id: string, @Res() res: Response) {
     return this.classesService.classMembers(id, res);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
+  @Get('/:id/:code')
+  @ApiResponse({
+    status: 200,
+    schema: {
+      type: 'string',
+      example: HTTP_MSG_SUCCESS,
+    },
+  })
+  @ApiResponse({
+    status: 403,
+    description: HTTP_MSG_FORBIDDEN,
+  })
+  @ApiResponse({
+    status: 500,
+    description: HTTP_MSG_INTERNAL_SERVER_ERROR,
+  })
+  joinClass(
+    @Param('id') id: string,
+    @Param('code') code: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    return this.classesService.joinClass(req.user['sub'], id, code, res);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
+  @Post('/invite')
+  @ApiResponse({
+    status: 200,
+    schema: {
+      type: 'string',
+      example: HTTP_MSG_SUCCESS,
+    },
+  })
+  @ApiResponse({
+    status: 403,
+    description: HTTP_MSG_FORBIDDEN,
+  })
+  @ApiResponse({
+    status: 500,
+    description: HTTP_MSG_INTERNAL_SERVER_ERROR,
+  })
+  inviteByEmail(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Body() dto: InviteEmailDto,
+  ) {
+    return this.classesService.inviteByEmail(req.user['sub'], dto.email, res);
   }
 }

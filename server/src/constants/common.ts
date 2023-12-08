@@ -15,4 +15,6 @@ export const HTTP_MSG_FORBIDDEN = 'Forbidden';
 export const HTTP_MSG_NOTFOUND = 'Not Found';
 export const HTTP_MSG_INTERNAL_SERVER_ERROR = 'Internal Server Error';
 
-// Call API
+// Class's statuses
+export const CLASS_STATUS_ACTIVED = 'ACTIVED';
+export const CLASS_STATUS_CLOSED = 'CLOSED';

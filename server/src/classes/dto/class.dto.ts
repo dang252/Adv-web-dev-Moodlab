@@ -13,3 +13,9 @@ export class ClassDto {
   @IsString()
   subject: string;
 }
+
+export class InviteEmailDto {
+  @IsNotEmpty()
+  @IsString()
+  email: string;
+}
