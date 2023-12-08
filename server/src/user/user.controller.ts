@@ -5,6 +5,7 @@ import { AuthGuard } from '@nestjs/passport';
 import {
   HTTP_MSG_SUCCESS,
   HTTP_MSG_INTERNAL_SERVER_ERROR,
+  HTTP_MSG_FORBIDDEN,
 } from 'src/constants';
 import { Request, Response } from 'express';
 import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
@@ -26,7 +27,7 @@ export class UserController {
   })
   @ApiResponse({
     status: 403,
-    description: 'Fobidden',
+    description: HTTP_MSG_FORBIDDEN,
   })
   @ApiResponse({
     status: 500,

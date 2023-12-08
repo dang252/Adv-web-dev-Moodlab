@@ -18,7 +18,9 @@ model User {
   role         String
   refreshToken String
 
-  Account Account?
+  account Account?
+  classes Class[]
+  grades  Grade[]
 
   @@map("users")
 }
@@ -32,4 +34,32 @@ model Account {
   user User @relation(fields: [userId], references: [id])
 
   @@map("accounts")
+}
+
+model Class {
+  id         Int    @id @default(autoincrement())
+  code       String
+  name       String
+  subject    String
+  teacherId  Int
+  inviteCode String
+  status     String
+
+  teacher  User    @relation(fields: [teacherId], references: [id])
+  students Grade[]
+
+  @@map("classes")
+}
+
+model Grade {
+  studentId   Int
+  classId     Int
+  overall     Float
+  isFinalized Boolean
+
+  student User  @relation(fields: [studentId], references: [id])
+  class   Class @relation(fields: [classId], references: [id])
+
+  @@id([studentId, classId])
+  @@map("grade")
 }

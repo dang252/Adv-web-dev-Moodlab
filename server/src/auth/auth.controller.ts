@@ -20,7 +20,7 @@ import { AuthDto, AccountDto, EmailDto, ResetPasswordDto } from './dto';
 import { Request, Response } from 'express';
 
 @Controller('auth')
-@ApiTags('auth')
+@ApiTags('/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
