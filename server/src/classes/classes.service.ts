@@ -59,7 +59,6 @@ export class ClassesService {
           data: {
             code: classInfo.code,
             name: classInfo.name,
-            subject: classInfo.subject,
             teacherId: user.id,
             inviteCode: this.generateClassCode(classCodeLength),
             status: CLASS_STATUS_ACTIVED,

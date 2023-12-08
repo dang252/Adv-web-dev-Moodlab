@@ -40,7 +40,6 @@ model Class {
   id         Int    @id @default(autoincrement())
   code       String
   name       String
-  subject    String
   teacherId  Int
   inviteCode String
   status     String
