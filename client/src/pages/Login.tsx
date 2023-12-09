@@ -15,9 +15,7 @@ import { getUser, loginAccount } from "../redux/reducers/user.reducer";
 import { useAppDispatch } from "../redux/hooks";
 import { UserAccount } from "../types/user";
 import { toast } from "react-toastify";
-import LoadingModal from "../components/LoadingModal";
-
-
+// import LoadingModal from "../components/LoadingModal";
 
 const { Header, Content } = Layout;
 
@@ -64,7 +62,7 @@ const Login = (props: PropType) => {
   const isDarkMode = useSelector<RootState, boolean>(
     (state) => state.users.isDarkMode
   );
-  
+
   const isLoading = useSelector<RootState, boolean>(
     (state) => state.users.isLoading
   );
@@ -85,15 +83,14 @@ const Login = (props: PropType) => {
         username: values.username,
         password: values.password,
       };
-      
+
       await dispathAsync(loginAccount(UserAccount)).unwrap();
       await dispathAsync(getUser()).unwrap();
-      toast.success("Login successfully")
-      navigate("/dashboard")
-    }
-    catch (err){
-      console.log("login failed", err)
-      toast.error("Login failed! please try again later")
+      toast.success("Login successfully");
+      navigate("/dashboard");
+    } catch (err) {
+      console.log("login failed", err);
+      toast.error("Login failed! please try again later");
     }
   };
 
@@ -192,7 +189,7 @@ const Login = (props: PropType) => {
           </div>
         </Content>
       </Layout>
-      <LoadingModal/>
+      {/* <LoadingModal/> */}
     </>
   );
 };

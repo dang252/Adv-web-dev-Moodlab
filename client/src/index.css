@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 * {
-  /* margin: 0;
+  margin: 0;
   padding: 0;
-  box-sizing: border-box; */
+  box-sizing: border-box;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -17,7 +17,7 @@
 /* Track */
 ::-webkit-scrollbar-track {
   background: #f1f1f1;
-  @apply bg-light-bg
+  @apply bg-light-bg;
 }
 
 /* Handle */
