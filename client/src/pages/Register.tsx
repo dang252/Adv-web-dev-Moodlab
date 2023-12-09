@@ -15,7 +15,7 @@ const { Header, Content } = Layout;
 import { UserAccount } from "../types/user";
 import { registerAccount } from "../redux/reducers/user.reducer";
 
-import { Store } from 'antd/lib/form/interface';
+import { Store } from "antd/lib/form/interface";
 import { useAppDispatch } from "../redux/hooks";
 import { useNavigate } from "react-router-dom";
 
@@ -59,7 +59,6 @@ const tailLayout = {
 };
 
 const Register = (props: PropType) => {
-  const [form] = Form.useForm();
   const dispathAsync = useAppDispatch();
   const navigate = useNavigate();
   const { triggerOpen, setTriggerOpen, switchMode } = props;
@@ -79,7 +78,7 @@ const Register = (props: PropType) => {
   } = theme.useToken();
 
   const onSubmit = async (values: Store) => {
-    try{
+    try {
       const UserAccount: UserAccount = {
         username: values.username,
         password: values.password,
@@ -87,16 +86,17 @@ const Register = (props: PropType) => {
         firstname: values.firstname,
         lastname: values.lastname,
       };
-  
+
       await dispathAsync(registerAccount(UserAccount)).unwrap();
-      toast.success("Register successfully! Please check your email to active your account!")
-      navigate("/Login")
+      toast.success(
+        "Register successfully! Please check your email to active your account!"
+      );
+      navigate("/Login");
+    } catch (err) {
+      console.log("Register failed", err);
+      toast.error("Register failed! please try again later");
     }
-    catch (err) {
-      console.log("Register failed", err)
-      toast.error("Register failed! please try again later")
-    }
-  }
+  };
 
   const onFinishFailed = (errorInfo: any) => {
     console.log("Failed:", errorInfo);
@@ -127,8 +127,9 @@ const Register = (props: PropType) => {
             }}
           >
             <Form
-              className={`w-[100%] mx-auto mt-20 p-5 rounded-md sm:max-w-[600px] ${isDarkMode ? "bg-zinc-800" : "bg-white"
-                }`}
+              className={`w-[100%] mx-auto mt-20 p-5 rounded-md sm:max-w-[600px] ${
+                isDarkMode ? "bg-zinc-800" : "bg-white"
+              }`}
               name="basic"
               initialValues={{ remember: true }}
               onFinish={onSubmit}
@@ -156,12 +157,15 @@ const Register = (props: PropType) => {
                 label="Email"
                 name="email"
                 rules={[
-                  { required: true, type: "email", message: "Please Enter your email!" },
+                  {
+                    required: true,
+                    type: "email",
+                    message: "Please Enter your email!",
+                  },
                 ]}
               >
                 <Input />
               </Form.Item>
-
 
               <Form.Item<FieldType>
                 label="Firstname"
@@ -172,7 +176,6 @@ const Register = (props: PropType) => {
               >
                 <Input />
               </Form.Item>
-
 
               <Form.Item<FieldType>
                 label="Lastname"

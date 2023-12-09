@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Empty } from "antd";
+import { Empty, Skeleton } from "antd";
 
 import ClassCard from "../components/ClassCard";
 
@@ -10,7 +10,7 @@ import { useAppDispatch } from "../redux/hooks";
 import { RootState } from "../redux/store";
 
 import { getClasses } from "../redux/reducers/class.reducer";
-import { Class } from "../types/classroom";
+import { ClassType } from "../types/classroom";
 
 interface PropType {
   isDarkMode: boolean;
@@ -26,7 +26,9 @@ const Classes = (props: PropType) => {
     (state) => state.classes.classList
   );
 
-  console.log(classList);
+  const isLoading = useSelector<RootState, boolean>(
+    (state) => state.classes.isLoading
+  );
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -39,38 +41,49 @@ const Classes = (props: PropType) => {
   }, []);
 
   return (
-    <CustomeFadeAnimate>
-      <div
-        className={`rounded-md flex gap-10 flex-wrap ${isDarkMode ? "" : ""}`}
-        style={{
-          minHeight: "100vh",
-          padding: 24,
-          color: isDarkMode ? "#fff" : undefined,
-          background: !isDarkMode ? undefined : undefined,
-        }}
-      >
-        {classList && classList.length === 0 && (
-          <div className="w-[100%] mx-auto">
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-          </div>
-        )}
+    <>
+      {isLoading ? (
+        <div className="min-h-screen mt-10">
+          <Skeleton />
+        </div>
+      ) : (
+        <CustomeFadeAnimate>
+          <div
+            className={`rounded-md flex gap-10 flex-wrap ${
+              isDarkMode ? "" : ""
+            }`}
+            style={{
+              minHeight: "100vh",
+              padding: 24,
+              color: isDarkMode ? "#fff" : undefined,
+              background: !isDarkMode ? undefined : undefined,
+            }}
+          >
+            {classList && classList.length === 0 && (
+              <div className="w-[100%] mx-auto">
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+              </div>
+            )}
 
-        {classList &&
-          classList.length !== 0 &&
-          classList.map((c: Class) => {
-            return (
-              <ClassCard
-                key={c.id}
-                id={c.id.toString()}
-                theme="../class theme/2c.jpg"
-                isDarkMode={isDarkMode}
-                name={c.name}
-                teacher={c.teacherId.toString()}
-              />
-            );
-          })}
-      </div>
-    </CustomeFadeAnimate>
+            {classList &&
+              classList.length !== 0 &&
+              classList.map((c: ClassType) => {
+                return (
+                  <ClassCard
+                    key={c.id}
+                    id={c.id.toString()}
+                    theme={`../class theme/${c.theme}`}
+                    isDarkMode={isDarkMode}
+                    name={c.name}
+                    teacher={c.id.toString()}
+                    description={c.description}
+                  />
+                );
+              })}
+          </div>
+        </CustomeFadeAnimate>
+      )}
+    </>
   );
 };
 

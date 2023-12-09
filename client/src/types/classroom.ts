@@ -13,11 +13,21 @@ export interface Comment {
   content: string;
 }
 
-export interface Class {
+export interface TeacherType {
+  id?: number;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+}
+
+export interface ClassType {
   id: number;
-  teacherId: number;
+  teacher: TeacherType;
   code: string;
   inviteCode: string;
+  inviteLink: string;
   name: string;
   status: string;
+  theme: string;
+  description: string;
 }

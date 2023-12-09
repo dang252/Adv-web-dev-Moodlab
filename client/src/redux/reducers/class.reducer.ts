@@ -1,6 +1,8 @@
 import { createAsyncThunk, createReducer } from "@reduxjs/toolkit";
 import axios from "axios";
 
+import { ClassType } from "../../types/classroom";
+
 import {
   PendingAction,
   FulfilledAction,
@@ -14,6 +16,7 @@ interface ClassState {
   isLoading: boolean;
   isError: boolean;
   classList: any[];
+  detailClass: ClassType | null;
 }
 
 // InitialState value
@@ -23,6 +26,7 @@ const initialState: ClassState = {
   isLoading: false,
   isError: false,
   classList: [],
+  detailClass: null,
 };
 
 export const getClasses = createAsyncThunk(
@@ -38,6 +42,33 @@ export const getClasses = createAsyncThunk(
 
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/classes`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const getDetailClass = createAsyncThunk(
+  "class/getDetailClass",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+  async (id: string, thunkAPI) => {
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/classes/${id}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -87,11 +118,76 @@ export const createNewClass = createAsyncThunk(
   }
 );
 
+export const editClassTheme = createAsyncThunk(
+  "class/editClassTheme",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+  async (body: { id: string; theme: string }, thunkAPI) => {
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/classes/${body.id}`,
+        {
+          theme: body.theme,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const inviteToClassByEmail = createAsyncThunk(
+  "class/inviteToClassByEmail",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+  async (email: string, thunkAPI) => {
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/classes/invite`,
+        {
+          email: email,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
 const classReducer = createReducer(initialState, (builder) => {
   builder
     .addCase(getClasses.fulfilled, (state, action) => {
       state.classList = action.payload;
     })
+
+    .addCase(getDetailClass.fulfilled, (state, action) => {
+      state.detailClass = action.payload;
+    })
+
     .addMatcher(
       (action): action is PendingAction => action.type.endsWith("/pending"),
       (state, action) => {

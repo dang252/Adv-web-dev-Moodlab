@@ -12,10 +12,11 @@ interface PropType {
   isDarkMode: boolean;
   name: string;
   teacher: string;
+  description: string;
 }
 
 const ClassCard = (props: PropType) => {
-  const { id, theme, isDarkMode, name, teacher } = props;
+  const { id, theme, isDarkMode, name, teacher, description } = props;
 
   const teacherItems: MenuProps["items"] = [
     {
@@ -53,8 +54,11 @@ const ClassCard = (props: PropType) => {
         >
           {name}
         </Link>
-        <p className="absolute text-white top-[70px] left-[15px] hover:underline hover:underline-offset-2">
+        <p className="absolute text-white top-[50px] left-[15px] hover:underline hover:underline-offset-2">
           {teacher}
+        </p>
+        <p className="absolute text-white top-[70px] left-[15px] hover:underline hover:underline-offset-2">
+          {description}
         </p>
         <Avatar
           className="absolute right-[20px] top-[60px]"

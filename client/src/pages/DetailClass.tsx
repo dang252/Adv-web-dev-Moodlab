@@ -1,10 +1,18 @@
 import { useEffect } from "react";
-import { Tabs } from "antd";
+import { Tabs, Spin } from "antd";
 import type { TabsProps } from "antd";
+import { useParams } from "react-router-dom";
+
+import { useSelector } from "react-redux";
+import { useAppDispatch } from "../redux/hooks";
+import { RootState } from "../redux/store";
+
+import { getDetailClass } from "../redux/reducers/class.reducer";
 
 import DetailClassNews from "../components/DetailClassNews";
 import DetailClassMembers from "../components/DetailClassMembers";
 import DetailClassResults from "../components/DetailClassResults";
+import { ClassType } from "../types/classroom";
 
 interface PropType {
   isDarkMode: boolean;
@@ -14,11 +22,37 @@ interface PropType {
 const DetailClass = (props: PropType) => {
   const { isDarkMode } = props;
 
-  const className: string = "Lớp học tình yêu";
+  const params = useParams();
+  const { id } = params;
+
+  const dispatchAsync = useAppDispatch();
+
+  const isLoading = useSelector<RootState, boolean>(
+    (state) => state.classes.isLoading
+  );
+
+  const detailClass = useSelector<RootState, ClassType | null>(
+    (state) => state.classes.detailClass
+  );
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  useEffect(() => {
+    if (id) {
+      const promise = dispatchAsync(getDetailClass(id.toString()));
+
+      // Get detail class failed
+      promise.then((res) => {
+        if (res.type === "class/getDetailClass/rejected") {
+          window.history.back();
+        }
+      });
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   const onChange = (key: string) => {
     console.log(key);
@@ -28,15 +62,8 @@ const DetailClass = (props: PropType) => {
     {
       key: "1",
       label: "News",
-      children: <DetailClassNews className={className} />,
+      children: <DetailClassNews detailClass={detailClass} />,
     },
-    // {
-    //   key: "2",
-    //   label: "Assignments",
-    //   children: (
-    //     <div className="w-[100%] 2xl:w-[70%] mx-auto flex flex-col items-center"></div>
-    //   ),
-    // },
     {
       key: "2",
       label: "Members",
@@ -50,22 +77,30 @@ const DetailClass = (props: PropType) => {
   ];
 
   return (
-    <div
-      className={`rounded-md ${isDarkMode ? "" : ""}`}
-      style={{
-        minHeight: "100vh",
-        color: isDarkMode ? "#fff" : undefined,
-        // background: !isDarkMode ? colorBgContainer : undefined,
-      }}
-    >
-      <Tabs
-        defaultActiveKey="1"
-        items={items}
-        onChange={onChange}
-        className="w-[100%]"
-        // indicatorSize={(origin) => origin - 16}
-      />
-    </div>
+    <>
+      {isLoading ? (
+        <div className="mt-20 min-h-screen flex justify-center">
+          <Spin size="large" />
+        </div>
+      ) : (
+        <div
+          className={`rounded-md ${isDarkMode ? "" : ""}`}
+          style={{
+            minHeight: "100vh",
+            color: isDarkMode ? "#fff" : undefined,
+            // background: !isDarkMode ? colorBgContainer : undefined,
+          }}
+        >
+          <Tabs
+            defaultActiveKey="1"
+            items={items}
+            onChange={onChange}
+            className="w-[100%]"
+            // indicatorSize={(origin) => origin - 16}
+          />
+        </div>
+      )}
+    </>
   );
 };
 
