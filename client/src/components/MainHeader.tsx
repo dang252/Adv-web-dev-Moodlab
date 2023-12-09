@@ -17,8 +17,7 @@ import { useState, useRef, useEffect } from "react";
 
 import CreateClassModal from "./CreateClassModal";
 import JoinClassModal from "./JoinClassModal";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify"
+import { toast } from "react-toastify";
 import { useAppDispatch } from "../redux/hooks";
 import { logoutAccount, refresh } from "../redux/reducers/user.reducer";
 const { Header } = Layout;
@@ -111,7 +110,6 @@ const MainHeader = (props: propType) => {
     },
   ];
 
-  
   const userItems: MenuProps["items"] = [
     {
       key: "logout",
@@ -119,22 +117,21 @@ const MainHeader = (props: propType) => {
       label: "Đăng xuất",
       icon: <PoweroffOutlined />,
       onClick: async () => {
-        for (let i = 0; i <= 1; i++){
+        for (let i = 0; i <= 1; i++) {
           try {
             await dispathAsync(logoutAccount()).unwrap();
-            toast.success("Logout successfully")
+            toast.success("Logout successfully");
             return;
-          }
-          catch (err){
-            console.log(err)
+          } catch (err) {
+            console.log(err);
             await dispathAsync(refresh()).unwrap();
           }
         }
-        toast.error("Logout failed! please try again later")
-      }
+        toast.error("Logout failed! please try again later");
+      },
     },
   ];
-  
+
   return (
     <>
       <CreateClassModal

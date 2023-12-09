@@ -12,3 +12,12 @@ export interface Comment {
   time: string;
   content: string;
 }
+
+export interface Class {
+  id: number;
+  teacherId: number;
+  code: string;
+  inviteCode: string;
+  name: string;
+  status: string;
+}

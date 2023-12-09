@@ -1,8 +1,16 @@
 import { useEffect } from "react";
+import { Empty } from "antd";
 
 import ClassCard from "../components/ClassCard";
 
 import CustomeFadeAnimate from "../animate/CustomeFadeAnimate";
+
+import { useSelector } from "react-redux";
+import { useAppDispatch } from "../redux/hooks";
+import { RootState } from "../redux/store";
+
+import { getClasses } from "../redux/reducers/class.reducer";
+import { Class } from "../types/classroom";
 
 interface PropType {
   isDarkMode: boolean;
@@ -12,8 +20,22 @@ interface PropType {
 const Classes = (props: PropType) => {
   const { isDarkMode } = props;
 
+  const dispatchAsync = useAppDispatch();
+
+  const classList = useSelector<RootState, any[]>(
+    (state) => state.classes.classList
+  );
+
+  console.log(classList);
+
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    dispatchAsync(getClasses());
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -27,41 +49,26 @@ const Classes = (props: PropType) => {
           background: !isDarkMode ? undefined : undefined,
         }}
       >
-        <ClassCard
-          id="1"
-          theme="../class theme/1a.jpg"
-          isDarkMode={isDarkMode}
-          name="Lớp học tình yêu"
-          teacher="Sadboiz tuổi 21"
-        />
-        <ClassCard
-          id="2"
-          theme="../class theme/2a.jpg"
-          isDarkMode={isDarkMode}
-          name="Lớp học tình yêu"
-          teacher="Sadboiz tuổi 21"
-        />
-        <ClassCard
-          id="3"
-          theme="../class theme/1b.jpg"
-          isDarkMode={isDarkMode}
-          name="Lớp học tình yêu"
-          teacher="Sadboiz tuổi 21"
-        />
-        <ClassCard
-          id="4"
-          theme="../class theme/3c.jpg"
-          isDarkMode={isDarkMode}
-          name="Lớp học tình yêu"
-          teacher="Sadboiz tuổi 21"
-        />
-        <ClassCard
-          id="5"
-          theme="../class theme/2c.jpg"
-          isDarkMode={isDarkMode}
-          name="Lớp học tình yêu"
-          teacher="Sadboiz tuổi 21"
-        />
+        {classList && classList.length === 0 && (
+          <div className="w-[100%] mx-auto">
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          </div>
+        )}
+
+        {classList &&
+          classList.length !== 0 &&
+          classList.map((c: Class) => {
+            return (
+              <ClassCard
+                key={c.id}
+                id={c.id.toString()}
+                theme="../class theme/2c.jpg"
+                isDarkMode={isDarkMode}
+                name={c.name}
+                teacher={c.teacherId.toString()}
+              />
+            );
+          })}
       </div>
     </CustomeFadeAnimate>
   );
