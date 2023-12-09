@@ -19,3 +19,9 @@ export class InviteEmailDto {
   @IsString()
   email: string;
 }
+
+export class ChangeTheme {
+  @IsNotEmpty()
+  @IsString()
+  theme: string;
+}

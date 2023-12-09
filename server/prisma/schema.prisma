@@ -37,12 +37,14 @@ model Account {
 }
 
 model Class {
-  id         Int    @id @default(autoincrement())
-  code       String
-  name       String
-  teacherId  Int
-  inviteCode String
-  status     String
+  id          Int    @id @default(autoincrement())
+  code        String
+  name        String
+  teacherId   Int
+  inviteCode  String
+  status      String
+  theme       String @default("1a.jpg")
+  description String @default("No description")
 
   teacher  User    @relation(fields: [teacherId], references: [id])
   students Grade[]

@@ -115,10 +115,26 @@ export class ClassesService {
         where: {
           id: parseInt(classId),
         },
+        include: {
+          teacher: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+        },
       });
       console.log("[API GET /class/:id] Get class's information successfully");
 
-      return res.status(HttpStatus.OK).send(classInfo);
+      const { teacherId, ...response } = classInfo;
+
+      return res.status(HttpStatus.OK).send({
+        inviteLink:
+          process.env.HOST_URL + '/' + response.id + '/' + response.inviteCode,
+        ...response,
+      });
     } catch (error) {
       // If the error has a status property, set the corresponding HTTP status code
       if (error.status) {
@@ -130,6 +146,41 @@ export class ClassesService {
 
       // If the error doesn't have a status property, set a generic 500 Internal Server Error status code
       console.log('[API GET /class/:id] Internal error');
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .send(HTTP_MSG_INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  // [PUT] /:id
+  async changeTheme(classId: string, newTheme: string, res: Response) {
+    try {
+      console.log('[API PUT /class/:id]');
+
+      await this.prisma.class.update({
+        where: {
+          id: parseInt(classId),
+        },
+        data: {
+          theme: {
+            set: newTheme,
+          },
+        },
+      } as any);
+      console.log('[API PUT /class/:id] Change theme successfully');
+
+      return res.status(HttpStatus.OK).send(HTTP_MSG_SUCCESS);
+    } catch (error) {
+      // If the error has a status property, set the corresponding HTTP status code
+      if (error.status) {
+        console.log(
+          `[API PUT /class/:id] Unknown error: ${error.status} - ${error.message}`,
+        );
+        return res.status(error.status).send(error.message);
+      }
+
+      // If the error doesn't have a status property, set a generic 500 Internal Server Error status code
+      console.log('[API PUT /class/:id] Internal error');
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .send(HTTP_MSG_INTERNAL_SERVER_ERROR);
@@ -227,7 +278,9 @@ export class ClassesService {
         `[API /class/:id/:code] Create a grade for studentId = ${userId} and classId = ${classId} successfully`,
       );
 
-      return res.status(HttpStatus.OK).send(HTTP_MSG_SUCCESS);
+      return res.redirect(
+        process.env.CLIENT_HOME_PAGE + `/dashboard/classes/${classId}`,
+      );
     } catch (error) {
       // If the error has a status property, set the corresponding HTTP status code
       if (error.status) {
@@ -285,6 +338,8 @@ export class ClassesService {
       console.log(
         '[API POST /class/invite] Send email Join class successfully',
       );
+
+      return res.status(HttpStatus.OK).send(HTTP_MSG_SUCCESS);
     } catch (error) {
       // If the error has a status property, set the corresponding HTTP status code
       if (error.status) {

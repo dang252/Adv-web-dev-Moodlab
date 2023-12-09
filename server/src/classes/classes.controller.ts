@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Req,
   Res,
   UseGuards,
@@ -17,7 +18,7 @@ import {
 } from 'src/constants';
 import { ClassesService } from './classes.service';
 import { Request, Response } from 'express';
-import { ClassDto, InviteEmailDto } from './dto';
+import { ChangeTheme, ClassDto, InviteEmailDto } from './dto';
 
 @Controller('classes')
 @ApiTags('/classes')
@@ -115,6 +116,43 @@ export class ClassesController {
 
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
+  @Put('/:id')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        theme: {
+          type: 'string',
+          example: '20120434',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      type: 'string',
+      example: HTTP_MSG_SUCCESS,
+    },
+  })
+  @ApiResponse({
+    status: 403,
+    description: HTTP_MSG_FORBIDDEN,
+  })
+  @ApiResponse({
+    status: 500,
+    description: HTTP_MSG_INTERNAL_SERVER_ERROR,
+  })
+  changeTheme(
+    @Param('id') id: string,
+    @Body() dto: ChangeTheme,
+    @Res() res: Response,
+  ) {
+    return this.classesService.changeTheme(id, dto.theme, res);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
   @Get('/:id/members')
   @ApiResponse({
     status: 200,
@@ -165,6 +203,17 @@ export class ClassesController {
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @Post('/invite')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: {
+          type: 'string',
+          example: '20120434',
+        },
+      },
+    },
+  })
   @ApiResponse({
     status: 200,
     schema: {
