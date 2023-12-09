@@ -17,6 +17,7 @@ import { registerAccount } from "../redux/reducers/user.reducer";
 
 import { Store } from 'antd/lib/form/interface';
 import { useAppDispatch } from "../redux/hooks";
+import { useNavigate } from "react-router-dom";
 
 interface PropType {
   triggerOpen: boolean;
@@ -60,6 +61,7 @@ const tailLayout = {
 const Register = (props: PropType) => {
   const [form] = Form.useForm();
   const dispathAsync = useAppDispatch();
+  const navigate = useNavigate();
   const { triggerOpen, setTriggerOpen, switchMode } = props;
 
   const isDarkMode = useSelector<RootState, boolean>(
@@ -76,27 +78,24 @@ const Register = (props: PropType) => {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  const onSubmit = (values: Store) => {
-    const UserAccount: UserAccount = {
-      username: values.username,
-      password: values.password,
-      email: values.email,
-      firstname: values.firstname,
-      lastname: values.lastname,
-    };
-
-    const promise = dispathAsync(registerAccount(UserAccount));
-
-    promise.unwrap().then((res) => {
-      console.log("check res:", res);
-      toast.success("Register account successfully, please check your email to active your account");
-      form.resetFields()
-    });
-
-    promise.unwrap().catch((err) => {
-      console.log("Check err:", err);
-      toast.error("Register account failed! Please try again later!");
-    });
+  const onSubmit = async (values: Store) => {
+    try{
+      const UserAccount: UserAccount = {
+        username: values.username,
+        password: values.password,
+        email: values.email,
+        firstname: values.firstname,
+        lastname: values.lastname,
+      };
+  
+      await dispathAsync(registerAccount(UserAccount)).unwrap();
+      toast.success("Register successfully! Please check your email to active your account!")
+      navigate("/Login")
+    }
+    catch (err) {
+      console.log("Register failed", err)
+      toast.error("Register failed! please try again later")
+    }
   }
 
   const onFinishFailed = (errorInfo: any) => {

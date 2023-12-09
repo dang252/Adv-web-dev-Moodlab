@@ -19,6 +19,8 @@ import CreateClassModal from "./CreateClassModal";
 import JoinClassModal from "./JoinClassModal";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify"
+import { useAppDispatch } from "../redux/hooks";
+import { logoutAccount, refresh } from "../redux/reducers/user.reducer";
 const { Header } = Layout;
 
 interface propType {
@@ -33,7 +35,7 @@ interface propType {
 }
 
 const MainHeader = (props: propType) => {
-  const navigate = useNavigate();
+  const dispathAsync = useAppDispatch();
   const {
     Header,
     colorBgContainer,
@@ -116,9 +118,19 @@ const MainHeader = (props: propType) => {
       danger: true,
       label: "Đăng xuất",
       icon: <PoweroffOutlined />,
-      onClick: () => {
-        navigate("/")
-        toast.success("Logout successfully")
+      onClick: async () => {
+        for (let i = 0; i <= 1; i++){
+          try {
+            await dispathAsync(logoutAccount()).unwrap();
+            toast.success("Logout successfully")
+            return;
+          }
+          catch (err){
+            console.log(err)
+            await dispathAsync(refresh()).unwrap();
+          }
+        }
+        toast.error("Logout failed! please try again later")
       }
     },
   ];

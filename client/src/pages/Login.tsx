@@ -11,10 +11,12 @@ import { RootState } from "../redux/store";
 
 import LandingHeader from "../components/LandingHeader";
 import { Link, useNavigate } from "react-router-dom";
-import { loginAccount } from "../redux/reducers/user.reducer";
+import { getUser, loginAccount } from "../redux/reducers/user.reducer";
 import { useAppDispatch } from "../redux/hooks";
 import { UserAccount } from "../types/user";
 import { toast } from "react-toastify";
+import LoadingModal from "../components/LoadingModal";
+
 
 
 const { Header, Content } = Layout;
@@ -77,24 +79,22 @@ const Login = (props: PropType) => {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  const onFinish = (values: any) => {
-    const UserAccount: UserAccount = {
-      username: values.username,
-      password: values.password,
-    };
-
-    const promise = dispathAsync(loginAccount(UserAccount));
-
-    promise.unwrap().then((res) => {
-      console.log("check res:", res);
-      toast.success("Login successfully");
+  const onFinish = async (values: any) => {
+    try {
+      const UserAccount: UserAccount = {
+        username: values.username,
+        password: values.password,
+      };
+      
+      await dispathAsync(loginAccount(UserAccount)).unwrap();
+      await dispathAsync(getUser()).unwrap();
+      toast.success("Login successfully")
       navigate("/dashboard")
-    });
-
-    promise.unwrap().catch((err) => {
-      console.log("Check err:", err);
-      toast.error("Login failed");
-    });
+    }
+    catch (err){
+      console.log("login failed", err)
+      toast.error("Login failed! please try again later")
+    }
   };
 
   const onFinishFailed = (errorInfo: any) => {
@@ -192,6 +192,7 @@ const Login = (props: PropType) => {
           </div>
         </Content>
       </Layout>
+      <LoadingModal/>
     </>
   );
 };

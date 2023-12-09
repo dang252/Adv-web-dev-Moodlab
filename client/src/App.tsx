@@ -19,6 +19,8 @@ import { RootState } from "./redux/store";
 
 import "./App.css";
 import { useEffect } from "react";
+import { useAppDispatch } from "./redux/hooks";
+import { stopLoad } from "./redux/reducers/user.reducer";
 
 const { defaultAlgorithm, darkAlgorithm } = theme;
 
@@ -54,6 +56,21 @@ const App = () => {
     dispatch({ type: "users/setTheme" });
     sessionStorage.setItem("mode", JSON.stringify(!isDarkMode));
   };
+
+  const dispathAsync = useAppDispatch();
+
+  useEffect(() => {
+    const stopLoading = () => {
+      dispathAsync(stopLoad())
+    }
+    window.addEventListener('beforeunload', stopLoading)
+
+    return () => {
+      window.removeEventListener('beforeunload', stopLoading)
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   return (
     <ConfigProvider
