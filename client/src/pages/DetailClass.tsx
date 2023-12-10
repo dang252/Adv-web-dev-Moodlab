@@ -42,38 +42,36 @@ const DetailClass = (props: PropType) => {
 
   useEffect(() => {
     if (id) {
-      const promise = dispatchAsync(getDetailClass(id.toString()));
+      const promise = dispatchAsync(getDetailClass(id.toString())).unwrap();
 
       // Get detail class failed
       promise
         .then((res) => {
           console.log(res);
+        })
+        .catch((error) => {
+          const data = error.response.data;
 
-          if (res.type === "class/getDetailClass/rejected") {
-            // Redirect user
-            window.history.back();
-
+          if (data === "No permission") {
             if (detailClass) {
               const body = {
                 id: detailClass?.id.toString(),
-                code: detailClass?.code,
+                code: detailClass?.inviteCode,
               };
 
-              // 401: call /classes/:id/:code
-              const inviteCodePromise = dispatchAsync(getInviteCode(body));
+              // 403: Recall /classes/:id/:code
+              const inviteCodePromise = dispatchAsync(
+                getInviteCode(body)
+              ).unwrap();
 
-              // Retry call /classes/:id
               inviteCodePromise.then((res) => {
-                if (res.type === "class/getInviteCode/fulfilled") {
-                  dispatchAsync(getDetailClass(id.toString()));
-                }
+                console.log(res);
+                toast.success("Join class successfully");
               });
             }
+          } else {
+            toast.error("Get detail class failed");
           }
-        })
-        .catch((error) => {
-          console.log(error);
-          toast.error("Get detail class failed");
         });
     }
 

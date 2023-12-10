@@ -7,16 +7,16 @@ import { IoMdFolderOpen } from "react-icons/io";
 import { TfiStatsUp } from "react-icons/tfi";
 
 interface PropType {
+  isDarkMode: boolean;
   id: string;
   theme: string;
-  isDarkMode: boolean;
   name: string;
-  teacher: string;
   description: string;
+  code: string;
 }
 
 const ClassCard = (props: PropType) => {
-  const { id, theme, isDarkMode, name, teacher, description } = props;
+  const { isDarkMode, id, theme, name, description, code } = props;
 
   const teacherItems: MenuProps["items"] = [
     {
@@ -55,7 +55,7 @@ const ClassCard = (props: PropType) => {
           {name}
         </Link>
         <p className="absolute text-white top-[50px] left-[15px] hover:underline hover:underline-offset-2">
-          {teacher}
+          {code}
         </p>
         <p className="absolute text-white top-[70px] left-[15px] hover:underline hover:underline-offset-2">
           {description}

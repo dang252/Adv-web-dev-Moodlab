@@ -75,8 +75,8 @@ const Classes = (props: PropType) => {
                     theme={`../class theme/${c.theme}`}
                     isDarkMode={isDarkMode}
                     name={c.name}
-                    teacher={c.id.toString()}
                     description={c.description}
+                    code={c.code}
                   />
                 );
               })}
