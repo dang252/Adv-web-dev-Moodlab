@@ -94,7 +94,7 @@ export class ClassesController {
 
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
-  @Get('/:id')
+  @Get('/:inviteCode')
   @ApiResponse({
     status: 200,
     schema: {
@@ -111,11 +111,11 @@ export class ClassesController {
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   classInfo(
-    @Param('id') id: string,
+    @Param('inviteCode') inviteCode: string,
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    return this.classesService.classInfo(id, req.user['sub'], res);
+    return this.classesService.classInfo(inviteCode, req.user['sub'], res);
   }
 
   @ApiBearerAuth()

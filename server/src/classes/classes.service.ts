@@ -132,14 +132,14 @@ export class ClassesService {
     }
   }
 
-  // [GET] /:id
-  async classInfo(classId: string, userId: number, res: Response) {
+  // [GET] /:inviteCode
+  async classInfo(classInviteCode: string, userId: number, res: Response) {
     try {
-      console.log('[API GET /classes/:id]');
+      console.log('[API GET /classes/:inviteCode]');
 
       const checkPermission = await this.prisma.class.findFirst({
         where: {
-          id: parseInt(classId),
+          inviteCode: classInviteCode,
           OR: [
             {
               teacherId: userId,
@@ -157,14 +157,14 @@ export class ClassesService {
 
       if (checkPermission == null) {
         console.log(
-          `[API GET /classes/:id] User has no permission to join class ${classId}`,
+          `[API GET /classes/:inviteCode] User has no permission to join class ${classInviteCode}`,
         );
         return res.status(HttpStatus.FORBIDDEN).send('No permission');
       }
 
-      const classInfo = await this.prisma.class.findUnique({
+      const classInfo = await this.prisma.class.findFirst({
         where: {
-          id: parseInt(classId),
+          inviteCode: classInviteCode,
         },
         include: {
           teacher: {
@@ -178,7 +178,7 @@ export class ClassesService {
         },
       });
       console.log(
-        "[API GET /classes/:id] Get class's information successfully",
+        "[API GET /classes/:inviteCode] Get class's information successfully",
       );
 
       const { teacherId, ...response } = classInfo;
@@ -192,13 +192,13 @@ export class ClassesService {
       // If the error has a status property, set the corresponding HTTP status code
       if (error.status) {
         console.log(
-          `[API GET /classes/:id] Unknown error: ${error.status} - ${error.message}`,
+          `[API GET /classes/:inviteCode] Unknown error: ${error.status} - ${error.message}`,
         );
         return res.status(error.status).send(error.message);
       }
 
       // If the error doesn't have a status property, set a generic 500 Internal Server Error status code
-      console.log('[API GET /classes/:id] Internal error');
+      console.log('[API GET /classes/:inviteCode] Internal error');
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .send(HTTP_MSG_INTERNAL_SERVER_ERROR);
@@ -393,7 +393,7 @@ export class ClassesService {
         subject: 'Join class by email',
         template: './join_class',
         context: {
-          inviteLink: process.env.HOST_URL + '/classes/' + checkPermission.id,
+          inviteLink: process.env.CLIENT_URL + '/classes/' + checkPermission.id,
         },
       });
 
