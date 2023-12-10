@@ -14,6 +14,7 @@ import axios from "axios";
 // Interface declair
 interface UserState {
   currentId: string; // id for state action
+  userId: number;
   username: string;
   email: string;
   password: string;
@@ -71,7 +72,7 @@ export const loginAccount = createAsyncThunk(
       const decodedToken = jwtDecode(accessToken) as JwtPayload
       const userId = decodedToken.sub;
       const username = account.username
-      return {...response.data, userId, username}
+      return { ...response.data, userId, username }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error);
@@ -172,6 +173,7 @@ export const stopLoad = () => ({
 // InitialState value
 const initialState: UserState = {
   currentId: "",
+  userId: NaN,
   username: "",
   email: "",
   password: "",
@@ -190,25 +192,23 @@ const userReducer = createReducer(initialState, (builder) => {
       localStorage.setItem("isDarkMode", JSON.stringify(state.isDarkMode));
     })
     .addCase(registerAccount.pending, () => {
-      
+
     })
-    .addCase(registerAccount.fulfilled, (_, action) => {
-      if (action.payload) {
-        // console.log("CHECK register from redux: ", action.payload);
-      }
+    .addCase(registerAccount.fulfilled, () => {
+
     })
     .addCase(registerAccount.rejected, (_) => {
     })
-     .addCase(loginAccount.pending, (_) => {
+    .addCase(loginAccount.pending, (_) => {
     })
     .addCase(loginAccount.fulfilled, (state, action) => {
       if (action.payload) {
         // console.log("CHECK login from redux: ", action.payload);
         const accessToken: string = action.payload.access_token;
         const refreshToken: string = action.payload.refresh_token;
-        console.log(action.payload)
+        console.log(action.payload.userId)
         // const decodedToken = jwtDecode(accessToken) as JwtPayload
-        state.currentId = action.payload.userId;
+        state.userId = action.payload.userId;
         state.username = action.payload.username;
         localStorage.setItem("accessToken", JSON.stringify(accessToken));
         localStorage.setItem("refreshToken", JSON.stringify(refreshToken));

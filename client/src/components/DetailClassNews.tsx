@@ -126,7 +126,7 @@ const DetailClassNews = (props: PropType) => {
   };
 
   //==================== Invite modal
-  const handleInviteOk = () => {};
+  const handleInviteOk = () => { };
 
   const handleInviteCancel = () => {
     setOpenInviteModal(false);
@@ -178,12 +178,12 @@ const DetailClassNews = (props: PropType) => {
                 <p>Using your class code</p>
                 <div className="w-[100%] flex flex-wrap gap-5 justify-between">
                   <p className="text-xl font-bold">
-                    Your class code: {detailClass.inviteCode}
+                    Your class code: {detailClass?.inviteCode}
                   </p>
                   <Button
                     type="primary"
                     onClick={() => {
-                      handleCopyClassCode(detailClass.inviteCode);
+                      handleCopyClassCode(detailClass?.inviteCode);
                     }}
                   >
                     Copy class code
@@ -260,14 +260,13 @@ const DetailClassNews = (props: PropType) => {
               setThemeUrl={setThemeUrl}
             />
             <img
-              className={`w-[100%] h-[120px] md:h-[150px] xl:h-[200px] object-cover ${
-                openInfor ? "rounded-t-xl" : "rounded-xl"
-              }`}
-              src={`../../class theme/${detailClass.theme}`}
+              className={`w-[100%] h-[120px] md:h-[150px] xl:h-[200px] object-cover ${openInfor ? "rounded-t-xl" : "rounded-xl"
+                }`}
+              src={`../../class theme/${detailClass?.theme}`}
               alt="theme"
             />
             <div className="absolute bottom-[30px] left-[30px] w-[70%] truncate text-white text-3xl font-semibold">
-              {detailClass.name}
+              {detailClass?.name}
             </div>
             <Button
               type="primary"
@@ -290,16 +289,15 @@ const DetailClassNews = (props: PropType) => {
           </div>
 
           <div
-            className={`w-[100%] p-5 rounded-b-xl ${
-              openInfor ? "flex" : "hidden"
-            } ${isDarkMode ? " bg-zinc-800 " : " bg-white "}`}
+            className={`w-[100%] p-5 rounded-b-xl ${openInfor ? "flex" : "hidden"
+              } ${isDarkMode ? " bg-zinc-800 " : " bg-white "}`}
           >
             <div className="flex items-center gap-5">
               <p className="font-bold">Code</p>
               <p>whyilostyou</p>
               <div
                 className="w-[30px] h-[30px] flex items-center justify-center rounded-full hover:bg-gray-200 hover:cursor-pointer"
-                onClick={() => {}}
+                onClick={() => { }}
               >
                 <FullscreenOutlined />
               </div>
@@ -308,9 +306,8 @@ const DetailClassNews = (props: PropType) => {
 
           {!openCreateNoti ? (
             <Card
-              className={`w-[100%] mt-5 hover:text-blue-500 ${
-                isDarkMode ? "" : "text-gray-400"
-              }`}
+              className={`w-[100%] mt-5 hover:text-blue-500 ${isDarkMode ? "" : "text-gray-400"
+                }`}
               hoverable
               onClick={() => {
                 setOpenCreateNoti(true);
@@ -335,11 +332,10 @@ const DetailClassNews = (props: PropType) => {
                 <Form form={form} name="post-form" onFinish={onFinish}>
                   <Form.Item name="post" rules={[{ required: true }]}>
                     <TextArea
-                      className={`${
-                        isDarkMode
-                          ? "bg-zinc-800 hover:bg-zinc-900"
-                          : "bg-gray-100 hover:bg-gray-200"
-                      }`}
+                      className={`${isDarkMode
+                        ? "bg-zinc-800 hover:bg-zinc-900"
+                        : "bg-gray-100 hover:bg-gray-200"
+                        }`}
                       rows={4}
                       placeholder="Notify something new for your classroom"
                     />

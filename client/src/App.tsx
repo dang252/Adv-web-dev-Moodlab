@@ -14,6 +14,7 @@ import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import NonAuthRoute from "./components/nonAuthRoute";
 
 import { RootState } from "./redux/store";
 
@@ -104,41 +105,49 @@ const App = () => {
         <Route
           path="/register"
           element={
-            <Register
-              triggerOpen={triggerOpen}
-              setTriggerOpen={setTriggerOpen}
-              switchMode={switchMode}
-            />
+            <NonAuthRoute>
+              <Register
+                triggerOpen={triggerOpen}
+                setTriggerOpen={setTriggerOpen}
+                switchMode={switchMode}
+              />
+            </NonAuthRoute>
           }
         />
         <Route
           path="/login"
           element={
-            <Login
-              triggerOpen={triggerOpen}
-              setTriggerOpen={setTriggerOpen}
-              switchMode={switchMode}
-            />
+            <NonAuthRoute>
+              <Login
+                triggerOpen={triggerOpen}
+                setTriggerOpen={setTriggerOpen}
+                switchMode={switchMode}
+              />
+            </NonAuthRoute>
           }
         />
         <Route
           path="/forgot"
           element={
-            <ForgotPassword
-              triggerOpen={triggerOpen}
-              setTriggerOpen={setTriggerOpen}
-              switchMode={switchMode}
-            />
+            <NonAuthRoute>
+              <ForgotPassword
+                triggerOpen={triggerOpen}
+                setTriggerOpen={setTriggerOpen}
+                switchMode={switchMode}
+              />
+            </NonAuthRoute>
           }
         />
         <Route
           path="/forgot/:token"
           element={
-            <ResetPassword
-              triggerOpen={triggerOpen}
-              setTriggerOpen={setTriggerOpen}
-              switchMode={switchMode}
-            />
+            <NonAuthRoute>
+              <ResetPassword
+                triggerOpen={triggerOpen}
+                setTriggerOpen={setTriggerOpen}
+                switchMode={switchMode}
+              />
+            </NonAuthRoute>
           }
         />
         <Route path="/dashboard/*" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
