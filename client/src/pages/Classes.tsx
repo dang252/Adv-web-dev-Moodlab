@@ -68,7 +68,6 @@ const Classes = (props: PropType) => {
             {classList &&
               classList.length !== 0 &&
               classList.map((c: ClassType) => {
-                console.log(c);
                 return (
                   <ClassCard
                     key={c.id}
