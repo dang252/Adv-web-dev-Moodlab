@@ -393,7 +393,8 @@ export class ClassesService {
         subject: 'Join class by email',
         template: './join_class',
         context: {
-          inviteLink: process.env.CLIENT_URL + '/classes/' + checkPermission.id,
+          inviteLink:
+            process.env.CLIENT_HOME_PAGE + '/classes/' + checkPermission.id,
         },
       });
 
