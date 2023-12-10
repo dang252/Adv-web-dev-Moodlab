@@ -35,7 +35,33 @@ export class ClassesService {
     try {
       console.log('[API GET /class]');
 
-      const classes = await this.prisma.class.findMany();
+      const classes = await this.prisma.class.findMany({
+        where: {
+          OR: [
+            {
+              teacherId: userId,
+            },
+            {
+              students: {
+                some: {
+                  studentId: userId,
+                },
+              },
+            },
+          ],
+        },
+        include: {
+          teacher: {
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+        orderBy: {
+          id: 'desc',
+        },
+      });
       console.log('[API GET /class] Get list classes successfully');
 
       return res.status(HttpStatus.OK).send(classes);
@@ -107,9 +133,34 @@ export class ClassesService {
   }
 
   // [GET] /:id
-  async classInfo(classId: string, res: Response) {
+  async classInfo(classId: string, userId: number, res: Response) {
     try {
-      console.log('[API GET /class/:id]');
+      console.log('[API GET /classes/:id]');
+
+      const checkPermission = await this.prisma.class.findFirst({
+        where: {
+          id: parseInt(classId),
+          OR: [
+            {
+              teacherId: userId,
+            },
+            {
+              students: {
+                some: {
+                  studentId: userId,
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      if (checkPermission == null) {
+        console.log(
+          `[API GET /classes/:id] User has no permission to join class ${classId}`,
+        );
+        return res.status(HttpStatus.FORBIDDEN).send('No permission');
+      }
 
       const classInfo = await this.prisma.class.findUnique({
         where: {
@@ -126,7 +177,9 @@ export class ClassesService {
           },
         },
       });
-      console.log("[API GET /class/:id] Get class's information successfully");
+      console.log(
+        "[API GET /classes/:id] Get class's information successfully",
+      );
 
       const { teacherId, ...response } = classInfo;
 
@@ -139,13 +192,13 @@ export class ClassesService {
       // If the error has a status property, set the corresponding HTTP status code
       if (error.status) {
         console.log(
-          `[API GET /class/:id] Unknown error: ${error.status} - ${error.message}`,
+          `[API GET /classes/:id] Unknown error: ${error.status} - ${error.message}`,
         );
         return res.status(error.status).send(error.message);
       }
 
       // If the error doesn't have a status property, set a generic 500 Internal Server Error status code
-      console.log('[API GET /class/:id] Internal error');
+      console.log('[API GET /classes/:id] Internal error');
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .send(HTTP_MSG_INTERNAL_SERVER_ERROR);
@@ -155,7 +208,7 @@ export class ClassesService {
   // [PUT] /:id
   async changeTheme(classId: string, newTheme: string, res: Response) {
     try {
-      console.log('[API PUT /class/:id]');
+      console.log('[API PUT /classes/:id]');
 
       await this.prisma.class.update({
         where: {
@@ -167,20 +220,20 @@ export class ClassesService {
           },
         },
       } as any);
-      console.log('[API PUT /class/:id] Change theme successfully');
+      console.log('[API PUT /classes/:id] Change theme successfully');
 
       return res.status(HttpStatus.OK).send(HTTP_MSG_SUCCESS);
     } catch (error) {
       // If the error has a status property, set the corresponding HTTP status code
       if (error.status) {
         console.log(
-          `[API PUT /class/:id] Unknown error: ${error.status} - ${error.message}`,
+          `[API PUT /classes/:id] Unknown error: ${error.status} - ${error.message}`,
         );
         return res.status(error.status).send(error.message);
       }
 
       // If the error doesn't have a status property, set a generic 500 Internal Server Error status code
-      console.log('[API PUT /class/:id] Internal error');
+      console.log('[API PUT /classes/:id] Internal error');
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .send(HTTP_MSG_INTERNAL_SERVER_ERROR);
@@ -190,7 +243,7 @@ export class ClassesService {
   // [GET] /:id/members
   async classMembers(classId: string, res: Response) {
     try {
-      console.log('[API GET /class/:id/members]');
+      console.log('[API GET /classes/:id/members]');
       const classMembers = await this.prisma.class.findUnique({
         where: {
           id: parseInt(classId),
@@ -202,7 +255,7 @@ export class ClassesService {
       });
 
       console.log(
-        `[API GET /class/:id/members] Get members in class (id: ${classId}) successfully`,
+        `[API GET /classes/:id/members] Get members in class (id: ${classId}) successfully`,
       );
 
       return res.status(HttpStatus.OK).send(classMembers);
@@ -231,7 +284,7 @@ export class ClassesService {
     res: Response,
   ) {
     try {
-      console.log('[API /class/:id/:code]');
+      console.log('[API GET /classes/:id/:code]');
 
       // Check if user has been in this class
       const user = await this.prisma.grade.findFirst({
@@ -242,11 +295,18 @@ export class ClassesService {
 
       if (user != null) {
         console.log(
-          `[API /class/:id/:code] User (id: ${userId}) has been in this class`,
+          `[API GET /classes/:id/:code] User (id: ${userId}) has been in this class`,
         );
-        return res
-          .status(HttpStatus.CONFLICT)
-          .send('User has been in this class');
+
+        // return res.redirect(
+        //   process.env.CLIENT_HOME_PAGE + `/classes/${classId}`,
+        // );
+        return (
+          res
+            // .status(HttpStatus.CONFLICT)
+            .status(HttpStatus.OK)
+            .send('User has been in this class')
+        );
       }
 
       // Check match classID, classInviteCode
@@ -258,7 +318,11 @@ export class ClassesService {
       });
 
       if (_class == null) {
-        console.log("[API /class/:id/:code] id and invite code don't match");
+        console.log(
+          "[API GET /classes/:id/:code] id and invite code don't match",
+        );
+
+        // return res.redirect(process.env.CLIENT_HOME_PAGE);
         return res
           .status(HttpStatus.NOT_FOUND)
           .send('The invite link is not exist');
@@ -275,23 +339,26 @@ export class ClassesService {
       });
 
       console.log(
-        `[API /class/:id/:code] Create a grade for studentId = ${userId} and classId = ${classId} successfully`,
+        `[API GET /classes/:id/:code] Create a grade for studentId = ${userId} and classId = ${classId} successfully`,
       );
 
-      return res.redirect(
-        process.env.CLIENT_HOME_PAGE + `/dashboard/classes/${classId}`,
-      );
+      // return res.redirect(
+      //   process.env.CLIENT_HOME_PAGE + `/dashboard/classes/${classId}`,
+      // );
+      return res.status(HttpStatus.OK).send(HTTP_MSG_SUCCESS);
     } catch (error) {
       // If the error has a status property, set the corresponding HTTP status code
       if (error.status) {
         console.log(
-          `[API /class/:id/:code] Unknown error: ${error.status} - ${error.message}`,
+          `[API GET /classes/:id/:code] Unknown error: ${error.status} - ${error.message}`,
         );
         return res.status(error.status).send(error.message);
+        // return res.redirect(process.env.CLIENT_HOME_PAGE);
       }
 
       // If the error doesn't have a status property, set a generic 500 Internal Server Error status code
-      console.log('[API /class/:id/:code] Internal error');
+      console.log('[API GET /classes/:id/:code] Internal error');
+      // return res.redirect(process.env.CLIENT_HOME_PAGE);
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .send(HTTP_MSG_INTERNAL_SERVER_ERROR);
@@ -301,7 +368,7 @@ export class ClassesService {
   // [POST] /invite
   async inviteByEmail(userId: number, email: string, res: Response) {
     try {
-      console.log('[API POST /class/invite]');
+      console.log('[API POST /classes/invite]');
 
       const checkPermission = await this.prisma.class.findFirst({
         where: {
@@ -311,7 +378,7 @@ export class ClassesService {
 
       if (checkPermission == null) {
         console.log(
-          `[API POST /class/invite] User (id: ${userId} can\'t invite other by email`,
+          `[API POST /classes/invite] User (id: ${userId} can\'t invite other by email`,
         );
         return res
           .status(HttpStatus.UNAUTHORIZED)
@@ -319,24 +386,19 @@ export class ClassesService {
       }
 
       console.log(
-        '[API POST /class/invite] Prepare for sending email to join class',
+        '[API POST /classes/invite] Prepare for sending email to join class',
       );
       await this.mailerService.sendMail({
         to: email,
         subject: 'Join class by email',
         template: './join_class',
         context: {
-          inviteLink:
-            process.env.HOST_URL +
-            '/class/' +
-            checkPermission.id +
-            '/' +
-            checkPermission.inviteCode,
+          inviteLink: process.env.HOST_URL + '/classes/' + checkPermission.id,
         },
       });
 
       console.log(
-        '[API POST /class/invite] Send email Join class successfully',
+        '[API POST /classes/invite] Send email Join class successfully',
       );
 
       return res.status(HttpStatus.OK).send(HTTP_MSG_SUCCESS);
@@ -344,13 +406,13 @@ export class ClassesService {
       // If the error has a status property, set the corresponding HTTP status code
       if (error.status) {
         console.log(
-          `[API /class/invite] Unknown error: ${error.status} - ${error.message}`,
+          `[API /classes/invite] Unknown error: ${error.status} - ${error.message}`,
         );
         return res.status(error.status).send(error.message);
       }
 
       // If the error doesn't have a status property, set a generic 500 Internal Server Error status code
-      console.log('[API /class/invite] Internal error');
+      console.log('[API /classes/invite] Internal error');
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .send(HTTP_MSG_INTERNAL_SERVER_ERROR);
