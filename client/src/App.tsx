@@ -14,7 +14,7 @@ import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 import ProtectedRoute from "./components/ProtectedRoute";
-import NonAuthRoute from "./components/nonAuthRoute";
+import NonAuthRoute from "./components/NonAuthRoute";
 
 import { RootState } from "./redux/store";
 
@@ -22,6 +22,7 @@ import "./App.css";
 import { useEffect } from "react";
 import { useAppDispatch } from "./redux/hooks";
 import { stopLoad } from "./redux/reducers/user.reducer";
+import { axiosAuthRequest, axiosAuthResponse } from "./config/axios";
 
 const { defaultAlgorithm, darkAlgorithm } = theme;
 
@@ -72,6 +73,8 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  axiosAuthRequest;
+  axiosAuthResponse;
 
   return (
     <ConfigProvider

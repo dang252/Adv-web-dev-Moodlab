@@ -39,7 +39,7 @@ export default function LoadingModal() {
         className="z-10 rounded-2xl w-72 h-80  backdrop:bg-gray-500 backdrop:bg-opacity-30 
             open:flex flex-col justify-center items-center hidden"
       >
-        <div className="z-20 rounded-full border-t-4 border-4 border-indigo-200 border-t-indigo-500 border-indigo-200 w-14 h-14  animate-spin"></div>
+        <div className="z-20 rounded-full border-t-4 border-4 border-indigo-200 border-t-indigo-500 w-14 h-14  animate-spin"></div>
         <p>Please wait...</p>
       </dialog>
     </div>

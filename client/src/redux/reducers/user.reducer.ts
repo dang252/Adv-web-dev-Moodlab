@@ -94,9 +94,9 @@ export const getUser = createAsyncThunk(
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/user`,
         {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          }
+          // headers: {
+          //   Authorization: `Bearer ${accessToken}`,
+          // }
         }
       );
       return response.data
@@ -232,11 +232,13 @@ const userReducer = createReducer(initialState, (builder) => {
     .addCase(refresh.pending, () => {
     })
     .addCase(refresh.rejected, () => {
+      console.log("refresh rejeceted")
       localStorage.removeItem("accessToken")
       localStorage.removeItem("refreshToken")
       return initialState;
     })
     .addCase(refresh.fulfilled, (_, action) => {
+      console.log("refresh success")
       if (action.payload) {
         const accessToken: string = action.payload.access_token;
         const refreshToken: string = action.payload.refresh_token;

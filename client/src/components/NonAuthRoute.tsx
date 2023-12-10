@@ -6,7 +6,7 @@ import { RootState } from "../redux/store";
 
 const NonAuthRoute = ({ children }: any) => {
     const isLogin: string = useSelector<RootState, string>(
-        (state) => state.users.currentId
+        (state) => state.users.email
     );
 
     if (isLogin) {
