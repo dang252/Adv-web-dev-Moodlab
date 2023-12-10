@@ -7,12 +7,13 @@ import { useSelector } from "react-redux";
 import { useAppDispatch } from "../redux/hooks";
 import { RootState } from "../redux/store";
 
-import { getDetailClass } from "../redux/reducers/class.reducer";
+import { getDetailClass, getInviteCode } from "../redux/reducers/class.reducer";
 
 import DetailClassNews from "../components/DetailClassNews";
 import DetailClassMembers from "../components/DetailClassMembers";
 import DetailClassResults from "../components/DetailClassResults";
 import { ClassType } from "../types/classroom";
+import { toast } from "react-toastify";
 
 interface PropType {
   isDarkMode: boolean;
@@ -44,11 +45,36 @@ const DetailClass = (props: PropType) => {
       const promise = dispatchAsync(getDetailClass(id.toString()));
 
       // Get detail class failed
-      promise.then((res) => {
-        if (res.type === "class/getDetailClass/rejected") {
-          window.history.back();
-        }
-      });
+      promise
+        .then((res) => {
+          console.log(res);
+
+          if (res.type === "class/getDetailClass/rejected") {
+            // Redirect user
+            window.history.back();
+
+            if (detailClass) {
+              const body = {
+                id: detailClass?.id.toString(),
+                code: detailClass?.code,
+              };
+
+              // 401: call /classes/:id/:code
+              const inviteCodePromise = dispatchAsync(getInviteCode(body));
+
+              // Retry call /classes/:id
+              inviteCodePromise.then((res) => {
+                if (res.type === "class/getInviteCode/fulfilled") {
+                  dispatchAsync(getDetailClass(id.toString()));
+                }
+              });
+            }
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          toast.error("Get detail class failed");
+        });
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
