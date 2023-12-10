@@ -110,8 +110,12 @@ export class ClassesController {
     status: 500,
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
-  classInfo(@Param('id') id: string, @Res() res: Response) {
-    return this.classesService.classInfo(id, res);
+  classInfo(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    return this.classesService.classInfo(id, req.user['sub'], res);
   }
 
   @ApiBearerAuth()
