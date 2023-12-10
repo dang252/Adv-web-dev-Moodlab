@@ -1,6 +1,8 @@
 import { Card, Avatar, Col, Row, Form, Input, Button } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { IoLogoOctocat } from "react-icons/io";
+import { store } from "../redux/store";
+import { UserState } from "../redux/reducers/user.reducer";
 
 type FieldType = {
   username?: string;
@@ -43,6 +45,8 @@ const SettingProfile = () => {
     console.log("Failed:", errorInfo);
   };
 
+  const user: UserState = store.getState().users
+
   return (
     <div className="w-[100%] 2xl:w-[70%] mx-auto flex flex-col items-center">
       <div className="w-[100%] flex flex-col gap-10">
@@ -56,7 +60,7 @@ const SettingProfile = () => {
               />
               <div className="w-[100%] xl:w-[auto] flex flex-col gap-5">
                 <p className="text-xl font-extrabold text-center xl:text-left">
-                  Lê Minh Trí
+                  {user.firstname} {user.lastname}
                 </p>
 
                 <Row>
@@ -64,7 +68,7 @@ const SettingProfile = () => {
                     <p className="font-bold">Username:</p>
                   </Col>
                   <Col span={12}>
-                    <p>sadboizcodon</p>
+                    <p>{user.username}</p>
                   </Col>
                 </Row>
 
@@ -73,7 +77,7 @@ const SettingProfile = () => {
                     <p className="font-bold">Email:</p>
                   </Col>
                   <Col span={12}>
-                    <p>boychungtinh2002@gmail.com</p>
+                    <p>{user.email}</p>
                   </Col>
                 </Row>
 
@@ -101,10 +105,10 @@ const SettingProfile = () => {
           onFinishFailed={onFinishFailed}
           autoComplete="off"
           initialValues={{
-            name: "Lê Minh Trí",
-            email: "boychungtinh2002@gmail.com",
+            name: user.firstname + " " + user.lastname,
+            email: user.email,
             phone: "019999999",
-            username: "sadboizchungtinh",
+            username: user.username,
             newPassword: "123",
             confirm: "123",
           }}

@@ -12,7 +12,7 @@ import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 
 // Interface declair
-interface UserState {
+export interface UserState {
   currentId: string; // id for state action
   userId: number;
   username: string;
