@@ -205,6 +205,24 @@ export const getInviteCode = createAsyncThunk(
   }
 );
 
+export const getClassMembers = createAsyncThunk(
+  "class/getClassMembers",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+  async (body: { id: string; }, thunkAPI) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/classes/${body.id}/members`,
+      );
+      return response.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+
 const classReducer = createReducer(initialState, (builder) => {
   builder
     .addCase(getClasses.fulfilled, (state, action) => {
@@ -214,6 +232,7 @@ const classReducer = createReducer(initialState, (builder) => {
     .addCase(getDetailClass.fulfilled, (state, action) => {
       state.detailClass = action.payload;
     })
+
 
     .addMatcher(
       (action): action is PendingAction => action.type.endsWith("/pending"),

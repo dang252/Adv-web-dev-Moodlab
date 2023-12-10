@@ -5,16 +5,49 @@ import {
   UserDeleteOutlined,
 } from "@ant-design/icons";
 import { v4 as uuidv4 } from "uuid";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
 const DetailClassMembers = () => {
-  const teachers = [
-    "Minh Trí đẹp trai",
-    "sadboiz phu nhuan",
-    "nguoi tung ben anh",
-  ];
+  // const teachers = [
+  //   "Minh Trí đẹp trai",
+  //   "sadboiz phu nhuan",
+  //   "nguoi tung ben anh",
+  // ];
 
-  const students = ["student a", "student b", "student c"];
+  // const students = ["student a", "student b", "student c"];
 
+  const [teachers, setTeachers] = useState<string[]>([])
+  const [students, setStudents] = useState<string[]>([])
+
+
+  const classId = useSelector<RootState, number | undefined>(
+    (state) => state.classes.detailClass?.id
+  );
+
+  useEffect(() => {
+    const getClassMembers = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/classes/${classId}/members`,
+        )
+        // const teacherList = response.data.teacher.map((t: any) => {
+        //   return t.firstName + t.lastName
+        // })
+        setTeachers([response.data.teacher.firstName + " " + response.data.teacher.lastName])
+        setStudents(response.data.students.map((student: any) => {
+          return "student " + student.studentId
+        }))
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        console.log(error)
+      }
+    }
+
+    getClassMembers()
+  }, [classId])
   return (
     <div className="w-[100%] 2xl:w-[70%] mx-auto flex flex-col">
       <div className="mt-10">
@@ -50,7 +83,7 @@ const DetailClassMembers = () => {
         <div className="flex items-center justify-between">
           <p className="text-2xl text-blue-500 font-bold">Students</p>
           <div className="flex items-center gap-5">
-            <p className="font-semibold">94 members</p>
+            <p className="font-semibold">{students.length} members</p>
             <UserAddOutlined className="text-2xl hover:cursor-pointer hover:text-blue-500" />
           </div>
         </div>

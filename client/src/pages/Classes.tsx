@@ -49,9 +49,8 @@ const Classes = (props: PropType) => {
       ) : (
         <CustomeFadeAnimate>
           <div
-            className={`rounded-md flex gap-10 flex-wrap ${
-              isDarkMode ? "" : ""
-            }`}
+            className={`rounded-md flex gap-10 flex-wrap ${isDarkMode ? "" : ""
+              }`}
             style={{
               minHeight: "100vh",
               padding: 24,

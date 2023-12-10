@@ -223,8 +223,8 @@ const userReducer = createReducer(initialState, (builder) => {
     })
     .addCase(getUser.fulfilled, (state, action) => {
       if (action.payload) {
-        state.lastname = action.payload.lastname;
-        state.firstname = action.payload.firstname;
+        state.lastname = action.payload.lastName;
+        state.firstname = action.payload.firstName;
         state.email = action.payload.email;
         state.role = action.payload.role;
       }
