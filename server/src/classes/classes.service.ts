@@ -394,7 +394,9 @@ export class ClassesService {
         template: './join_class',
         context: {
           inviteLink:
-            process.env.CLIENT_HOME_PAGE + '/classes/' + checkPermission.id,
+            process.env.CLIENT_HOME_PAGE +
+            '/classes/' +
+            checkPermission.inviteCode,
         },
       });
 
