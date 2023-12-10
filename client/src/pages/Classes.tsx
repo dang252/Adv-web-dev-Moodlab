@@ -68,6 +68,7 @@ const Classes = (props: PropType) => {
             {classList &&
               classList.length !== 0 &&
               classList.map((c: ClassType) => {
+                console.log(c);
                 return (
                   <ClassCard
                     key={c.id}
@@ -77,6 +78,7 @@ const Classes = (props: PropType) => {
                     name={c.name}
                     description={c.description}
                     code={c.code}
+                    inviteCode={c.inviteCode}
                   />
                 );
               })}

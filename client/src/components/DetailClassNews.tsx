@@ -111,7 +111,7 @@ const DetailClassNews = (props: PropType) => {
       if (res.type === "class/editClassTheme/fulfilled") {
         toast.success("Edit theme successfully");
 
-        dispatchAsync(getDetailClass(detailClass.id.toString()));
+        dispatchAsync(getDetailClass(detailClass.inviteCode));
       }
 
       if (res.type === "class/editClassTheme/rejected") {

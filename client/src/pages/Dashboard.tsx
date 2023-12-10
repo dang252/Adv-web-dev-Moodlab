@@ -163,7 +163,7 @@ const Dashboard = () => {
                 }
               />
               <Route
-                path="/classes/:id"
+                path="/classes/:inviteCode"
                 element={
                   <DetailClass
                     isDarkMode={isDarkMode}

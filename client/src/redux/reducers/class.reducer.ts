@@ -60,7 +60,7 @@ export const getDetailClass = createAsyncThunk(
   "class/getDetailClass",
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
-  async (id: string, thunkAPI) => {
+  async (inviteCode: string, thunkAPI) => {
     try {
       const accessToken = localStorage
         .getItem("accessToken")
@@ -68,7 +68,7 @@ export const getDetailClass = createAsyncThunk(
         .replace(/^"(.*)"$/, "$1");
 
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/classes/${id}`,
+        `${import.meta.env.VITE_API_URL}/classes/${inviteCode}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,

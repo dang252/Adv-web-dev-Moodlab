@@ -24,7 +24,7 @@ const DetailClass = (props: PropType) => {
   const { isDarkMode } = props;
 
   const params = useParams();
-  const { id } = params;
+  const { inviteCode } = params;
 
   const dispatchAsync = useAppDispatch();
 
@@ -41,8 +41,8 @@ const DetailClass = (props: PropType) => {
   }, []);
 
   useEffect(() => {
-    if (id) {
-      const promise = dispatchAsync(getDetailClass(id.toString())).unwrap();
+    if (inviteCode) {
+      const promise = dispatchAsync(getDetailClass(inviteCode)).unwrap();
 
       // Get detail class failed
       promise
@@ -76,7 +76,7 @@ const DetailClass = (props: PropType) => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [inviteCode]);
 
   const onChange = (key: string) => {
     console.log(key);

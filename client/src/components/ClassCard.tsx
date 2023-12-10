@@ -13,10 +13,11 @@ interface PropType {
   name: string;
   description: string;
   code: string;
+  inviteCode: string;
 }
 
 const ClassCard = (props: PropType) => {
-  const { isDarkMode, id, theme, name, description, code } = props;
+  const { isDarkMode, theme, name, description, code, inviteCode } = props;
 
   const teacherItems: MenuProps["items"] = [
     {
@@ -49,7 +50,7 @@ const ClassCard = (props: PropType) => {
           className="w-[100%] h-[100px] object-cover rounded-t-xl"
         />
         <Link
-          to={`/dashboard/classes/${id}`}
+          to={`/dashboard/classes/${inviteCode}`}
           className="absolute text-xl font-semibold top-[15px] left-[15px] text-white hover:text-white hover:underline hover:underline-offset-2"
         >
           {name}
