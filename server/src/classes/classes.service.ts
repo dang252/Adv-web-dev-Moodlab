@@ -365,20 +365,26 @@ export class ClassesService {
     }
   }
 
-  // [POST] /invite
-  async inviteByEmail(userId: number, email: string, res: Response) {
+  // [POST] /:id/invite
+  async inviteByEmail(
+    classId: string,
+    userId: number,
+    email: string,
+    res: Response,
+  ) {
     try {
-      console.log('[API POST /classes/invite]');
+      console.log('[API POST /classes/:id/invite]');
 
       const checkPermission = await this.prisma.class.findFirst({
         where: {
+          id: parseInt(classId),
           teacherId: userId,
         },
       });
 
       if (checkPermission == null) {
         console.log(
-          `[API POST /classes/invite] User (id: ${userId} can\'t invite other by email`,
+          `[API POST /classes/:id/invite] User (id: ${userId} can\'t invite other by email`,
         );
         return res
           .status(HttpStatus.UNAUTHORIZED)
@@ -386,7 +392,7 @@ export class ClassesService {
       }
 
       console.log(
-        '[API POST /classes/invite] Prepare for sending email to join class',
+        '[API POST /classes/:id/invite] Prepare for sending email to join class',
       );
       await this.mailerService.sendMail({
         to: email,
@@ -401,7 +407,7 @@ export class ClassesService {
       });
 
       console.log(
-        '[API POST /classes/invite] Send email Join class successfully',
+        '[API POST /classes/:id/invite] Send email Join class successfully',
       );
 
       return res.status(HttpStatus.OK).send(HTTP_MSG_SUCCESS);
