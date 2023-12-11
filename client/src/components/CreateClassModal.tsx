@@ -4,6 +4,8 @@ import { useAppDispatch } from "../redux/hooks";
 
 import { createNewClass, getClasses } from "../redux/reducers/class.reducer";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
 interface PropType {
   isModalOpen: boolean;
@@ -51,6 +53,11 @@ const CreateClassModal = (props: PropType) => {
     setIsCreateModalOpen(false);
   };
 
+  const userFullname = useSelector<RootState, string>(
+    (state) => { return state.users.firstname + " " + state.users.lastname }
+  );
+
+
   const onFinishFailed = (errorInfo: any) => {
     console.log("Failed:", errorInfo);
   };
@@ -71,7 +78,7 @@ const CreateClassModal = (props: PropType) => {
         wrapperCol={{ span: 16 }}
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
-        initialValues={{ teacherName: "Minh Trí đẹp trai" }}
+        initialValues={{ teacherName: userFullname }}
         autoComplete="off"
       >
         <Form.Item<FieldType> label="Teacher name" name="teacherName">
