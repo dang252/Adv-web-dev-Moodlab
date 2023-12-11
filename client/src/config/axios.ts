@@ -69,5 +69,6 @@ export const axiosAuthResponse = axios.interceptors.response.use(
                 console.log(err)
             }
         }
+        return Promise.reject(error);
     }
 )
