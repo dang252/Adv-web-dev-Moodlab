@@ -152,7 +152,7 @@ export const inviteToClassByEmail = createAsyncThunk(
   "class/inviteToClassByEmail",
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
-  async (email: string, thunkAPI) => {
+  async (body: { id: number; email: string }, thunkAPI) => {
     try {
       const accessToken = localStorage
         .getItem("accessToken")
@@ -160,9 +160,9 @@ export const inviteToClassByEmail = createAsyncThunk(
         .replace(/^"(.*)"$/, "$1");
 
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/classes/invite`,
+        `${import.meta.env.VITE_API_URL}/classes/${body.id}/invite`,
         {
-          email: email,
+          email: body.email,
         },
         {
           headers: {

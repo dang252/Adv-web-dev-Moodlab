@@ -85,6 +85,10 @@ const DetailClassNews = (props: PropType) => {
     (state) => state.users.isDarkMode
   );
 
+  const classId = useSelector<RootState, number | undefined>(
+    (state) => state.classes.detailClass?.id
+  );
+
   //==================== Post form
   const onFinish = (values: any) => {
     console.log(values);
@@ -145,17 +149,24 @@ const DetailClassNews = (props: PropType) => {
   const onFinishInvite = async (values: any) => {
     const email: string = values.email;
 
-    const res = await dispatchAsync(inviteToClassByEmail(email));
+    if (classId) {
+      const body: { id: number, email: string } = {
+        id: classId,
+        email: email,
+      }
 
-    if (res.type === "class/inviteToClassByEmail/fulfilled") {
-      toast.success("Invite to class successfully");
+      const res = await dispatchAsync(inviteToClassByEmail(body));
+
+      if (res.type === "class/inviteToClassByEmail/fulfilled") {
+        toast.success("Invite to class successfully");
+      }
+
+      if (res.type === "class/inviteToClassByEmail/rejected") {
+        toast.error("Invite to class failed");
+      }
+
+      form.resetFields();
     }
-
-    if (res.type === "class/inviteToClassByEmail/rejected") {
-      toast.error("Invite to class failed");
-    }
-
-    form.resetFields();
   };
 
   return (
