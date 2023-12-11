@@ -4,7 +4,7 @@ import { refresh } from "../redux/reducers/user.reducer";
 
 export const axiosAuthRequest = axios.interceptors.request.use(
     function (request: any) {
-        console.log("interceptor resquest")
+        // console.log("interceptor resquest")
         if (!(request.url?.includes("/login") || request.url?.includes("/register") || request.url?.includes("/forgot"))) {
             if (!request.headers.Authorization) {
                 const accessToken = localStorage
@@ -37,9 +37,9 @@ export const axiosAuthResponse = axios.interceptors.response.use(
         return response
     },
     async function (error: any) {
-        console.log("interceptor response", error)
+        // console.log("interceptor response", error)
         if (error.request.status == 401 && !error.config.url?.includes("/auth/refresh")) {
-            console.log("request url", error.config.url)
+            // console.log("request url", error.config.url)
             try {
                 // const refreshToken = localStorage
                 //     .getItem("refreshToken")

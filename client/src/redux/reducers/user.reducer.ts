@@ -206,7 +206,6 @@ const userReducer = createReducer(initialState, (builder) => {
         // console.log("CHECK login from redux: ", action.payload);
         const accessToken: string = action.payload.access_token;
         const refreshToken: string = action.payload.refresh_token;
-        console.log(action.payload.userId)
         // const decodedToken = jwtDecode(accessToken) as JwtPayload
         state.userId = action.payload.userId;
         state.username = action.payload.username;
