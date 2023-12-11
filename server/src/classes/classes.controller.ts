@@ -206,7 +206,7 @@ export class ClassesController {
 
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
-  @Post('/invite')
+  @Post('/:id/invite')
   @ApiBody({
     schema: {
       type: 'object',
@@ -234,10 +234,11 @@ export class ClassesController {
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   inviteByEmail(
+    @Param('id') id: string,
     @Req() req: Request,
     @Res() res: Response,
     @Body() dto: InviteEmailDto,
   ) {
-    return this.classesService.inviteByEmail(req.user['sub'], dto.email, res);
+    return this.classesService.inviteByEmail(id, req.user['sub'], dto.email, res);
   }
 }
