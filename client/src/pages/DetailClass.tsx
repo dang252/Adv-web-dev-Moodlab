@@ -64,11 +64,13 @@ const DetailClass = (props: PropType) => {
                 getInviteCode(body)
               ).unwrap();
 
-              inviteCodePromise.then((res) => {
-                const retrypromise = dispatchAsync(getDetailClass(inviteCode)).unwrap();
+              inviteCodePromise.then(() => {
+                const retrypromise = dispatchAsync(
+                  getDetailClass(inviteCode)
+                ).unwrap();
                 retrypromise.then(() => {
                   toast.success("Join class successfully");
-                })
+                });
               });
             }
           } else {
@@ -122,7 +124,7 @@ const DetailClass = (props: PropType) => {
             items={items}
             onChange={onChange}
             className="w-[100%]"
-          // indicatorSize={(origin) => origin - 16}
+            // indicatorSize={(origin) => origin - 16}
           />
         </div>
       )}

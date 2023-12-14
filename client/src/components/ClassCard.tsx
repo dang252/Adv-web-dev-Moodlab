@@ -53,7 +53,7 @@ const ClassCard = (props: PropType) => {
           to={`/dashboard/classes/${inviteCode}`}
           className="absolute text-xl font-semibold top-[15px] left-[15px] text-white hover:text-white hover:underline hover:underline-offset-2"
         >
-          {name}
+          <p className="truncate max-w-[200px]">{name}</p>
         </Link>
         <p className="absolute text-white top-[50px] left-[15px] hover:underline hover:underline-offset-2">
           {code}
