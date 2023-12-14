@@ -250,7 +250,11 @@ export class ClassesService {
         },
         include: {
           teacher: true,
-          students: true,
+          students: {
+            include: {
+              student: true,
+            },
+          },
         },
       });
 
@@ -290,6 +294,7 @@ export class ClassesService {
       const user = await this.prisma.grade.findFirst({
         where: {
           studentId: userId,
+          classId: parseInt(classId),
         },
       });
 
