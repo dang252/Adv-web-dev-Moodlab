@@ -1,4 +1,10 @@
 import { useState } from "react";
+import {
+  SortableContainer,
+  SortableElement,
+  SortEnd,
+} from "react-sortable-hoc";
+import { arrayMoveImmutable } from "array-move";
 
 import { Button, Form, Input, Row, Col } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
@@ -6,13 +12,23 @@ import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { MdDragIndicator } from "react-icons/md";
 
 interface PropType {
+  fields: any[];
+  setFields: React.Dispatch<React.SetStateAction<any[]>>;
   handleCreateGradeOk: (values: any) => void;
 }
 
-const CreateClassGradeModal = (props: PropType) => {
-  const { handleCreateGradeOk } = props;
+interface SortableItemProps {
+  value: any;
+}
 
-  const [fields, setFields] = useState<any[]>([]);
+interface SortableListProps {
+  items: any[];
+  onSortEnd: (sort: SortEnd) => void;
+}
+
+const CreateClassGradeModal = (props: PropType) => {
+  const { fields, setFields, handleCreateGradeOk } = props;
+
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
 
   const handleAddField = () => {
@@ -87,6 +103,31 @@ const CreateClassGradeModal = (props: PropType) => {
     );
   };
 
+  const SortableItem = SortableElement<SortableItemProps>(({ value }: any) => (
+    <FieldCard
+      fieldKey={value.fieldKey}
+      name={value.name}
+      restField={value.restField}
+    />
+  ));
+
+  const SortableList = SortableContainer<SortableListProps>(
+    ({ items }: any) => (
+      <div>
+        {items.map((value: any, index: any) => {
+          return (
+            <SortableItem key={`item-${index}`} index={index} value={value} />
+          );
+        })}
+      </div>
+    )
+  );
+
+  const onSortEnd = ({ oldIndex, newIndex }: SortEnd) => {
+    const newFields = arrayMoveImmutable(fields, oldIndex, newIndex);
+    setFields(newFields);
+  };
+
   return (
     <div className="w-[100%] mt-10 mb-5 flex flex-col gap-14 items-start">
       <Form
@@ -97,35 +138,14 @@ const CreateClassGradeModal = (props: PropType) => {
       >
         <Form.List name="grades">
           {(_) => {
-            // list, { add, remove }
-
             return (
               <div>
-                {fields.map((item) => {
-                  const value = {
-                    key: item?.key,
-                    name: item?.name,
-                    restField: {
-                      isListField: item?.isListField,
-                      fieldKey: item?.fieldKey,
-                    },
-                  };
-
-                  return (
-                    <FieldCard
-                      key={value.key}
-                      fieldKey={value.key}
-                      name={value.name}
-                      restField={value.restField}
-                    />
-                  );
-                })}
+                <SortableList items={fields} onSortEnd={onSortEnd} />
 
                 <Form.Item>
                   <Button
                     type="dashed"
                     onClick={() => {
-                      //   add();
                       handleAddField();
                     }}
                     block
@@ -138,41 +158,6 @@ const CreateClassGradeModal = (props: PropType) => {
             );
           }}
         </Form.List>
-
-        {/* <Form.List name="grades">
-          {(list, { add, remove }) => {
-            return (
-              <div>
-                {list.map(({ key, name, ...restField }) => {
-                  console.log(list);
-
-                  return (
-                    <FieldCard
-                      key={key}
-                      fieldKey={key}
-                      name={name}
-                      restField={restField}
-                      remove={remove}
-                    />
-                  );
-                })}
-
-                <Form.Item>
-                  <Button
-                    type="dashed"
-                    onClick={() => {
-                      add();
-                    }}
-                    block
-                    icon={<PlusOutlined />}
-                  >
-                    Add field
-                  </Button>
-                </Form.Item>
-              </div>
-            );
-          }}
-        </Form.List> */}
 
         <Form.Item>
           <div className="flex gap-3 justify-end">
