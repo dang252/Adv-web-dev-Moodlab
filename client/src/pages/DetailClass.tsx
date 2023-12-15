@@ -11,7 +11,8 @@ import { getDetailClass, getInviteCode } from "../redux/reducers/class.reducer";
 
 import DetailClassNews from "../components/DetailClassNews";
 import DetailClassMembers from "../components/DetailClassMembers";
-import DetailClassResults from "../components/DetailClassResults";
+import DetailClassGrades from "../components/DetailClassGrades";
+
 import { ClassType } from "../types/classroom";
 import { toast } from "react-toastify";
 
@@ -27,6 +28,8 @@ const DetailClass = (props: PropType) => {
   const { inviteCode } = params;
 
   const dispatchAsync = useAppDispatch();
+
+  const USER_ROLE = useSelector<RootState, string>((state) => state.users.role);
 
   const isLoading = useSelector<RootState, boolean>(
     (state) => state.classes.isLoading
@@ -86,7 +89,20 @@ const DetailClass = (props: PropType) => {
     console.log(key);
   };
 
-  const items: TabsProps["items"] = [
+  const studentItems: TabsProps["items"] = [
+    {
+      key: "1",
+      label: "News",
+      children: <DetailClassNews detailClass={detailClass} />,
+    },
+    {
+      key: "2",
+      label: "Members",
+      children: <DetailClassMembers />,
+    },
+  ];
+
+  const teacherItems: TabsProps["items"] = [
     {
       key: "1",
       label: "News",
@@ -99,8 +115,8 @@ const DetailClass = (props: PropType) => {
     },
     {
       key: "3",
-      label: "Results",
-      children: <DetailClassResults />,
+      label: "Grades",
+      children: <DetailClassGrades />,
     },
   ];
 
@@ -121,7 +137,7 @@ const DetailClass = (props: PropType) => {
         >
           <Tabs
             defaultActiveKey="1"
-            items={items}
+            items={USER_ROLE === "TEACHER" ? teacherItems : studentItems}
             onChange={onChange}
             className="w-[100%]"
             // indicatorSize={(origin) => origin - 16}
