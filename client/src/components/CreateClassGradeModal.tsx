@@ -3,6 +3,7 @@ import {
   SortableContainer,
   SortableElement,
   SortEnd,
+  SortableHandle,
 } from "react-sortable-hoc";
 import { arrayMoveImmutable } from "array-move";
 
@@ -56,16 +57,20 @@ const CreateClassGradeModal = (props: PropType) => {
     );
   };
 
+  const DragHandle = SortableHandle(() => (
+    <Form.Item>
+      <MdDragIndicator size={30} />
+    </Form.Item>
+  ));
+
   const FieldCard = ({ fieldKey, name, restField }: any) => {
     return (
       <Row key={fieldKey} gutter={16}>
-        <Col span={1}>
-          <Form.Item>
-            <MdDragIndicator size={30} />
-          </Form.Item>
+        <Col xs={{ span: 2 }} md={{ span: 1 }} xxl={{ span: 1 }}>
+          <DragHandle />
         </Col>
 
-        <Col span={11}>
+        <Col xs={{ span: 8 }} md={{ span: 10 }} xxl={{ span: 11 }}>
           <Form.Item
             {...restField}
             name={[name, "name"]}
@@ -75,7 +80,7 @@ const CreateClassGradeModal = (props: PropType) => {
           </Form.Item>
         </Col>
 
-        <Col span={8}>
+        <Col xs={{ span: 7 }} md={{ span: 8 }} xxl={{ span: 8 }}>
           <Form.Item
             {...restField}
             name={[name, "scale"]}
@@ -85,15 +90,22 @@ const CreateClassGradeModal = (props: PropType) => {
           </Form.Item>
         </Col>
 
-        <Col span={4}>
+        <Col xs={{ span: 7 }} md={{ span: 5 }} xxl={{ span: 4 }}>
           <Form.Item>
             <div className="flex justify-end gap-3">
               <MinusCircleOutlined
                 onClick={() => {
+                  console.log("DELETE", name);
                   handleRemoveFeild(name);
                 }}
               />
-              <Button type="primary" htmlType="button">
+              <Button
+                type="primary"
+                htmlType="button"
+                onClick={() => {
+                  console.log("FINALIZE", name);
+                }}
+              >
                 Finalize
               </Button>
             </div>
@@ -140,7 +152,11 @@ const CreateClassGradeModal = (props: PropType) => {
           {(_) => {
             return (
               <div>
-                <SortableList items={fields} onSortEnd={onSortEnd} />
+                <SortableList
+                  items={fields}
+                  onSortEnd={onSortEnd}
+                  useDragHandle
+                />
 
                 <Form.Item>
                   <Button
@@ -162,10 +178,10 @@ const CreateClassGradeModal = (props: PropType) => {
         <Form.Item>
           <div className="flex gap-3 justify-end">
             <Button type="primary" htmlType="submit">
-              Add
+              Save
             </Button>
 
-            <Button htmlType="button">Save</Button>
+            {/* <Button htmlType="button">Save</Button> */}
           </div>
         </Form.Item>
       </Form>

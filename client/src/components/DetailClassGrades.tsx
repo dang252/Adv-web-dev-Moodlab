@@ -21,7 +21,7 @@ const DetailClassGrades = () => {
   };
 
   return (
-    <div className="w-[100%] 2xl:w-[70%] mx-auto flex flex-col items-center">
+    <div className="w-[100%] md:w-[80%] 2xl:w-[70%] mx-auto flex flex-col items-center">
       <div className="flex gap-5 mb-5 self-end">
         <Button
           type="primary"
