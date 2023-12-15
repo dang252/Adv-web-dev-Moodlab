@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   SortableContainer,
   SortableElement,
@@ -32,8 +32,14 @@ const CreateClassGradeModal = (props: PropType) => {
 
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
 
+  useEffect(() => {
+    if (fields.length !== 0) setCurrentIndex(fields.length - 1);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleAddField = () => {
-    if (currentIndex === null) {
+    if (currentIndex === null && fields.length === 0) {
       setCurrentIndex(0);
       setFields([{ name: 0, key: 0, isListField: true, fieldKey: 0 }]);
     }
@@ -50,6 +56,14 @@ const CreateClassGradeModal = (props: PropType) => {
   };
 
   const handleRemoveFeild = (name: string) => {
+    if (fields.length === 0) setCurrentIndex(null);
+
+    if (currentIndex !== null && currentIndex > 0) {
+      let curr = currentIndex;
+      curr = curr - 1;
+      setCurrentIndex(curr);
+    }
+
     setFields(
       fields.filter((item) => {
         return item.name !== name;
@@ -63,7 +77,9 @@ const CreateClassGradeModal = (props: PropType) => {
     </Form.Item>
   ));
 
-  const FieldCard = ({ fieldKey, name, restField }: any) => {
+  const FieldCard = ({ value }: any) => {
+    const { fieldKey, name, scale } = value;
+
     return (
       <Row key={fieldKey} gutter={16}>
         <Col xs={{ span: 2 }} md={{ span: 1 }} xxl={{ span: 1 }}>
@@ -72,9 +88,9 @@ const CreateClassGradeModal = (props: PropType) => {
 
         <Col xs={{ span: 8 }} md={{ span: 10 }} xxl={{ span: 11 }}>
           <Form.Item
-            {...restField}
             name={[name, "name"]}
             rules={[{ required: true, message: "Missing name" }]}
+            initialValue={scale === undefined ? "" : name}
           >
             <Input placeholder="Name" />
           </Form.Item>
@@ -82,9 +98,9 @@ const CreateClassGradeModal = (props: PropType) => {
 
         <Col xs={{ span: 7 }} md={{ span: 8 }} xxl={{ span: 8 }}>
           <Form.Item
-            {...restField}
             name={[name, "scale"]}
             rules={[{ required: true, message: "Missing scale" }]}
+            initialValue={scale}
           >
             <Input placeholder="Scale" />
           </Form.Item>
@@ -115,24 +131,22 @@ const CreateClassGradeModal = (props: PropType) => {
     );
   };
 
-  const SortableItem = SortableElement<SortableItemProps>(({ value }: any) => (
-    <FieldCard
-      fieldKey={value.fieldKey}
-      name={value.name}
-      restField={value.restField}
-    />
-  ));
+  const SortableItem = SortableElement<SortableItemProps>(({ value }: any) => {
+    return <FieldCard value={value} />;
+  });
 
   const SortableList = SortableContainer<SortableListProps>(
-    ({ items }: any) => (
-      <div>
-        {items.map((value: any, index: any) => {
-          return (
-            <SortableItem key={`item-${index}`} index={index} value={value} />
-          );
-        })}
-      </div>
-    )
+    ({ items }: any) => {
+      return (
+        <div>
+          {items.map((value: any, index: any) => {
+            return (
+              <SortableItem key={`item-${index}`} index={index} value={value} />
+            );
+          })}
+        </div>
+      );
+    }
   );
 
   const onSortEnd = ({ oldIndex, newIndex }: SortEnd) => {

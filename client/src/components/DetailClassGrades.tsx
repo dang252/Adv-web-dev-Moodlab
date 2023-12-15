@@ -6,15 +6,24 @@ import CreateClassGradeModal from "./CreateClassGradeModal";
 
 const DetailClassGrades = () => {
   const [showCreateGrade, setShowCreateGrade] = useState<boolean>(true);
-  const [fields, setFields] = useState<any[]>([]);
+  const [fields, setFields] = useState<any[]>([
+    { name: "BTCN", scale: "10", id: 0 },
+    { name: "GK", scale: "30", id: 1 },
+    { name: "CK", scale: "60", id: 2 },
+  ]);
 
   const handleCreateGradeOk = (values: any) => {
     const { grades } = values;
     const data = [];
 
     for (let i = 0; i < fields.length; ++i) {
-      const field = { ...grades[fields[i].key], id: i };
-      data.push(field);
+      if (fields[i].key !== undefined) {
+        const field = { ...grades[fields[i].key], id: i };
+        data.push(field);
+      } else {
+        const field = { ...fields[i], id: i };
+        data.push(field);
+      }
     }
 
     console.log(data);
