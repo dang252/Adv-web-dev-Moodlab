@@ -1,16 +1,17 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-import { Card } from "antd";
+import { Button, Card } from "antd";
 
 import { TaskType } from "../../types/kanban";
 
 interface PropType {
   task: TaskType;
+  handleDeleteTask: (id: string) => void;
 }
 
 const MyTask = (props: PropType) => {
-  const { task } = props;
+  const { task, handleDeleteTask } = props;
 
   const id = task.id;
 
@@ -32,12 +33,28 @@ const MyTask = (props: PropType) => {
   return (
     <Card
       className="w-[100%] cursor-grab"
+      title={
+        <div className="flex items-center justify-between">
+          <p>{task.title}</p>
+          <Button
+            type="primary"
+            danger
+            onClick={() => {
+              handleDeleteTask(task.id);
+            }}
+          >
+            Delete
+          </Button>
+        </div>
+      }
       ref={setNodeRef}
       style={style}
       {...attributes}
       {...listeners}
     >
-      {task.title}
+      <div className="flex">
+        <p>{task.description}</p>
+      </div>
     </Card>
   );
 };

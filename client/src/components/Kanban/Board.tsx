@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 import {
   DragEndEvent,
@@ -16,19 +17,31 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+
 import { TaskType, ColumnType } from "../../types/kanban";
-import { tasksData, columnsData } from "../../utils/task";
+import { columnsData } from "../../utils/task";
 import MyColumn from "./MyColumn";
 import MyTask from "./MyTask";
+import { toast } from "react-toastify";
 
 const Board = () => {
-  const [tasks, setTasks] = useState<TaskType[]>(tasksData);
+  const [tasks, setTasks] = useState<TaskType[]>([]);
   const [activeTask, setActiveTask] = useState<TaskType | null>(null);
+
+  const username = useSelector<RootState, string>((state) => {
+    return state.users.username;
+  });
 
   const columns: ColumnType[] = columnsData;
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -36,6 +49,65 @@ const Board = () => {
 
   const dropAnimation: DropAnimation = {
     ...defaultDropAnimation,
+  };
+
+  const handleSaveKaban = (username: string, data: TaskType[]) => {
+    const Kaban = {
+      username: username,
+      tasks: data,
+    };
+
+    localStorage.setItem("kaban", JSON.stringify(Kaban));
+  };
+
+  useEffect(() => {
+    if (username !== "") {
+      const kabanStr = localStorage.getItem("kaban");
+
+      if (kabanStr !== null) {
+        const Kaban = JSON.parse(kabanStr);
+
+        setTasks(Kaban.tasks);
+      }
+    }
+  }, [username]);
+
+  const handleCreateTask = (
+    columnId: string,
+    title: string,
+    description: string
+  ) => {
+    const newTask: TaskType = {
+      id: uuidv4(),
+      columnId: columnId,
+      title: title,
+      description: description,
+    };
+
+    setTasks([...tasks, newTask]);
+
+    const data = tasks;
+    data.push(newTask);
+
+    handleSaveKaban(username, data);
+
+    toast.success("Add task successfully");
+  };
+
+  const handleDeleteTask = (id: string) => {
+    setTasks(
+      tasks.filter((task) => {
+        return task.id !== id;
+      })
+    );
+
+    const data = tasks.filter((task) => {
+      return task.id !== id;
+    });
+
+    handleSaveKaban(username, data);
+
+    toast.success("Delete task successfully");
   };
 
   const handleDragStart = ({ active }: DragStartEvent) => {
@@ -86,6 +158,8 @@ const Board = () => {
   const handleDragEnd = ({ active, over }: DragEndEvent) => {
     setActiveTask(null);
     console.log(active, over);
+
+    handleSaveKaban(username, tasks);
   };
 
   const task = activeTask ? activeTask : null;
@@ -102,18 +176,22 @@ const Board = () => {
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex flex-wrap gap-5">
+        <div className="w-[100%] 2xl:w-[80%] pb-4 flex overflow-x-auto gap-10">
           {columns?.map((col) => {
             return (
               <MyColumn
                 key={col.id}
                 column={col}
+                handleCreateTask={handleCreateTask}
+                handleDeleteTask={handleDeleteTask}
                 tasks={tasks.filter((task) => task.columnId === col.id)}
               />
             );
           })}
           <DragOverlay dropAnimation={dropAnimation}>
-            {task ? <MyTask task={task} /> : null}
+            {task ? (
+              <MyTask handleDeleteTask={handleDeleteTask} task={task} />
+            ) : null}
           </DragOverlay>
         </div>
       </DndContext>

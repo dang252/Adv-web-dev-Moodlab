@@ -151,7 +151,7 @@ const DetailClassGrades = () => {
         />
       )}
 
-      <div className="mt-10 mb-[50px] w-[100%] overflow-auto">
+      <div className="mt-10 mb-[50px] w-[100%] pb-4 overflow-auto">
         {fields.length === 0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
 
         {fields.length !== 0 && (

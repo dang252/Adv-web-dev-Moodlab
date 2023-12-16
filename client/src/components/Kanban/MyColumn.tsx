@@ -5,7 +5,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
-import { Tag } from "antd";
+import { Button, Tag } from "antd";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -20,10 +20,16 @@ import MyTask from "./MyTask";
 interface PropType {
   column: ColumnType;
   tasks: TaskType[];
+  handleCreateTask: (
+    columnId: string,
+    title: string,
+    description: string
+  ) => void;
+  handleDeleteTask: (id: string) => void;
 }
 
 const MyColumn = (props: PropType) => {
-  const { column, tasks } = props;
+  const { column, tasks, handleCreateTask, handleDeleteTask } = props;
 
   const id = column.id;
 
@@ -37,11 +43,11 @@ const MyColumn = (props: PropType) => {
 
   return (
     <div
-      className={`w-[400px] flex flex-col items-center rounded-md ${
+      className={`min-w-[350px] min-h-[500px] max-h-[500px] overflow-y-auto flex flex-col items-center rounded-md ${
         isDarkMode ? "bg-zinc-800" : "bg-zinc-200"
       }`}
     >
-      <div className="w-[100%] p-4">
+      <div className="w-[100%] p-4 flex items-center justify-between">
         {column.id === "backlog" && (
           <Tag icon={<ClockCircleOutlined />} color="error">
             waiting
@@ -57,6 +63,20 @@ const MyColumn = (props: PropType) => {
             success
           </Tag>
         )}
+
+        <Button
+          type="primary"
+          onClick={() => {
+            const title = prompt(`Add new task title for: ${id}`);
+            const description = prompt(`Description of task:`);
+
+            if (column.id && title && description) {
+              handleCreateTask(column.id, title, description);
+            }
+          }}
+        >
+          Add
+        </Button>
       </div>
       <SortableContext
         id={id}
@@ -66,7 +86,7 @@ const MyColumn = (props: PropType) => {
         <div ref={setNodeRef} className="w-[100%] p-4 flex flex-col gap-3">
           {tasks.map((task) => (
             <div key={task.id}>
-              <MyTask task={task} />
+              <MyTask task={task} handleDeleteTask={handleDeleteTask} />
             </div>
           ))}
         </div>
