@@ -7,6 +7,9 @@ import {
 } from "react-sortable-hoc";
 import { arrayMoveImmutable } from "array-move";
 
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+
 import { Button, Form, Input, Row, Col } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 
@@ -31,6 +34,10 @@ const CreateClassGradeModal = (props: PropType) => {
   const { fields, setFields, handleCreateGradeOk } = props;
 
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
+
+  const isDarkMode = useSelector<RootState, boolean | undefined>(
+    (state) => state.users.isDarkMode
+  );
 
   useEffect(() => {
     if (fields.length !== 0) setCurrentIndex(fields.length - 1);
@@ -138,7 +145,11 @@ const CreateClassGradeModal = (props: PropType) => {
   const SortableList = SortableContainer<SortableListProps>(
     ({ items }: any) => {
       return (
-        <div>
+        <div
+          className={`px-2 py-4 mb-5 border border-solid rounded-md max-h-[300px] overflow-y-auto overflow-x-hidden ${
+            isDarkMode ? "border-zinc-700" : "border-zinc-300"
+          }`}
+        >
           {items.map((value: any, index: any) => {
             return (
               <SortableItem key={`item-${index}`} index={index} value={value} />
