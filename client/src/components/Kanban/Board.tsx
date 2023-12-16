@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { toast } from "react-toastify";
+
+import { CgNotes } from "react-icons/cg";
 
 import {
   DragEndEvent,
@@ -24,7 +27,6 @@ import { TaskType, ColumnType } from "../../types/kanban";
 import { columnsData } from "../../utils/task";
 import MyColumn from "./MyColumn";
 import MyTask from "./MyTask";
-import { toast } from "react-toastify";
 
 const Board = () => {
   const [tasks, setTasks] = useState<TaskType[]>([]);
@@ -165,9 +167,10 @@ const Board = () => {
   const task = activeTask ? activeTask : null;
 
   return (
-    <div className="flex flex-col items-center mb-[400px]">
-      <div className="flex gap-5 mb-10 text-2xl font-semibold">
-        <p>Task Board</p>
+    <div className="flex flex-col items-center mb-[200px]">
+      <div className="flex items-center gap-5 mb-10 text-2xl font-black">
+        <p>What to you want to do?</p>
+        <CgNotes />
       </div>
       <DndContext
         sensors={sensors}

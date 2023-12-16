@@ -4,8 +4,9 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { toast } from "react-toastify";
 
-import { Button, Tag } from "antd";
+import { Button, Tag, Empty } from "antd";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -37,15 +38,22 @@ const MyColumn = (props: PropType) => {
     (state) => state.users.isDarkMode
   );
 
+  const getTasksLengthByColumnId = (tasks: TaskType[], columnId: string) => {
+    return tasks.filter((task) => {
+      return task.columnId === columnId;
+    }).length;
+  };
+
   const { setNodeRef } = useDroppable({
     id,
   });
 
   return (
     <div
-      className={`min-w-[350px] min-h-[500px] max-h-[500px] overflow-y-auto flex flex-col items-center rounded-md ${
-        isDarkMode ? "bg-zinc-800" : "bg-zinc-200"
-      }`}
+      className={`min-w-[350px] min-h-[500px] max-h-[500px] overflow-y-auto flex flex-col items-center
+                rounded-md border border-solid ${
+                  isDarkMode ? "border-zinc-700" : "border-zinc-300 shadow-md"
+                }`}
     >
       <div className="w-[100%] p-4 flex items-center justify-between">
         {column.id === "backlog" && (
@@ -70,6 +78,10 @@ const MyColumn = (props: PropType) => {
             const title = prompt(`Add new task title for: ${id}`);
             const description = prompt(`Description of task:`);
 
+            if (!column.id || title === "" || description === "") {
+              toast.error("Add task failed");
+            }
+
             if (column.id && title && description) {
               handleCreateTask(column.id, title, description);
             }
@@ -84,6 +96,10 @@ const MyColumn = (props: PropType) => {
         strategy={verticalListSortingStrategy}
       >
         <div ref={setNodeRef} className="w-[100%] p-4 flex flex-col gap-3">
+          {getTasksLengthByColumnId(tasks, column?.id) === 0 && (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          )}
+
           {tasks.map((task) => (
             <div key={task.id}>
               <MyTask task={task} handleDeleteTask={handleDeleteTask} />
