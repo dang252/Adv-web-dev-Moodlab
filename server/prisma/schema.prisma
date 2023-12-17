@@ -37,14 +37,15 @@ model Account {
 }
 
 model Class {
-  id          Int    @id @default(autoincrement())
-  code        String
-  name        String
-  teacherId   Int
-  inviteCode  String
-  status      String
-  theme       String @default("1a.jpg")
-  description String @default("No description")
+  id           Int                @id @default(autoincrement())
+  code         String
+  name         String
+  teacherId    Int
+  inviteCode   String
+  status       String
+  theme        String             @default("1a.jpg")
+  description  String             @default("No description")
+  compositions GradeComposition[]
 
   teacher  User    @relation(fields: [teacherId], references: [id])
   students Grade[]
@@ -53,14 +54,35 @@ model Class {
 }
 
 model Grade {
-  studentId   Int
-  classId     Int
-  overall     Float
-  isFinalized Boolean
+  id        Int   @id @default(autoincrement())
+  studentId Int
+  classId   Int
+  overall   Float @default(0)
 
   student User  @relation(fields: [studentId], references: [id])
   class   Class @relation(fields: [classId], references: [id])
 
-  @@id([studentId, classId])
-  @@map("grade")
+  @@map("grades")
+}
+
+model GradeComposition {
+  id          Int     @id @default(autoincrement())
+  classId     Int
+  position    Int
+  name        String
+  scale       Float
+  isFinalized Boolean @default(false)
+
+  class Class @relation(fields: [classId], references: [id])
+
+  @@map("grade_compositions")
+}
+
+model GradePoint {
+  studentId          Int
+  gradeCompositionId Int
+  points             Json[]
+
+  @@id([studentId, gradeCompositionId])
+  @@map("grade_points")
 }

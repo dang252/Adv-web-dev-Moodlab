@@ -18,7 +18,7 @@ import {
 } from 'src/constants';
 import { ClassesService } from './classes.service';
 import { Request, Response } from 'express';
-import { ChangeTheme, ClassDto, InviteEmailDto } from './dto';
+import { ChangeTheme, ClassDto, GradeDto, InviteEmailDto } from './dto';
 
 @Controller('classes')
 @ApiTags('/classes')
@@ -179,7 +179,7 @@ export class ClassesController {
 
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
-  @Get('/:id/:code')
+  @Get('/:id/join/:code')
   @ApiResponse({
     status: 200,
     schema: {
@@ -239,6 +239,95 @@ export class ClassesController {
     @Res() res: Response,
     @Body() dto: InviteEmailDto,
   ) {
-    return this.classesService.inviteByEmail(id, req.user['sub'], dto.email, res);
+    return this.classesService.inviteByEmail(
+      id,
+      req.user['sub'],
+      dto.email,
+      res,
+    );
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
+  @Get('/:id/grades')
+  @ApiResponse({
+    status: 200,
+    schema: {
+      type: 'string',
+      example: HTTP_MSG_SUCCESS,
+    },
+  })
+  @ApiResponse({
+    status: 403,
+    description: HTTP_MSG_FORBIDDEN,
+  })
+  @ApiResponse({
+    status: 500,
+    description: HTTP_MSG_INTERNAL_SERVER_ERROR,
+  })
+  getListGradeCompositions(@Param('id') id: string, @Res() res: Response) {
+    return this.classesService.getListGradeCompositions(id, res);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
+  @Post('/:id/grades')
+  @ApiBody({
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          grade_id: { type: 'number' },
+          position: { type: 'number' },
+          name: { type: 'string' },
+          scale: { type: 'number' },
+        },
+      },
+      example: [
+        {
+          grade_id: 1,
+          position: 0,
+          name: 'BTCN',
+          scale: 20,
+        },
+        {
+          grade_id: 2,
+          position: 1,
+          name: 'GK',
+          scale: 30,
+        },
+
+        {
+          grade_id: 3,
+          position: 2,
+          name: 'CK',
+          scale: 50,
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      type: 'string',
+      example: HTTP_MSG_SUCCESS,
+    },
+  })
+  @ApiResponse({
+    status: 403,
+    description: HTTP_MSG_FORBIDDEN,
+  })
+  @ApiResponse({
+    status: 500,
+    description: HTTP_MSG_INTERNAL_SERVER_ERROR,
+  })
+  changeGradesScale(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Res() res: Response,
+    @Body() dto: GradeDto[],
+  ) {
+    return this.classesService.changeGradesScale(id, req.user['sub'], dto, res);
   }
 }

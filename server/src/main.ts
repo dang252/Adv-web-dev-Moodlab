@@ -10,7 +10,7 @@ async function bootstrap() {
     origin: [
       process.env.HOST_URL,
       process.env.CLIENT_URL,
-      'http://localhost:5173',
+      process.env.CLIENT_URL_LOCAL,
     ],
     methods: 'GET,PUT,POST,DELETE',
     allowedHeaders: 'Content-Type,Authorization',
