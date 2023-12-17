@@ -45,7 +45,7 @@ const DndCalendar = () => {
   const [currentEvents, setCurrentEvents] = useState<any>([]);
 
   const username = useSelector<RootState, string>((state) => {
-    return state.users.username;
+    return state.persisted.users.username;
   });
 
   const handleSaveCalender = (username: string, data: any[]) => {
@@ -170,8 +170,8 @@ const DndCalendar = () => {
             eventAdd={function (e) {
               handleAddEvent(e);
             }}
-            //   eventChange={function () {}}
-            //   eventRemove={function () {}}
+          //   eventChange={function () {}}
+          //   eventRemove={function () {}}
           />
         </div>
       </div>

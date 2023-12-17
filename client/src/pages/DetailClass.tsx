@@ -29,7 +29,7 @@ const DetailClass = (props: PropType) => {
 
   const dispatchAsync = useAppDispatch();
 
-  const USER_ROLE = useSelector<RootState, string>((state) => state.users.role);
+  const USER_ROLE = useSelector<RootState, string>((state) => state.persisted.users.role);
 
   const isLoading = useSelector<RootState, boolean>(
     (state) => state.classes.isLoading
@@ -59,7 +59,7 @@ const DetailClass = (props: PropType) => {
             if (detailClass) {
               const body = {
                 id: detailClass?.id.toString(),
-                code: detailClass?.inviteCode,
+                code: inviteCode,
               };
 
               // 403: Recall /classes/:id/:code
@@ -140,7 +140,7 @@ const DetailClass = (props: PropType) => {
             items={USER_ROLE === "TEACHER" ? teacherItems : studentItems}
             onChange={onChange}
             className="w-[100%]"
-            // indicatorSize={(origin) => origin - 16}
+          // indicatorSize={(origin) => origin - 16}
           />
         </div>
       )}

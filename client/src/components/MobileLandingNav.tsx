@@ -18,7 +18,7 @@ const MobileLandingNav = (props: PropType) => {
   const { triggerOpen, setTriggerOpen, switchMode } = props;
 
   const isDarkMode = useSelector<RootState, boolean>(
-    (state) => state.users.isDarkMode
+    (state) => state.persisted.users.isDarkMode
   );
 
   const [open, setOpen] = useState(false);

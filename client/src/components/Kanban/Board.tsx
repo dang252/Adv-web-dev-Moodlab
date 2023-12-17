@@ -33,7 +33,7 @@ const Board = () => {
   const [activeTask, setActiveTask] = useState<TaskType | null>(null);
 
   const username = useSelector<RootState, string>((state) => {
-    return state.users.username;
+    return state.persisted.users.username;
   });
 
   const columns: ColumnType[] = columnsData;

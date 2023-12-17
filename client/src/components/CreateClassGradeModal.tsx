@@ -36,7 +36,7 @@ const CreateClassGradeModal = (props: PropType) => {
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
 
   const isDarkMode = useSelector<RootState, boolean | undefined>(
-    (state) => state.users.isDarkMode
+    (state) => state.persisted.users.isDarkMode
   );
 
   useEffect(() => {
@@ -146,9 +146,8 @@ const CreateClassGradeModal = (props: PropType) => {
     ({ items }: any) => {
       return (
         <div
-          className={`px-2 py-4 mb-5 border border-solid rounded-md max-h-[300px] overflow-y-auto overflow-x-hidden ${
-            isDarkMode ? "border-zinc-700" : "border-zinc-300"
-          }`}
+          className={`px-2 py-4 mb-5 border border-solid rounded-md max-h-[300px] overflow-y-auto overflow-x-hidden ${isDarkMode ? "border-zinc-700" : "border-zinc-300"
+            }`}
         >
           {items.map((value: any, index: any) => {
             return (

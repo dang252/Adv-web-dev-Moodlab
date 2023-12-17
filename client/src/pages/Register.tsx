@@ -64,7 +64,7 @@ const Register = (props: PropType) => {
   const { triggerOpen, setTriggerOpen, switchMode } = props;
 
   const isDarkMode = useSelector<RootState, boolean>(
-    (state) => state.users.isDarkMode
+    (state) => state.persisted.users.isDarkMode
   );
 
   useTitle("Moodlab | Register");
@@ -127,9 +127,8 @@ const Register = (props: PropType) => {
             }}
           >
             <Form
-              className={`w-[100%] mx-auto mt-20 p-5 rounded-md sm:max-w-[600px] ${
-                isDarkMode ? "bg-zinc-800" : "bg-white"
-              }`}
+              className={`w-[100%] mx-auto mt-20 p-5 rounded-md sm:max-w-[600px] ${isDarkMode ? "bg-zinc-800" : "bg-white"
+                }`}
               name="basic"
               initialValues={{ remember: true }}
               onFinish={onSubmit}

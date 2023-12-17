@@ -35,7 +35,7 @@ const DetailClassGrades = () => {
   const [targetField, setTargetField] = useState<any>(null);
 
   const isDarkMode = useSelector<RootState, boolean | undefined>(
-    (state) => state.users.isDarkMode
+    (state) => state.persisted.users.isDarkMode
   );
 
   //==================== Create Field
@@ -162,11 +162,10 @@ const DetailClassGrades = () => {
                   {field.id !== undefined && (
                     <div
                       className={`min-w-[300px] p-4
-                                  border border-solid rounded-md ${
-                                    isDarkMode
-                                      ? "border-zinc-700"
-                                      : "border-zinc-300 shadow-md"
-                                  }`}
+                                  border border-solid rounded-md ${isDarkMode
+                          ? "border-zinc-700"
+                          : "border-zinc-300 shadow-md"
+                        }`}
                     >
                       <div className="flex items-center justify-between mb-5">
                         <p className="font-bold">

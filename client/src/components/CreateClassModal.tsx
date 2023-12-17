@@ -54,7 +54,7 @@ const CreateClassModal = (props: PropType) => {
   };
 
   const userFullname = useSelector<RootState, string>(
-    (state) => { return state.users.firstname + " " + state.users.lastname }
+    (state) => { return state.persisted.users.firstname + " " + state.persisted.users.lastname }
   );
 
 
