@@ -45,7 +45,7 @@ const SettingProfile = () => {
     console.log("Failed:", errorInfo);
   };
 
-  const user: UserState = store.getState().users
+  const user: UserState = store.getState().persisted.users
 
   return (
     <div className="w-[100%] 2xl:w-[70%] mx-auto flex flex-col items-center">
