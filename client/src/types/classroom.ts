@@ -30,4 +30,11 @@ export interface ClassType {
   status: string;
   theme: string;
   description: string;
+  gradeStructure: gradeCol[] | null;
+}
+
+export interface gradeCol {
+  id: number;
+  name: string;
+  scale: number;
 }
