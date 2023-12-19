@@ -124,6 +124,7 @@ const DetailClassGrades = () => {
       );
     }
   };
+
   const handleCreateGradeOk = async (values: any) => {
     const { grades } = values;
     const data = [];

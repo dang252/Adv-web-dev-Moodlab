@@ -14,8 +14,6 @@ import { Button, Form, Input, Row, Col, InputNumber } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 
 import { MdDragIndicator } from "react-icons/md";
-import { ClassType } from "../types/classroom";
-
 
 interface PropType {
   fields: any[];
@@ -35,7 +33,9 @@ interface SortableListProps {
 const CreateClassGradeModal = (props: PropType) => {
   const { fields, setFields, handleCreateGradeOk } = props;
 
-  const [currentIndex, setCurrentIndex] = useState<number | null>(fields.length);
+  const [currentIndex, setCurrentIndex] = useState<number | null>(
+    fields.length
+  );
 
   const isDarkMode = useSelector<RootState, boolean | undefined>(
     (state) => state.persisted.users.isDarkMode
@@ -148,14 +148,21 @@ const CreateClassGradeModal = (props: PropType) => {
     ({ items }: any) => {
       return (
         <div
-          className={`px-2 py-4 mb-5 border border-solid rounded-md max-h-[300px] overflow-y-auto overflow-x-hidden ${isDarkMode ? "border-zinc-700" : "border-zinc-300"
-            }`}
+          className={`px-2 py-4 mb-5 border border-solid rounded-md max-h-[300px] overflow-y-auto overflow-x-hidden ${
+            isDarkMode ? "border-zinc-700" : "border-zinc-300"
+          }`}
         >
-          {items.length !== 0 && items[0] != undefined && items.map((value: any, index: any) => {
-            return (
-              <SortableItem key={`item-${index}`} index={index} value={value} />
-            );
-          })}
+          {items.length !== 0 &&
+            items[0] != undefined &&
+            items.map((value: any, index: any) => {
+              return (
+                <SortableItem
+                  key={`item-${index}`}
+                  index={index}
+                  value={value}
+                />
+              );
+            })}
         </div>
       );
     }
