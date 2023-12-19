@@ -2,17 +2,32 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { v4 as uuidv4 } from "uuid";
+import * as XLSX from "xlsx";
 
-import { Button, Empty, Modal, Form, Input, Card } from "antd";
+import { Button, Empty, Modal, Form, Input, Card, Drawer } from "antd";
 import { CaretUpOutlined, CaretDownOutlined } from "@ant-design/icons";
 
 import { MdDelete } from "react-icons/md";
 
 import CreateClassGradeModal from "./CreateClassGradeModal";
+import ContentTable from "./ContentTable";
+import { toast } from "react-toastify";
 
 type FieldType = {
   name?: string;
 };
+
+type AddDetailContentType = {
+  id?: string;
+  name?: string;
+  grades?: number;
+};
+
+interface FieldContentType {
+  id: string;
+  fieldId: number;
+  name: string;
+}
 
 const getFieldContentByIdLength = (source: any[], fieldId: number) => {
   return source.filter((content) => {
@@ -22,6 +37,7 @@ const getFieldContentByIdLength = (source: any[], fieldId: number) => {
 
 const DetailClassGrades = () => {
   const [form] = Form.useForm();
+  const [createDetailContentForm] = Form.useForm();
 
   const [showCreateGrade, setShowCreateGrade] = useState<boolean>(true);
   const [fields, setFields] = useState<any[]>([
@@ -33,6 +49,13 @@ const DetailClassGrades = () => {
   const [fieldsContents, setFieldsContents] = useState<any[]>([]);
   const [createFieldContentModal, setCreateFieldContentModal] = useState(false);
   const [targetField, setTargetField] = useState<any>(null);
+
+  const [modifyContentModal, setModifyContentModal] = useState(false);
+  const [targetContent, setTargetContent] = useState<FieldContentType | null>(
+    null
+  );
+  const [contentList, setContentList] = useState<any[]>([]);
+  const [data, setData] = useState<any[]>([]);
 
   const isDarkMode = useSelector<RootState, boolean | undefined>(
     (state) => state.users.isDarkMode
@@ -54,7 +77,6 @@ const DetailClassGrades = () => {
     }
 
     setFields(data);
-    console.log(data);
   };
 
   //==================== Create Field Content
@@ -62,7 +84,7 @@ const DetailClassGrades = () => {
     setCreateFieldContentModal(true);
   };
 
-  const handleCraeteFieldContentOk = () => {
+  const handleCreateFieldContentOk = () => {
     setCreateFieldContentModal(false);
   };
 
@@ -86,12 +108,80 @@ const DetailClassGrades = () => {
     console.log("Failed:", errorInfo);
   };
 
+  //==================== Modify Field Content
+  const showModifyContentModal = (content: FieldContentType) => {
+    setModifyContentModal(true);
+    setTargetContent(content);
+  };
+
+  const onClose = () => {
+    setModifyContentModal(false);
+    setTargetContent(null);
+    setContentList([]);
+    setData([]);
+  };
+
+  const handleImportExcel = (e: any) => {
+    const reader = new FileReader();
+    reader.readAsBinaryString(e.target.files[0]);
+
+    if (e.target.value) e.target.value = null;
+
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      const data = e?.target?.result;
+
+      if (data) {
+        const workbook = XLSX.read(data, { type: "binary" });
+
+        const sheetname = workbook.SheetNames[0];
+
+        const sheet = workbook.Sheets[sheetname];
+
+        const parsedData = XLSX.utils.sheet_to_json(sheet);
+
+        setContentList(parsedData);
+        toast.success("Import data successfully");
+
+        return;
+      }
+
+      toast.error("Import data failed");
+    };
+  };
+
+  const handleExportExcel = () => {
+    console.log(data);
+  };
+
+  const onAddDetailContentFinish = (values: any) => {
+    const { id, name, grades } = values;
+    let key = null;
+
+    if (contentList.length === 0) key = 1;
+    if (contentList.length !== 0) key = contentList.length + 1;
+
+    const newDetail = {
+      "#": key,
+      ID: Number(id),
+      Name: name,
+      Grades: Number(grades),
+    };
+
+    setContentList([...contentList, newDetail]);
+
+    createDetailContentForm.resetFields();
+  };
+
+  const onAddDetailContentFailed = (errorInfo: any) => {
+    console.log("Failed:", errorInfo);
+  };
+
   return (
     <div className="w-[100%] md:w-[80%] 2xl:w-[70%] mx-auto flex flex-col items-center">
       <Modal
         title={`Create content for ${targetField?.name}`}
         open={createFieldContentModal}
-        onOk={handleCraeteFieldContentOk}
+        onOk={handleCreateFieldContentOk}
         width={600}
         footer={null}
       >
@@ -130,6 +220,93 @@ const DetailClassGrades = () => {
           </Form.Item>
         </Form>
       </Modal>
+
+      <Drawer
+        title="Modify Content"
+        placement={"left"}
+        closable={false}
+        onClose={onClose}
+        open={modifyContentModal}
+        width={"100vw"}
+        extra={
+          <div className="flex items-center gap-3">
+            <Button
+              type="primary"
+              danger
+              onClick={() => {
+                handleExportExcel();
+              }}
+            >
+              Export
+            </Button>
+            <input
+              accept=".xlsx, .xls"
+              className="text-gray-400 text-sm file:mr-4 file:px-4 file:py-[6px] file:text-sm file:border-0
+                        file:rounded-md file:text-white file:bg-blue-500 hover:file:bg-blue-400 hover:file:cursor-pointer"
+              placeholder="Select a document"
+              type="file"
+              onChange={(e: any) => {
+                handleImportExcel(e);
+              }}
+            />
+            <Button onClick={onClose}>Close</Button>
+          </div>
+        }
+      >
+        <div className={`${isDarkMode ? "text-white" : "text-black"}`}>
+          <p className="text-center text-2xl font-bold my-5">
+            Modify Content For {targetContent?.name}
+          </p>
+
+          <Form
+            form={createDetailContentForm}
+            name="add-content-detail"
+            className="w-[100%] md:w-[50%] 2xl:w-[30%] mx-auto mb-10"
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 20 }}
+            onFinish={onAddDetailContentFinish}
+            onFinishFailed={onAddDetailContentFailed}
+            autoComplete="off"
+          >
+            <Form.Item<AddDetailContentType>
+              label="ID"
+              name="id"
+              rules={[{ required: true, message: "Please input id!" }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item<AddDetailContentType>
+              label="Name"
+              name="name"
+              rules={[{ required: true, message: "Please input name!" }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item<AddDetailContentType>
+              label="Grades"
+              name="grades"
+              rules={[{ required: true, message: "Please input grades!" }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item wrapperCol={{ offset: 4, span: 20 }}>
+              <Button type="primary" htmlType="submit">
+                Add
+              </Button>
+            </Form.Item>
+          </Form>
+
+          <ContentTable
+            contentList={contentList}
+            setContentList={setContentList}
+            data={data}
+            setData={setData}
+          />
+        </div>
+      </Drawer>
 
       <div className="flex gap-5 mb-5 self-end">
         <Button
@@ -195,9 +372,17 @@ const DetailClassGrades = () => {
                             return (
                               <Card
                                 key={content?.id}
-                                title={content.id}
+                                title={<p className="truncate">{content.id}</p>}
                                 extra={
                                   <div className="pl-5 flex gap-3">
+                                    <Button
+                                      type="primary"
+                                      onClick={() => {
+                                        showModifyContentModal(content);
+                                      }}
+                                    >
+                                      Modify
+                                    </Button>
                                     <div
                                       className="flex items-center hover:text-blue-500 hover:cursor-pointer"
                                       onClick={() => {
