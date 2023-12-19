@@ -51,7 +51,7 @@ const ForgotPassword = (props: PropType) => {
   const { triggerOpen, setTriggerOpen, switchMode } = props;
 
   const isDarkMode = useSelector<RootState, boolean>(
-    (state) => state.users.isDarkMode
+    (state) => state.persisted.users.isDarkMode
   );
 
   useTitle("Moodlab | Forgot Password");
@@ -74,7 +74,7 @@ const ForgotPassword = (props: PropType) => {
       );
       toast.success("We have emailed you password reset link! Please check your email");
     }
-    catch (err:any) {
+    catch (err: any) {
       toast.error("Can't send password reset link! please try again later!");
     }
   };
@@ -108,9 +108,8 @@ const ForgotPassword = (props: PropType) => {
             }}
           >
             <Form
-              className={`w-[100%] mx-auto mt-20 p-5 rounded-md sm:max-w-[600px] ${
-                isDarkMode ? "bg-zinc-800" : "bg-white"
-              }`}
+              className={`w-[100%] mx-auto mt-20 p-5 rounded-md sm:max-w-[600px] ${isDarkMode ? "bg-zinc-800" : "bg-white"
+                }`}
               name="basic"
               initialValues={{ remember: true }}
               onFinish={onFinish}

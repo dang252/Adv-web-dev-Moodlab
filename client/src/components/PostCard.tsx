@@ -37,7 +37,7 @@ const PostCard = (props: PropType) => {
   ];
 
   const isDarkMode = useSelector<RootState, boolean | undefined>(
-    (state) => state.users.isDarkMode
+    (state) => state.persisted.users.isDarkMode
   );
 
   const onFinish = (values: any) => {
@@ -57,9 +57,8 @@ const PostCard = (props: PropType) => {
         </div>
         <Dropdown menu={{ items: postOptionItems }} trigger={["click"]}>
           <div
-            className={`w-[30px] h-[30px] flex justify-center items-center rounded-full hover:cursor-pointer ${
-              isDarkMode ? "hover:bg-zinc-600" : "hover:bg-gray-200"
-            }`}
+            className={`w-[30px] h-[30px] flex justify-center items-center rounded-full hover:cursor-pointer ${isDarkMode ? "hover:bg-zinc-600" : "hover:bg-gray-200"
+              }`}
           >
             <SlOptionsVertical />
           </div>
@@ -75,11 +74,10 @@ const PostCard = (props: PropType) => {
           <Form form={form} name={`post-form-${id}`} onFinish={onFinish}>
             <Form.Item name={`post-form-${id}`} rules={[{ required: true }]}>
               <TextArea
-                className={`${
-                  isDarkMode
+                className={`${isDarkMode
                     ? "bg-zinc-800 hover:bg-zinc-900"
                     : "bg-gray-100 hover:bg-gray-200"
-                }`}
+                  }`}
                 rows={4}
                 placeholder="Add you comment here..."
               />

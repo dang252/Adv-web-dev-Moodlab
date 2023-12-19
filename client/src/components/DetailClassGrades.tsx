@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { v4 as uuidv4 } from "uuid";
 import * as XLSX from "xlsx";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 import { Button, Empty, Modal, Form, Input, Card, Drawer } from "antd";
 import { CaretUpOutlined, CaretDownOutlined } from "@ant-design/icons";
@@ -11,7 +13,7 @@ import { MdDelete } from "react-icons/md";
 
 import CreateClassGradeModal from "./CreateClassGradeModal";
 import ContentTable from "./ContentTable";
-import { toast } from "react-toastify";
+import { ClassType } from "../types/classroom";
 
 type FieldType = {
   name?: string;
@@ -40,11 +42,6 @@ const DetailClassGrades = () => {
   const [createDetailContentForm] = Form.useForm();
 
   const [showCreateGrade, setShowCreateGrade] = useState<boolean>(true);
-  const [fields, setFields] = useState<any[]>([
-    { name: "BTCN", scale: "10", id: 0 },
-    { name: "GK", scale: "30", id: 1 },
-    { name: "CK", scale: "60", id: 2 },
-  ]);
 
   const [fieldsContents, setFieldsContents] = useState<any[]>([]);
   const [createFieldContentModal, setCreateFieldContentModal] = useState(false);
@@ -58,25 +55,92 @@ const DetailClassGrades = () => {
   const [data, setData] = useState<any[]>([]);
 
   const isDarkMode = useSelector<RootState, boolean | undefined>(
-    (state) => state.users.isDarkMode
+    (state) => state.persisted.users.isDarkMode
   );
 
+  const detailClass = useSelector<RootState, ClassType | null>(
+    (state) => state.classes.detailClass
+  );
+  const [fields, setFields] = useState<any[]>([]);
+  const [formFields, setFormFields] = useState<any[]>([]);
+
+  useEffect(() => {
+    const getClassGradeStructure = async () => {
+      try {
+        const accessToken = localStorage
+          .getItem("accessToken")
+          ?.toString()
+          .replace(/^"(.*)"$/, "$1");
+
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/classes/${detailClass?.id}/grades`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        setFields(response.data);
+        setFormFields(response.data);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        toast.error(
+          "Can not see grade structure for now! Please try again later"
+        );
+      }
+    };
+
+    setFields(data);
+    getClassGradeStructure();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // eslint-disable-next-line no-unsafe-optional-chaining
+
   //==================== Create Field
-  const handleCreateGradeOk = (values: any) => {
+  const updateClassGradeStructure = async (data: any) => {
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/classes/${detailClass?.id}/grades`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      setFields(formFields);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      setFormFields(fields);
+      console.log(error);
+      toast.error(
+        "Can not update grade structure for now! Please try again later"
+      );
+    }
+  };
+  const handleCreateGradeOk = async (values: any) => {
     const { grades } = values;
     const data = [];
 
-    for (let i = 0; i < fields.length; ++i) {
-      if (fields[i].key !== undefined) {
-        const field = { ...grades[fields[i].key], id: i };
-        data.push(field);
+    for (let i = 0; i < formFields.length; ++i) {
+      if (formFields[i].key !== undefined) {
+        const formField = { ...grades[formFields[i].key], id: i, position: i };
+        data.push(formField);
       } else {
-        const field = { ...fields[i], id: i };
-        data.push(field);
+        const formField = { ...formFields[i], grade_id: i, position: i };
+        data.push(formField);
       }
     }
-
-    setFields(data);
+    // console.log(data);
+    // console.log(typeof data[data.length - 1].scale)
+    updateClassGradeStructure(data);
+    // setFields(data);
   };
 
   //==================== Create Field Content
@@ -322,16 +386,18 @@ const DetailClassGrades = () => {
 
       {showCreateGrade && (
         <CreateClassGradeModal
-          fields={fields}
-          setFields={setFields}
+          fields={formFields}
+          setFields={setFormFields}
           handleCreateGradeOk={handleCreateGradeOk}
         />
       )}
 
       <div className="mt-10 mb-[50px] w-[100%] pb-4 overflow-auto">
-        {fields.length === 0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
+        {(fields.length === 0 || fields[0] == undefined) && (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        )}
 
-        {fields.length !== 0 && (
+        {fields.length !== 0 && fields[0] != undefined && (
           <div className="flex gap-[50px]">
             {fields?.map((field) => {
               return (

@@ -24,7 +24,7 @@ const Landing = (props: PropType) => {
   const { triggerOpen, setTriggerOpen, switchMode } = props;
 
   const isDarkMode = useSelector<RootState, boolean>(
-    (state) => state.users.isDarkMode
+    (state) => state.persisted.users.isDarkMode
   );
 
   useTitle("Moodlab | Welcome");
@@ -62,9 +62,8 @@ const Landing = (props: PropType) => {
             }}
           >
             <div
-              className={`hidden xl:block absolute z-10 mt-100 w-[100%] h-[750px] left-0 ${
-                isDarkMode ? "bg-zinc-800" : "bg-blue-500"
-              }`}
+              className={`hidden xl:block absolute z-10 mt-100 w-[100%] h-[750px] left-0 ${isDarkMode ? "bg-zinc-800" : "bg-blue-500"
+                }`}
             ></div>
             <section className="relative z-20">
               <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-12">
@@ -105,9 +104,8 @@ const Landing = (props: PropType) => {
                   </Link>
                   <a
                     href="#"
-                    className={`inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center rounded-lg border border-solid border-gray-400 hover:border-blue-500 hover:text-blue-500 ${
-                      isDarkMode ? "text-white" : "text-black xl:bg-white"
-                    }`}
+                    className={`inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center rounded-lg border border-solid border-gray-400 hover:border-blue-500 hover:text-blue-500 ${isDarkMode ? "text-white" : "text-black xl:bg-white"
+                      }`}
                   >
                     <svg
                       className="mr-2 -ml-1 w-5 h-5"

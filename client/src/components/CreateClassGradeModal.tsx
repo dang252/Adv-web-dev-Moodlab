@@ -10,10 +10,12 @@ import { arrayMoveImmutable } from "array-move";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 
-import { Button, Form, Input, Row, Col } from "antd";
+import { Button, Form, Input, Row, Col, InputNumber } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 
 import { MdDragIndicator } from "react-icons/md";
+import { ClassType } from "../types/classroom";
+
 
 interface PropType {
   fields: any[];
@@ -33,10 +35,10 @@ interface SortableListProps {
 const CreateClassGradeModal = (props: PropType) => {
   const { fields, setFields, handleCreateGradeOk } = props;
 
-  const [currentIndex, setCurrentIndex] = useState<number | null>(null);
+  const [currentIndex, setCurrentIndex] = useState<number | null>(fields.length);
 
   const isDarkMode = useSelector<RootState, boolean | undefined>(
-    (state) => state.users.isDarkMode
+    (state) => state.persisted.users.isDarkMode
   );
 
   useEffect(() => {
@@ -109,7 +111,7 @@ const CreateClassGradeModal = (props: PropType) => {
             rules={[{ required: true, message: "Missing scale" }]}
             initialValue={scale}
           >
-            <Input placeholder="Scale" />
+            <InputNumber placeholder="Scale" />
           </Form.Item>
         </Col>
 
@@ -146,11 +148,10 @@ const CreateClassGradeModal = (props: PropType) => {
     ({ items }: any) => {
       return (
         <div
-          className={`px-2 py-4 mb-5 border border-solid rounded-md max-h-[300px] overflow-y-auto overflow-x-hidden ${
-            isDarkMode ? "border-zinc-700" : "border-zinc-300"
-          }`}
+          className={`px-2 py-4 mb-5 border border-solid rounded-md max-h-[300px] overflow-y-auto overflow-x-hidden ${isDarkMode ? "border-zinc-700" : "border-zinc-300"
+            }`}
         >
-          {items.map((value: any, index: any) => {
+          {items.length !== 0 && items[0] != undefined && items.map((value: any, index: any) => {
             return (
               <SortableItem key={`item-${index}`} index={index} value={value} />
             );

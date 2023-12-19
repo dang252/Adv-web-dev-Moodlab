@@ -1,10 +1,9 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import userReducer from "./user.reducer";
 import classReducer from "./class.reducer";
-// import themeReducer from "./theme.reducer";
+import persistedReducer from "./persisted.reducer";
 
 export const rootReducer = combineReducers({
-  users: userReducer,
+  persisted: persistedReducer,
   classes: classReducer,
   // theme: themeReducer,
 });

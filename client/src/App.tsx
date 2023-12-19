@@ -32,7 +32,7 @@ const App = () => {
   const dispatch = useDispatch();
 
   const isDarkMode = useSelector<RootState, boolean | undefined>(
-    (state) => state.users.isDarkMode
+    (state) => state.persisted.users.isDarkMode
   );
 
   useEffect(() => {

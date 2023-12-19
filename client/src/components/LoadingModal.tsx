@@ -3,7 +3,7 @@ import { useAppSelector } from "../redux/hooks";
 
 export default function LoadingModal() {
   const modal = useRef<HTMLDialogElement>(null);
-  const isLoading = useAppSelector((state) => state.users.isLoading);
+  const isLoading = useAppSelector((state) => state.persisted.users.isLoading);
   useEffect(() => {
     if (isLoading) {
       // modal.current?.close()

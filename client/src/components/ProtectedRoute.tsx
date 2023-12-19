@@ -6,7 +6,7 @@ import { RootState } from "../redux/store";
 
 const ProtectedRoute = ({ children }: any) => {
   const accessToken: string = useSelector<RootState, string>(
-    (state) => state.users.currentId
+    (state) => state.persisted.users.currentId
   );
 
   if (!accessToken) {

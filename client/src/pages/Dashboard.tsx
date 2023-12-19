@@ -42,7 +42,7 @@ const Dashboard = () => {
   const dispatch = useDispatch();
 
   const isDarkMode = useSelector<RootState, boolean>(
-    (state) => state.users.isDarkMode
+    (state) => state.persisted.users.isDarkMode
   );
 
   const {

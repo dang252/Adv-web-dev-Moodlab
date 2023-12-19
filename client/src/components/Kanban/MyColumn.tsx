@@ -35,7 +35,7 @@ const MyColumn = (props: PropType) => {
   const id = column.id;
 
   const isDarkMode = useSelector<RootState, boolean | undefined>(
-    (state) => state.users.isDarkMode
+    (state) => state.persisted.users.isDarkMode
   );
 
   const getTasksLengthByColumnId = (tasks: TaskType[], columnId: string) => {
@@ -51,9 +51,8 @@ const MyColumn = (props: PropType) => {
   return (
     <div
       className={`min-w-[350px] min-h-[500px] max-h-[500px] overflow-y-auto flex flex-col items-center
-                rounded-md border border-solid ${
-                  isDarkMode ? "border-zinc-700" : "border-zinc-300 shadow-md"
-                }`}
+                rounded-md border border-solid ${isDarkMode ? "border-zinc-700" : "border-zinc-300 shadow-md"
+        }`}
     >
       <div className="w-[100%] p-4 flex items-center justify-between">
         {column.id === "backlog" && (

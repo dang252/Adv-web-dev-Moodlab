@@ -82,7 +82,7 @@ const DetailClassNews = (props: PropType) => {
   const [themeUrl, setThemeUrl] = useState<string>("1a.jpg");
 
   const isDarkMode = useSelector<RootState, boolean | undefined>(
-    (state) => state.users.isDarkMode
+    (state) => state.persisted.users.isDarkMode
   );
 
   const classId = useSelector<RootState, number | undefined>(

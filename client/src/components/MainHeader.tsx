@@ -48,7 +48,7 @@ const MainHeader = (props: propType) => {
   const headerRef = useRef<any>(null);
 
   const isDarkMode = useSelector<RootState, boolean>(
-    (state) => state.users.isDarkMode
+    (state) => state.persisted.users.isDarkMode
   );
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
@@ -157,9 +157,8 @@ const MainHeader = (props: propType) => {
           <div className="flex items-center gap-14">
             <NotiDropdown />
             <div
-              className={`z-30 border border-solid rounded-md border-white w-[30px] h-[30px] flex justify-center items-center p-5 hover:border-blue-500 hover:text-blue-500 hover:cursor-pointer ${
-                isDarkMode ? "border-gray-500" : "border-gray-700"
-              }`}
+              className={`z-30 border border-solid rounded-md border-white w-[30px] h-[30px] flex justify-center items-center p-5 hover:border-blue-500 hover:text-blue-500 hover:cursor-pointer ${isDarkMode ? "border-gray-500" : "border-gray-700"
+                }`}
               onClick={() => {
                 setTriggerOpen(!triggerOpen);
               }}
@@ -186,9 +185,8 @@ const MainHeader = (props: propType) => {
               placement="bottomRight"
             >
               <div
-                className={`w-[30px] h-[30px] rounded-full border border-solid border-gray-500 flex justify-center items-center hover:cursor-pointer ${
-                  isDarkMode ? "bg-blue-500 border-blue-500" : ""
-                }`}
+                className={`w-[30px] h-[30px] rounded-full border border-solid border-gray-500 flex justify-center items-center hover:cursor-pointer ${isDarkMode ? "bg-blue-500 border-blue-500" : ""
+                  }`}
               >
                 <IoMdAdd />
               </div>

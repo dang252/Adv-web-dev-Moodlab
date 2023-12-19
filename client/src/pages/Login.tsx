@@ -60,11 +60,11 @@ const Login = (props: PropType) => {
   const { triggerOpen, setTriggerOpen, switchMode } = props;
 
   const isDarkMode = useSelector<RootState, boolean>(
-    (state) => state.users.isDarkMode
+    (state) => state.persisted.users.isDarkMode
   );
 
   const isLoading = useSelector<RootState, boolean>(
-    (state) => state.users.isLoading
+    (state) => state.persisted.users.isLoading
   );
 
   useTitle("Moodlab | Login");
@@ -123,9 +123,8 @@ const Login = (props: PropType) => {
             }}
           >
             <Form
-              className={`w-[100%] mx-auto mt-20 p-5 rounded-md sm:max-w-[600px] ${
-                isDarkMode ? "bg-zinc-800" : "bg-white"
-              }`}
+              className={`w-[100%] mx-auto mt-20 p-5 rounded-md sm:max-w-[600px] ${isDarkMode ? "bg-zinc-800" : "bg-white"
+                }`}
               name="basic"
               initialValues={{ remember: true }}
               onFinish={onFinish}

@@ -18,7 +18,7 @@ const ContributorCard = (props: PropType) => {
   const { name, src, role, fb, github } = props;
 
   const isDarkMode = useSelector<RootState, boolean>(
-    (state) => state.users.isDarkMode
+    (state) => state.persisted.users.isDarkMode
   );
 
   return (

@@ -17,6 +17,7 @@ interface ClassState {
   isError: boolean;
   classList: any[];
   detailClass: ClassType | null;
+
 }
 
 // InitialState value
@@ -190,7 +191,7 @@ export const getInviteCode = createAsyncThunk(
         .replace(/^"(.*)"$/, "$1");
 
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/classes/${body.id}/${body.code}`,
+        `${import.meta.env.VITE_API_URL}/classes/${body.id}/join/${body.code}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -223,16 +224,98 @@ export const getClassMembers = createAsyncThunk(
 );
 
 
+export const getClassGradeStructure = createAsyncThunk(
+  "class/getClassGradeStructure",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+  async (classId: string, thunkAPI) => {
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/classes/${classId}/grades`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const postClassGradeStructure = createAsyncThunk(
+  "class/postClassGradeStructure",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+  async (body: { classId: string; gradeStructure: any[] }, thunkAPI) => {
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/classes/${body.classId}/grades`,
+        {
+
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
 const classReducer = createReducer(initialState, (builder) => {
   builder
     .addCase(getClasses.fulfilled, (state, action) => {
       state.classList = action.payload;
     })
 
+    .addCase(getClasses.rejected, (state, _) => {
+      state.classList = [];
+    })
+
     .addCase(getDetailClass.fulfilled, (state, action) => {
       state.detailClass = action.payload;
     })
 
+    .addCase(getDetailClass.rejected, (state, _) => {
+      state.detailClass = null;
+    })
+
+    .addCase(getClassGradeStructure.fulfilled, (state, action) => {
+      if (state.detailClass) {
+        state.detailClass.gradeStructure = [...action.payload];
+      }
+    })
+
+    .addCase(getClassGradeStructure.rejected, (state, _) => {
+      if (state.detailClass) {
+        state.detailClass.gradeStructure = null
+      }
+    })
+
+    .addCase(postClassGradeStructure.fulfilled, (state, action) => {
+      if (state.detailClass) {
+        state.detailClass.gradeStructure = [...action.payload];
+      }
+    })
 
     .addMatcher(
       (action): action is PendingAction => action.type.endsWith("/pending"),
