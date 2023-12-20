@@ -5,15 +5,22 @@ import { v4 as uuidv4 } from "uuid";
 import * as XLSX from "xlsx";
 import { toast } from "react-toastify";
 import axios from "axios";
+import ExcelJS from "exceljs";
 
 import { Button, Empty, Modal, Form, Input, Card, Drawer } from "antd";
-import { CaretUpOutlined, CaretDownOutlined } from "@ant-design/icons";
+import {
+  CaretUpOutlined,
+  CaretDownOutlined,
+  DownloadOutlined,
+} from "@ant-design/icons";
 
 import { MdDelete } from "react-icons/md";
 
 import CreateClassGradeModal from "./CreateClassGradeModal";
 import ContentTable from "./ContentTable";
 import { ClassType } from "../types/classroom";
+
+import { SHEET_GRADES_COLUMN } from "../utils/grades";
 
 type FieldType = {
   name?: string;
@@ -114,7 +121,12 @@ const DetailClassGrades = () => {
           },
         }
       );
+
       setFields(formFields);
+
+      if (formFields.length === 0) toast.success("Create grades successfully");
+      if (formFields.length !== 0) toast.success("Update grades successfully");
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setFormFields(fields);
@@ -186,6 +198,29 @@ const DetailClassGrades = () => {
     setData([]);
   };
 
+  const handleDownloadGradesTemplate = () => {
+    const workbook = new ExcelJS.Workbook();
+
+    const sheet = workbook.addWorksheet("Grades");
+
+    sheet.properties.defaultRowHeight = 20;
+
+    sheet.columns = SHEET_GRADES_COLUMN;
+
+    workbook.xlsx.writeBuffer().then(function (data) {
+      const blob = new Blob([data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `template.xlsx`;
+      anchor.click();
+      window.URL.revokeObjectURL(url);
+    });
+  };
+
   const handleImportExcel = (e: any) => {
     const reader = new FileReader();
     reader.readAsBinaryString(e.target.files[0]);
@@ -215,7 +250,40 @@ const DetailClassGrades = () => {
   };
 
   const handleExportExcel = () => {
-    console.log(data);
+    let SHEET_NAME = "";
+
+    if (targetField && targetContent) SHEET_NAME = targetContent.name;
+    else SHEET_NAME = "grades";
+
+    const workbook = new ExcelJS.Workbook();
+
+    const sheet = workbook.addWorksheet(SHEET_NAME);
+
+    sheet.properties.defaultRowHeight = 20;
+
+    sheet.columns = SHEET_GRADES_COLUMN;
+
+    data?.map((d) => {
+      sheet.addRow({
+        ["#"]: d.key,
+        ID: d.id,
+        Name: d.name,
+        Grades: d.grades,
+      });
+    });
+
+    workbook.xlsx.writeBuffer().then(function (data) {
+      const blob = new Blob([data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `${targetField.name}.xlsx`;
+      anchor.click();
+      window.URL.revokeObjectURL(url);
+    });
   };
 
   const onAddDetailContentFinish = (values: any) => {
@@ -299,6 +367,10 @@ const DetailClassGrades = () => {
               type="primary"
               danger
               onClick={() => {
+                if (data.length === 0) {
+                  toast.error("Data is empty to export");
+                  return;
+                }
                 handleExportExcel();
               }}
             >
@@ -336,7 +408,13 @@ const DetailClassGrades = () => {
             <Form.Item<AddDetailContentType>
               label="ID"
               name="id"
-              rules={[{ required: true, message: "Please input id!" }]}
+              rules={[
+                {
+                  required: true,
+                  pattern: new RegExp(/^[0-9]+$/),
+                  message: "Please input id!",
+                },
+              ]}
             >
               <Input />
             </Form.Item>
@@ -352,7 +430,13 @@ const DetailClassGrades = () => {
             <Form.Item<AddDetailContentType>
               label="Grades"
               name="grades"
-              rules={[{ required: true, message: "Please input grades!" }]}
+              rules={[
+                {
+                  required: true,
+                  pattern: new RegExp(/^[+-]?\d+(\.\d+)?$/),
+                  message: "Please input grades!",
+                },
+              ]}
             >
               <Input />
             </Form.Item>
@@ -374,6 +458,14 @@ const DetailClassGrades = () => {
       </Drawer>
 
       <div className="flex gap-5 mb-5 self-end">
+        <Button
+          icon={<DownloadOutlined />}
+          onClick={() => {
+            handleDownloadGradesTemplate();
+          }}
+        >
+          Download Grades Template
+        </Button>
         <Button
           type="primary"
           icon={showCreateGrade ? <CaretUpOutlined /> : <CaretDownOutlined />}
