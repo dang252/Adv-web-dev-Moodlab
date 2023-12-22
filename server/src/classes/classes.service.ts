@@ -281,7 +281,7 @@ export class ClassesService {
     }
   }
 
-  // [GET] /:id/:code
+  // [GET] /:id/join/:code
   async joinClass(
     userId: number,
     classId: string,
@@ -432,14 +432,19 @@ export class ClassesService {
     }
   }
 
-  // [GET] /:id/grade
+  // [GET] /:id/grades
   async getListGradeCompositions(classId: string, res: Response) {
     try {
       console.log('[API GET /classes/:id/grades]');
       const listGradeCompositions = await this.prisma.gradeComposition.findMany(
         {
           where: {
-            classId: parseInt(classId),
+            grade: {
+              classId: parseInt(classId),
+            },
+          },
+          include: {
+            grade: true,
           },
         },
       );
@@ -464,7 +469,7 @@ export class ClassesService {
     }
   }
 
-  // [POST] /:id/grade
+  // [POST] /:id/grades
   async changeGradesScale(
     classId: string,
     userId: number,
@@ -495,7 +500,12 @@ export class ClassesService {
       );
       let listGradeCompositions = await this.prisma.gradeComposition.findMany({
         where: {
-          classId: parseInt(classId),
+          grade: {
+            classId: parseInt(classId),
+          },
+        },
+        include: {
+          grade: true,
         },
       });
 
@@ -528,7 +538,7 @@ export class ClassesService {
           );
           await this.prisma.gradeComposition.create({
             data: {
-              classId: parseInt(classId),
+              gradeId: grade.grade_id,
               position: grade.position,
               name: grade.name,
               scale: grade.scale,
@@ -543,12 +553,11 @@ export class ClassesService {
       console.log('\t[');
       listGradeCompositions.forEach(async (composition) => {
         console.log(
-          `\t{\n\t\t\tid: ${composition.id},\n\t\t\tclassId: ${composition.classId},\n\t\t\tposition: ${composition.position},\n\t\t\tname: ${composition.name},\n\t\t\tscale: ${composition.scale},\n\t\t}`,
+          `\t{\n\t\t\tid: ${composition.id},\n\t\t\tgradeId: ${composition.gradeId},\n\t\t\tposition: ${composition.position},\n\t\t\tname: ${composition.name},\n\t\t\tscale: ${composition.scale},\n\t\t}`,
         );
         await this.prisma.gradeComposition.delete({
           where: {
             id: composition.id,
-            classId: parseInt(classId),
           },
         });
       });

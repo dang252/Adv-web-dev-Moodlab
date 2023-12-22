@@ -18,9 +18,12 @@ model User {
   role         String
   refreshToken String
 
-  account Account?
-  classes Class[]
-  grades  Grade[]
+  account  Account?
+  classes  Class[]
+  grades   Grade[]
+  points   Point[]
+  comments Comment[]
+  reviews  Review[]
 
   @@map("users")
 }
@@ -37,15 +40,14 @@ model Account {
 }
 
 model Class {
-  id           Int                @id @default(autoincrement())
-  code         String
-  name         String
-  teacherId    Int
-  inviteCode   String
-  status       String
-  theme        String             @default("1a.jpg")
-  description  String             @default("No description")
-  compositions GradeComposition[]
+  id          Int    @id @default(autoincrement())
+  code        String
+  name        String
+  teacherId   Int
+  inviteCode  String
+  status      String
+  theme       String @default("1a.jpg")
+  description String @default("No description")
 
   teacher  User    @relation(fields: [teacherId], references: [id])
   students Grade[]
@@ -59,30 +61,75 @@ model Grade {
   classId   Int
   overall   Float @default(0)
 
-  student User  @relation(fields: [studentId], references: [id])
-  class   Class @relation(fields: [classId], references: [id])
+  student      User               @relation(fields: [studentId], references: [id])
+  class        Class              @relation(fields: [classId], references: [id])
+  compositions GradeComposition[]
 
   @@map("grades")
 }
 
 model GradeComposition {
-  id          Int     @id @default(autoincrement())
-  classId     Int
-  position    Int
-  name        String
-  scale       Float
-  isFinalized Boolean @default(false)
+  id       Int    @id @default(autoincrement())
+  gradeId  Int    @default(0)
+  position Int
+  name     String
+  scale    Float
 
-  class Class @relation(fields: [classId], references: [id])
+  grade Grade  @relation(fields: [gradeId], references: [id])
+  exams Exam[]
 
   @@map("grade_compositions")
 }
 
-model GradePoint {
-  studentId          Int
+model Exam {
+  id                 Int     @id @default(autoincrement())
   gradeCompositionId Int
-  points             Json[]
+  name               String
+  position           Int     @default(-1)
+  isFinalized        Boolean @default(false)
 
-  @@id([studentId, gradeCompositionId])
-  @@map("grade_points")
+  gradeComposition GradeComposition @relation(fields: [gradeCompositionId], references: [id])
+  points           Point[]
+  reviews          Review[]
+
+  @@map("exams")
+}
+
+model Point {
+  studentId Int
+  examId    Int
+  points    Float @default(-1)
+
+  student User @relation(fields: [studentId], references: [id])
+  exam    Exam @relation(fields: [examId], references: [id])
+
+  @@id([studentId, examId])
+  @@map("points")
+}
+
+model Review {
+  id               Int    @id @default(autoincrement())
+  examId           Int
+  reporterId       Int
+  expectationPoint Float
+  explaination     String
+  status           String
+
+  exam     Exam      @relation(fields: [examId], references: [id])
+  reporter User      @relation(fields: [reporterId], references: [id])
+  comments Comment[]
+
+  @@map("reviews")
+}
+
+model Comment {
+  id       Int    @id @default(autoincrement())
+  reviewId Int
+  userId   Int
+  content  String
+
+  review Review @relation(fields: [reviewId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@map("comments")
 }
