@@ -49,8 +49,9 @@ model Class {
   theme       String @default("1a.jpg")
   description String @default("No description")
 
-  teacher  User    @relation(fields: [teacherId], references: [id])
-  students Grade[]
+  teacher      User               @relation(fields: [teacherId], references: [id])
+  students     Grade[]
+  compositions GradeComposition[]
 
   @@map("classes")
 }
@@ -61,21 +62,20 @@ model Grade {
   classId   Int
   overall   Float @default(0)
 
-  student      User               @relation(fields: [studentId], references: [id])
-  class        Class              @relation(fields: [classId], references: [id])
-  compositions GradeComposition[]
+  student User  @relation(fields: [studentId], references: [id])
+  class   Class @relation(fields: [classId], references: [id])
 
   @@map("grades")
 }
 
 model GradeComposition {
   id       Int    @id @default(autoincrement())
-  gradeId  Int    @default(0)
+  classId  Int    @default(0)
   position Int
   name     String
   scale    Float
 
-  grade Grade  @relation(fields: [gradeId], references: [id])
+  class Class  @relation(fields: [classId], references: [id])
   exams Exam[]
 
   @@map("grade_compositions")

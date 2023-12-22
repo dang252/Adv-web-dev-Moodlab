@@ -439,12 +439,7 @@ export class ClassesService {
       const listGradeCompositions = await this.prisma.gradeComposition.findMany(
         {
           where: {
-            grade: {
-              classId: parseInt(classId),
-            },
-          },
-          include: {
-            grade: true,
+            classId: parseInt(classId),
           },
         },
       );
@@ -500,12 +495,7 @@ export class ClassesService {
       );
       let listGradeCompositions = await this.prisma.gradeComposition.findMany({
         where: {
-          grade: {
-            classId: parseInt(classId),
-          },
-        },
-        include: {
-          grade: true,
+          classId: parseInt(classId),
         },
       });
 
@@ -538,7 +528,7 @@ export class ClassesService {
           );
           await this.prisma.gradeComposition.create({
             data: {
-              gradeId: grade.grade_id,
+              classId: parseInt(classId),
               position: grade.position,
               name: grade.name,
               scale: grade.scale,
@@ -553,7 +543,7 @@ export class ClassesService {
       console.log('\t[');
       listGradeCompositions.forEach(async (composition) => {
         console.log(
-          `\t{\n\t\t\tid: ${composition.id},\n\t\t\tgradeId: ${composition.gradeId},\n\t\t\tposition: ${composition.position},\n\t\t\tname: ${composition.name},\n\t\t\tscale: ${composition.scale},\n\t\t}`,
+          `\t{\n\t\t\tid: ${composition.id},\n\t\t\tclassId: ${composition.classId},\n\t\t\tposition: ${composition.position},\n\t\t\tname: ${composition.name},\n\t\t\tscale: ${composition.scale},\n\t\t}`,
         );
         await this.prisma.gradeComposition.delete({
           where: {
