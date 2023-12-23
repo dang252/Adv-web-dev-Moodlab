@@ -330,4 +330,30 @@ export class ClassesController {
   ) {
     return this.classesService.changeGradesScale(id, req.user['sub'], dto, res);
   }
+
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
+  @Post('/:id/points')
+  @ApiBody({})
+  showStudentPoints(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Res() res: Response,
+    @Body() dto: GradeDto[],
+  ) {
+    // return this.classesService.showStudentPoints(id, req.user['sub'], dto, res);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
+  @Post('/:id/reviews')
+  @ApiBody({})
+  showAllReviews(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Res() res: Response,
+    @Body() dto: GradeDto[],
+  ) {
+    // return this.classesService.showAllReviews(id, req.user['sub'], dto, res);
+  }
 }
