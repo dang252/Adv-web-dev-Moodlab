@@ -14,6 +14,9 @@ import { ClassesModule } from './classes/classes.module';
 import { ExamController } from './exam/exam.controller';
 import { ExamService } from './exam/exam.service';
 import { ExamModule } from './exam/exam.module';
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -45,10 +48,18 @@ import { ExamModule } from './exam/exam.module';
   ],
   controllers: [
     AppController,
+    AuthController,
     UserController,
     ClassesController,
     ExamController,
   ],
-  providers: [AppService, UserService, ClassesService, ExamService],
+  providers: [
+    AppService,
+    JwtService,
+    AuthService,
+    UserService,
+    ClassesService,
+    ExamService,
+  ],
 })
 export class AppModule {}
