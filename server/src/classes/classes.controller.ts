@@ -179,7 +179,7 @@ export class ClassesController {
 
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
-  @Get('/:id/join/:code')
+  @Get('/join/:code')
   @ApiResponse({
     status: 200,
     schema: {
@@ -196,12 +196,11 @@ export class ClassesController {
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   joinClass(
-    @Param('id') id: string,
     @Param('code') code: string,
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    return this.classesService.joinClass(req.user['sub'], id, code, res);
+    return this.classesService.joinClass(req.user['sub'], code, res);
   }
 
   @ApiBearerAuth()

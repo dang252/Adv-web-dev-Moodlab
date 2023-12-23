@@ -281,13 +281,8 @@ export class ClassesService {
     }
   }
 
-  // [GET] /:id/join/:code
-  async joinClass(
-    userId: number,
-    classId: string,
-    classInviteCode: string,
-    res: Response,
-  ) {
+  // [GET] /join/:code
+  async joinClass(userId: number, classInviteCode: string, res: Response) {
     try {
       console.log('[API GET /classes/:id/:code]');
 
@@ -295,7 +290,9 @@ export class ClassesService {
       const user = await this.prisma.grade.findFirst({
         where: {
           studentId: userId,
-          classId: parseInt(classId),
+        },
+        include: {
+          class: true,
         },
       });
 
@@ -318,15 +315,12 @@ export class ClassesService {
       // Check match classID, classInviteCode
       const _class = await this.prisma.class.findFirst({
         where: {
-          id: parseInt(classId),
           inviteCode: classInviteCode,
         },
       });
 
       if (_class == null) {
-        console.log(
-          "[API GET /classes/:id/:code] id and invite code don't match",
-        );
+        console.log("[API GET /classes/:id/:code] invite code doesn't exist");
 
         // return res.redirect(process.env.CLIENT_HOME_PAGE);
         return res
@@ -338,12 +332,12 @@ export class ClassesService {
       await this.prisma.grade.create({
         data: {
           studentId: userId,
-          classId: parseInt(classId),
+          classId: _class.id,
         },
       });
 
       console.log(
-        `[API GET /classes/:id/:code] Create a grade for studentId = ${userId} and classId = ${classId} successfully`,
+        `[API GET /classes/:id/:code] Create a grade for studentId = ${userId} and classId = ${_class.id} successfully`,
       );
 
       // return res.redirect(
