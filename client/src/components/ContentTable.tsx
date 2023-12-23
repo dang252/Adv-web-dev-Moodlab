@@ -128,13 +128,13 @@ const ContentTable = (props: PropType) => {
 
   const columns = [
     {
-      title: "Order",
+      title: "#",
       dataIndex: "order",
-      width: "10%",
+      width: "5%",
       editable: false,
     },
     {
-      title: "Id",
+      title: "Student ID",
       dataIndex: "id",
       width: "15%",
       editable: true,
@@ -184,17 +184,19 @@ const ContentTable = (props: PropType) => {
               type="primary"
               danger
               onClick={() => {
-                setData(
-                  data.filter((r) => {
-                    return r.key !== record.key;
-                  })
-                );
+                if (confirm("Are you sure to delete this student?") == true) {
+                  setData(
+                    data.filter((r) => {
+                      return r.key !== record.key;
+                    })
+                  );
 
-                setContentList(
-                  contentList.filter((c) => {
-                    return c["#"] !== record.key;
-                  })
-                );
+                  setContentList(
+                    contentList.filter((c) => {
+                      return c["#"] !== record.key;
+                    })
+                  );
+                }
               }}
             >
               Delete
