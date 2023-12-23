@@ -270,7 +270,7 @@ export class ClassesController {
 
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
-  @Post('/:id/grades')
+  @Put('/:id/grades')
   @ApiBody({
     schema: {
       type: 'array',

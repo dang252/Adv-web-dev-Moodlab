@@ -435,6 +435,9 @@ export class ClassesService {
           where: {
             classId: parseInt(classId),
           },
+          include: {
+            exams: true,
+          },
         },
       );
 
@@ -458,7 +461,7 @@ export class ClassesService {
     }
   }
 
-  // [POST] /:id/grades
+  // [PUT] /:id/grades
   async changeGradesScale(
     classId: string,
     userId: number,
@@ -466,7 +469,7 @@ export class ClassesService {
     res: Response,
   ) {
     try {
-      console.log('[API POST /classes/:id/grades]');
+      console.log('[API PUT /classes/:id/grades]');
 
       const checkPermission = await this.prisma.class.findFirst({
         where: {
@@ -477,7 +480,7 @@ export class ClassesService {
 
       if (checkPermission == null) {
         console.log(
-          `[API POST /classes/:id/grades] User (id: ${userId} can\'t change grades scale`,
+          `[API PUT /classes/:id/grades] User (id: ${userId} can\'t change grades scale`,
         );
         return res
           .status(HttpStatus.UNAUTHORIZED)
@@ -485,7 +488,7 @@ export class ClassesService {
       }
 
       console.log(
-        `[API POST /classes/:id/grades] Get all compositions in class (id: ${classId})`,
+        `[API PUT /classes/:id/grades] Get all compositions in class (id: ${classId})`,
       );
       let listGradeCompositions = await this.prisma.gradeComposition.findMany({
         where: {
@@ -500,7 +503,7 @@ export class ClassesService {
 
         if (isExistComposition) {
           console.log(
-            `[API POST /classes/:id/grades] Composition ${grade.grade_id} is exist -> update: \n\t{\n\t\tposition: ${grade.position},\n\t\tname: ${grade.name},\n\t\tscale: ${grade.scale},\n\t}`,
+            `[API PUT /classes/:id/grades] Composition ${grade.grade_id} is exist -> update: \n\t{\n\t\tposition: ${grade.position},\n\t\tname: ${grade.name},\n\t\tscale: ${grade.scale},\n\t}`,
           );
           listGradeCompositions = listGradeCompositions.filter(
             (item) => item.id !== grade.grade_id,
@@ -518,7 +521,7 @@ export class ClassesService {
           });
         } else {
           console.log(
-            `[API POST /classes/:id/grades] Composition ${grade.grade_id} is not exist -> insert: \n\t{\n\tclassId: ${classId},\n\t\tposition: ${grade.position},\n\t\tname: ${grade.name},\n\t\tscale: ${grade.scale},\n\t}`,
+            `[API PUT /classes/:id/grades] Composition ${grade.grade_id} is not exist -> insert: \n\t{\n\tclassId: ${classId},\n\t\tposition: ${grade.position},\n\t\tname: ${grade.name},\n\t\tscale: ${grade.scale},\n\t}`,
           );
           await this.prisma.gradeComposition.create({
             data: {
@@ -532,12 +535,12 @@ export class ClassesService {
       });
 
       console.log(
-        `[API POST /classes/:id/grades] List of compositions need to delete:`,
+        `[API PUT /classes/:id/grades] List of compositions need to delete:`,
       );
       console.log('\t[');
       listGradeCompositions.forEach(async (composition) => {
         console.log(
-          `\t{\n\t\t\tid: ${composition.id},\n\t\t\tclassId: ${composition.classId},\n\t\t\tposition: ${composition.position},\n\t\t\tname: ${composition.name},\n\t\t\tscale: ${composition.scale},\n\t\t}`,
+          `\t\t{\n\t\t\tid: ${composition.id},\n\t\t\tclassId: ${composition.classId},\n\t\t\tposition: ${composition.position},\n\t\t\tname: ${composition.name},\n\t\t\tscale: ${composition.scale},\n\t\t},`,
         );
         await this.prisma.gradeComposition.delete({
           where: {
@@ -547,18 +550,29 @@ export class ClassesService {
       });
       console.log('\t]');
 
-      return res.status(HttpStatus.OK).send(HTTP_MSG_SUCCESS);
+      const result = await this.prisma.gradeComposition.findMany({
+        where: {
+          classId: parseInt(classId),
+        },
+        include: {
+          exams: true,
+        },
+      });
+
+      return res.status(HttpStatus.OK).send({
+        compositions: result.sort((a, b) => a.position - b.position),
+      });
     } catch (error) {
       // If the error has a status property, set the corresponding HTTP status code
       if (error.status) {
         console.log(
-          `[API POST /classes/:id/grades] Unknown error: ${error.status} - ${error.message}`,
+          `[API PUT /classes/:id/grades] Unknown error: ${error.status} - ${error.message}`,
         );
         return res.status(error.status).send(error.message);
       }
 
       // If the error doesn't have a status property, set a generic 500 Internal Server Error status code
-      console.log('[API POST /classes/:id/grades] Internal error');
+      console.log('[API PUT /classes/:id/grades] Internal error');
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .send(HTTP_MSG_INTERNAL_SERVER_ERROR);

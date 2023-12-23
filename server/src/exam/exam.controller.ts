@@ -15,6 +15,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ExamService } from './exam.service';
+import { Request, Response } from 'express';
 import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
 import {
   HTTP_MSG_SUCCESS,
@@ -29,7 +30,7 @@ export class ExamController {
 
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
-  @Get(':/examId')
+  @Get('/:examId')
   @ApiOperation({ summary: 'get grade board of an exam' })
   @ApiResponse({
     status: 200,
@@ -47,16 +48,16 @@ export class ExamController {
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   getExamGrade(
-    @Param('examId') type: Number,
+    @Param('examId') examId: string,
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    // return this.examService.getExamGrade();
+    return this.examService.getExamGrade(examId, res);
   }
 
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
-  @Put(':/examId')
+  @Put('/:examId')
   @ApiOperation({ summary: 'update grade board of an exam' })
   @ApiResponse({
     status: 200,
@@ -74,16 +75,16 @@ export class ExamController {
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   updateExamGrade(
-    @Param('examId') type: Number,
+    @Param('examId') examId: string,
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    // return this.examService.updateExamGrade();
+    return this.examService.updateExamGrade(examId, res);
   }
 
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
-  @Post(':/examId/review')
+  @Post('/:examId/review')
   @ApiOperation({ summary: 'students request for a grade review of an exam' })
   @ApiResponse({
     status: 200,
@@ -101,16 +102,16 @@ export class ExamController {
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   createReview(
-    @Param('examId') type: Number,
+    @Param('examId') examId: string,
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    // return this.examService.createReview();
+    return this.examService.createReview(examId, res);
   }
 
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
-  @Get(':/examId/review/:reviewId')
+  @Get('/:examId/review/:reviewId')
   @ApiOperation({ summary: 'show a grade review of an exam' })
   @ApiResponse({
     status: 200,
@@ -128,16 +129,16 @@ export class ExamController {
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   showReview(
-    @Param('examId') type: Number,
+    @Param('examId') examId: string,
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    // return this.examService.showReview();
+    return this.examService.showReview(examId, res);
   }
 
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
-  @Put(':/examId/review/:reviewId')
+  @Put('/:examId/review/:reviewId')
   @ApiOperation({ summary: 'make final decision for review' })
   @ApiResponse({
     status: 200,
@@ -155,16 +156,16 @@ export class ExamController {
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   updateReview(
-    @Param('examId') type: Number,
+    @Param('examId') examId: string,
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    // return this.examService.updateReview();
+    return this.examService.updateReview(examId, res);
   }
 
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
-  @Get(':/examId/review/:reviewId/comments')
+  @Get('/:examId/review/:reviewId/comments')
   @ApiOperation({ summary: 'get comments in a review' })
   @ApiResponse({
     status: 200,
@@ -182,16 +183,16 @@ export class ExamController {
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   getComments(
-    @Param('examId') type: Number,
+    @Param('examId') examId: string,
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    // return this.examService.getComments();
+    return this.examService.getComments(examId, res);
   }
 
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
-  @Post(':/examId/review/:reviewId/comments')
+  @Post('/:examId/review/:reviewId/comments')
   @ApiOperation({ summary: 'add comment in a review' })
   @ApiResponse({
     status: 200,
@@ -209,16 +210,16 @@ export class ExamController {
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   addComment(
-    @Param('examId') type: Number,
+    @Param('examId') examId: string,
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    // return this.examService.addComment();
+    return this.examService.addComment(examId, res);
   }
 
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
-  @Post(':/examId/reviews')
+  @Get('/:examId/reviews')
   @ApiOperation({ summary: 'show all reviews in a class' })
   @ApiResponse({
     status: 200,
@@ -236,10 +237,10 @@ export class ExamController {
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   getAllReviews(
-    @Param('examId') type: Number,
+    @Param('examId') examId: string,
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    // return this.examService.getAllReviews();
+    return this.examService.getAllReviews(examId, res);
   }
 }

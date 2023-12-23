@@ -8,11 +8,7 @@ import axios from "axios";
 import ExcelJS from "exceljs";
 
 import { Button, Empty, Modal, Form, Input, Card, Drawer } from "antd";
-import {
-  CaretUpOutlined,
-  CaretDownOutlined,
-  DownloadOutlined,
-} from "@ant-design/icons";
+import { CaretUpOutlined, CaretDownOutlined, DownloadOutlined } from "@ant-design/icons";
 
 import { MdDelete } from "react-icons/md";
 
@@ -55,9 +51,7 @@ const DetailClassGrades = () => {
   const [targetField, setTargetField] = useState<any>(null);
 
   const [modifyContentModal, setModifyContentModal] = useState(false);
-  const [targetContent, setTargetContent] = useState<FieldContentType | null>(
-    null
-  );
+  const [targetContent, setTargetContent] = useState<FieldContentType | null>(null);
   const [contentList, setContentList] = useState<any[]>([]);
   const [data, setData] = useState<any[]>([]);
   const [isSaveData, setIsSaveData] = useState<boolean>(false);
@@ -92,9 +86,7 @@ const DetailClassGrades = () => {
         setFormFields(response.data);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        toast.error(
-          "Can not see grade structure for now! Please try again later"
-        );
+        toast.error("Can not see grade structure for now! Please try again later");
       }
     };
 
@@ -113,15 +105,11 @@ const DetailClassGrades = () => {
         ?.toString()
         .replace(/^"(.*)"$/, "$1");
 
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/classes/${detailClass?.id}/grades`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      await axios.put(`${import.meta.env.VITE_API_URL}/classes/${detailClass?.id}/grades`, data, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
       setFields(formFields);
 
@@ -132,9 +120,7 @@ const DetailClassGrades = () => {
     } catch (error: any) {
       setFormFields(fields);
       console.log(error);
-      toast.error(
-        "Can not update grade structure for now! Please try again later"
-      );
+      toast.error("Can not update grade structure for now! Please try again later");
     }
   };
 
@@ -151,7 +137,7 @@ const DetailClassGrades = () => {
         data.push(formField);
       }
     }
-    // console.log(data);
+    console.log(data);
     // console.log(typeof data[data.length - 1].scale)
     updateClassGradeStructure(data);
     // setFields(data);
@@ -523,9 +509,7 @@ const DetailClassGrades = () => {
                     <div
                       className={`min-w-[300px] p-4
                                   border border-solid rounded-md ${
-                                    isDarkMode
-                                      ? "border-zinc-700"
-                                      : "border-zinc-300 shadow-md"
+                                    isDarkMode ? "border-zinc-700" : "border-zinc-300 shadow-md"
                                   }`}
                     >
                       <div className="flex items-center justify-between mb-5">
@@ -547,8 +531,9 @@ const DetailClassGrades = () => {
                         className="mt-10 flex flex-col gap-3 min-h-[400px] max-h-[400px]
                                       overflow-x-hidden overflow-y-auto"
                       >
-                        {getFieldContentByIdLength(fieldsContents, field.id) ===
-                          0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
+                        {getFieldContentByIdLength(fieldsContents, field.id) === 0 && (
+                          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                        )}
 
                         {fieldsContents?.map((content) => {
                           if (content?.fieldId === field.id) {
@@ -570,15 +555,11 @@ const DetailClassGrades = () => {
                                       className="flex items-center hover:text-blue-500 hover:cursor-pointer"
                                       onClick={() => {
                                         if (
-                                          confirm(
-                                            "Are you sure to delete this content?"
-                                          ) == true
+                                          confirm("Are you sure to delete this content?") == true
                                         ) {
-                                          const result = fieldsContents.filter(
-                                            (field) => {
-                                              return field.id !== content.id;
-                                            }
-                                          );
+                                          const result = fieldsContents.filter((field) => {
+                                            return field.id !== content.id;
+                                          });
 
                                           setFieldsContents(result);
                                         }
