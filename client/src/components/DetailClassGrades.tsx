@@ -60,6 +60,7 @@ const DetailClassGrades = () => {
   );
   const [contentList, setContentList] = useState<any[]>([]);
   const [data, setData] = useState<any[]>([]);
+  const [isSaveData, setIsSaveData] = useState<boolean>(false);
 
   const isDarkMode = useSelector<RootState, boolean | undefined>(
     (state) => state.persisted.users.isDarkMode
@@ -249,6 +250,11 @@ const DetailClassGrades = () => {
     };
   };
 
+  const handleSaveDetailContentData = () => {
+    console.log(data);
+    toast.success("Save data successfully");
+  };
+
   const handleExportExcel = () => {
     let SHEET_NAME = "";
 
@@ -303,6 +309,8 @@ const DetailClassGrades = () => {
     setContentList([...contentList, newDetail]);
 
     createDetailContentForm.resetFields();
+
+    toast.success("Add new student successfully");
   };
 
   const onAddDetailContentFailed = (errorInfo: any) => {
@@ -364,21 +372,36 @@ const DetailClassGrades = () => {
         extra={
           <div className="flex items-center gap-3">
             <Button
-              type="primary"
               danger
               onClick={() => {
                 if (data.length === 0) {
                   toast.error("Data is empty to export");
                   return;
                 }
+
+                if (!isSaveData) {
+                  toast.error("Please save data before export");
+                  return;
+                }
+
                 handleExportExcel();
               }}
             >
               Export
             </Button>
+
+            <Button
+              onClick={() => {
+                setIsSaveData(true);
+                handleSaveDetailContentData();
+              }}
+            >
+              Save
+            </Button>
+
             <input
               accept=".xlsx, .xls"
-              className="text-gray-400 text-sm file:mr-4 file:px-4 file:py-[6px] file:text-sm file:border-0
+              className="text-gray-400 text-sm file:mr-4 file:px-4 file:py-[5px] file:text-sm file:border-0
                         file:rounded-md file:text-white file:bg-blue-500 hover:file:bg-blue-400 hover:file:cursor-pointer"
               placeholder="Select a document"
               type="file"
@@ -386,6 +409,7 @@ const DetailClassGrades = () => {
                 handleImportExcel(e);
               }}
             />
+
             <Button onClick={onClose}>Close</Button>
           </div>
         }
@@ -545,13 +569,19 @@ const DetailClassGrades = () => {
                                     <div
                                       className="flex items-center hover:text-blue-500 hover:cursor-pointer"
                                       onClick={() => {
-                                        const result = fieldsContents.filter(
-                                          (field) => {
-                                            return field.id !== content.id;
-                                          }
-                                        );
+                                        if (
+                                          confirm(
+                                            "Are you sure to delete this content?"
+                                          ) == true
+                                        ) {
+                                          const result = fieldsContents.filter(
+                                            (field) => {
+                                              return field.id !== content.id;
+                                            }
+                                          );
 
-                                        setFieldsContents(result);
+                                          setFieldsContents(result);
+                                        }
                                       }}
                                     >
                                       <MdDelete size={25} />
