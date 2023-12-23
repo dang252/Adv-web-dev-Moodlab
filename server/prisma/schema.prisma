@@ -82,11 +82,12 @@ model GradeComposition {
 }
 
 model Exam {
-  id                 Int     @id @default(autoincrement())
+  id                 Int      @id @default(autoincrement())
   gradeCompositionId Int
   name               String
-  position           Int     @default(-1)
-  isFinalized        Boolean @default(false)
+  dueDate            DateTime @default(now())
+  position           Int      @default(-1)
+  isFinalized        Boolean  @default(false)
 
   gradeComposition GradeComposition @relation(fields: [gradeCompositionId], references: [id])
   points           Point[]

@@ -277,28 +277,49 @@ export class ClassesController {
       items: {
         type: 'object',
         properties: {
-          grade_id: { type: 'number' },
+          gradeCompositionId: { type: 'number' },
           position: { type: 'number' },
           name: { type: 'string' },
           scale: { type: 'number' },
+          exams: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                id: { type: 'number' },
+                name: { type: 'string' },
+                dueDate: { type: 'date' },
+                position: { type: 'number' },
+                isFinalized: { type: 'boolean' },
+              },
+            },
+          },
         },
       },
       example: [
         {
-          grade_id: 1,
+          gradeCompositionId: 1,
           position: 0,
           name: 'BTCN',
           scale: 20,
+          exams: [
+            {
+              id: 0,
+              name: 'BTCN-01',
+              dueDate: '2023-12-31T00:00:00Z',
+              position: 0,
+              isFinalized: false,
+            },
+          ],
         },
         {
-          grade_id: 2,
+          gradeCompositionId: 2,
           position: 1,
           name: 'GK',
           scale: 30,
         },
-
         {
-          grade_id: 3,
+          gradeCompositionId: 3,
           position: 2,
           name: 'CK',
           scale: 50,
@@ -321,13 +342,13 @@ export class ClassesController {
     status: 500,
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
-  changeGradesScale(
+  updateGrades(
     @Param('id') id: string,
     @Req() req: Request,
     @Res() res: Response,
     @Body() dto: GradeDto[],
   ) {
-    return this.classesService.changeGradesScale(id, req.user['sub'], dto, res);
+    return this.classesService.updateGrades(id, req.user['sub'], dto, res);
   }
 
   @ApiBearerAuth()

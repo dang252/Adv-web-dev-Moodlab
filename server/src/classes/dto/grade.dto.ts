@@ -1,9 +1,10 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { ExamDto } from 'src/exam/dto';
 
 export class GradeDto {
   @IsNotEmpty()
   @IsNumber()
-  grade_id: number;
+  gradeCompositionId: number;
 
   @IsNotEmpty()
   @IsNumber()
@@ -16,4 +17,6 @@ export class GradeDto {
   @IsNotEmpty()
   @IsNumber()
   scale: number;
+
+  exams: ExamDto[];
 }

@@ -462,7 +462,7 @@ export class ClassesService {
   }
 
   // [PUT] /:id/grades
-  async changeGradesScale(
+  async updateGrades(
     classId: string,
     userId: number,
     grades: GradeDto[],
@@ -498,37 +498,101 @@ export class ClassesService {
 
       grades.forEach(async (grade) => {
         const isExistComposition = listGradeCompositions.some(
-          (composition) => composition.id === grade.grade_id,
+          (composition) => composition.id === grade.gradeCompositionId,
         );
 
         if (isExistComposition) {
           console.log(
-            `[API PUT /classes/:id/grades] Composition ${grade.grade_id} is exist -> update: \n\t{\n\t\tposition: ${grade.position},\n\t\tname: ${grade.name},\n\t\tscale: ${grade.scale},\n\t}`,
+            `[API PUT /classes/:id/grades] Composition ${grade.gradeCompositionId} is exist -> update: \n\t{\n\t\tposition: ${grade.position},\n\t\tname: ${grade.name},\n\t\tscale: ${grade.scale},\n\t}`,
           );
           listGradeCompositions = listGradeCompositions.filter(
-            (item) => item.id !== grade.grade_id,
+            (item) => item.id !== grade.gradeCompositionId,
           );
 
-          await this.prisma.gradeComposition.update({
+          const updatedComposition = await this.prisma.gradeComposition.update({
             data: {
               position: grade.position,
               name: grade.name,
               scale: grade.scale,
             },
             where: {
-              id: grade.grade_id,
+              id: grade.gradeCompositionId,
+            },
+            include: {
+              exams: true,
             },
           });
+
+          if (grade.exams != null) {
+            let upsertRecords = [];
+
+            for (const exam of grade.exams) {
+              try {
+                // update when exam exists
+                await this.prisma.exam.update({
+                  data: {
+                    gradeCompositionId: updatedComposition.id,
+                    name: exam.name,
+                    dueDate: exam.dueDate,
+                    position: exam.position,
+                    isFinalized: exam.isFinalized,
+                  },
+                  where: {
+                    id: exam.id,
+                  },
+                });
+              } catch (error) {
+                // create new one when exam doesn't exist
+                await this.prisma.exam.create({
+                  data: {
+                    gradeCompositionId: updatedComposition.id,
+                    name: exam.name,
+                    dueDate: exam.dueDate,
+                    position: exam.position,
+                    isFinalized: exam.isFinalized,
+                  },
+                });
+              }
+
+              upsertRecords.push(exam.id);
+            }
+
+            if (upsertRecords.length < updatedComposition.exams.length) {
+              updatedComposition.exams.forEach(async (exam) => {
+                const isUpsertedExam = upsertRecords.some(
+                  (record) => record === exam.id,
+                );
+
+                if (!isUpsertedExam) {
+                  await this.prisma.exam.delete({
+                    where: {
+                      id: exam.id,
+                    },
+                  });
+                }
+              });
+            }
+          }
         } else {
           console.log(
-            `[API PUT /classes/:id/grades] Composition ${grade.grade_id} is not exist -> insert: \n\t{\n\tclassId: ${classId},\n\t\tposition: ${grade.position},\n\t\tname: ${grade.name},\n\t\tscale: ${grade.scale},\n\t}`,
+            `[API PUT /classes/:id/grades] Composition ${grade.gradeCompositionId} is not exist -> insert: \n\t{\n\tclassId: ${classId},\n\t\tposition: ${grade.position},\n\t\tname: ${grade.name},\n\t\tscale: ${grade.scale},\n\t}`,
           );
-          await this.prisma.gradeComposition.create({
+
+          const newGrade = await this.prisma.gradeComposition.create({
             data: {
               classId: parseInt(classId),
               position: grade.position,
               name: grade.name,
               scale: grade.scale,
+            },
+          });
+
+          await this.prisma.exam.updateMany({
+            where: {
+              gradeCompositionId: grade.gradeCompositionId,
+            },
+            data: {
+              gradeCompositionId: newGrade.id,
             },
           });
         }

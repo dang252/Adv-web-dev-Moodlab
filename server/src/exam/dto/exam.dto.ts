@@ -1,19 +1,29 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsDate,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 
 export class ExamDto {
-  @IsNotEmpty()
   @IsNumber()
-  grade_id: number;
+  id: number;
 
-  @IsNotEmpty()
   @IsNumber()
-  position: number;
+  gradeCompositionId: number;
 
   @IsNotEmpty()
   @IsString()
   name: string;
 
-  @IsNotEmpty()
   @IsNumber()
-  scale: number;
+  position: number;
+
+  @IsNotEmpty()
+  @IsDate()
+  dueDate: Date;
+
+  @IsBoolean()
+  isFinalized: boolean;
 }
