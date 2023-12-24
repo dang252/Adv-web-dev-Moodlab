@@ -5,29 +5,30 @@ import {
 } from 'src/constants';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Response } from 'express';
+import { CommentDto } from './dto';
 
 @Injectable()
 export class ReviewService {
   constructor(private prisma: PrismaService) {}
 
-  // [PUT] /:examId/review/:reviewId
-  async updateReview(examId: string, res: Response) {
+  // [PUT] /review/:reviewId
+  async updateReview(reviewId: string, res: Response) {
     try {
-      console.log('[API PUT /exam/:examId/review/:reviewId]');
+      console.log('[API PUT /review/:reviewId]');
 
       return res.status(HttpStatus.OK).send(HTTP_MSG_SUCCESS);
     } catch (error) {
       // If the error has a status property, set the corresponding HTTP status code
       if (error.status) {
         console.log(
-          `[API PUT /exam/:examId/review/:reviewId] Unknown error: ${error.status} - ${error.message}`,
+          `[API PUT /review/:reviewId] Unknown error: ${error.status} - ${error.message}`,
         );
         return res.status(error.status).send(error.message);
         // return res.redirect(process.env.CLIENT_HOME_PAGE);
       }
 
       // If the error doesn't have a status property, set a generic 500 Internal Server Error status code
-      console.log('[API PUT /exam/:examId/review/:reviewId] Internal error');
+      console.log('[API PUT /review/:reviewId] Internal error');
       // return res.redirect(process.env.CLIENT_HOME_PAGE);
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -35,26 +36,24 @@ export class ReviewService {
     }
   }
 
-  // [GET] /:examId/review/:reviewId/comments
-  async getComments(examId: string, res: Response) {
+  // [GET] /review/:reviewId/comments
+  async getComments(reviewId: string, res: Response) {
     try {
-      console.log('[API GET /exam/:examId/review/:reviewId/comments]');
+      console.log('[API GET /review/:reviewId/comments]');
 
       return res.status(HttpStatus.OK).send(HTTP_MSG_SUCCESS);
     } catch (error) {
       // If the error has a status property, set the corresponding HTTP status code
       if (error.status) {
         console.log(
-          `[API GET /exam/:examId/review/:reviewId/comments] Unknown error: ${error.status} - ${error.message}`,
+          `[API GET /review/:reviewId/comments] Unknown error: ${error.status} - ${error.message}`,
         );
         return res.status(error.status).send(error.message);
         // return res.redirect(process.env.CLIENT_HOME_PAGE);
       }
 
       // If the error doesn't have a status property, set a generic 500 Internal Server Error status code
-      console.log(
-        '[API GET /exam/:examId/review/:reviewId/comments] Internal error',
-      );
+      console.log('[API GET /review/:reviewId/comments] Internal error');
       // return res.redirect(process.env.CLIENT_HOME_PAGE);
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -62,26 +61,37 @@ export class ReviewService {
     }
   }
 
-  // [POST] /:examId/review/:reviewId/comments
-  async addComment(examId: string, res: Response) {
+  // [POST] /review/:reviewId/comment
+  async addComment(
+    reviewId: string,
+    userId: number,
+    content: string,
+    res: Response,
+  ) {
     try {
-      console.log('[API POST /exam/:examId/review/:reviewId/comments]');
+      console.log('[API POST /review/:reviewId/comments]');
 
-      return res.status(HttpStatus.OK).send(HTTP_MSG_SUCCESS);
+      const newComment = await this.prisma.comment.create({
+        data: {
+          reviewId: parseInt(reviewId),
+          userId: userId,
+          content: content,
+        },
+      });
+
+      return res.status(HttpStatus.OK).send(newComment);
     } catch (error) {
       // If the error has a status property, set the corresponding HTTP status code
       if (error.status) {
         console.log(
-          `[API POST /exam/:examId/review/:reviewId/comments] Unknown error: ${error.status} - ${error.message}`,
+          `[API POST /review/:reviewId/comments] Unknown error: ${error.status} - ${error.message}`,
         );
         return res.status(error.status).send(error.message);
         // return res.redirect(process.env.CLIENT_HOME_PAGE);
       }
 
       // If the error doesn't have a status property, set a generic 500 Internal Server Error status code
-      console.log(
-        '[API POST /exam/:examId/review/:reviewId/comments] Internal error',
-      );
+      console.log('[API POST /review/:reviewId/comments] Internal error');
       // return res.redirect(process.env.CLIENT_HOME_PAGE);
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
