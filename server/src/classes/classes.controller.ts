@@ -365,7 +365,15 @@ export class ClassesController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    return this.classesService.showStudentPoints(id, req.user['sub'], res);
+    const role = req.user['role'];
+
+    if (role == 'TEACHER') {
+      return this.classesService.showStudentsPoints(id, res);
+    } else if (role == 'STUDENT') {
+      return this.classesService.showStudentPoints(id, req.user['sub'], res);
+    } else {
+      return [];
+    }
   }
 
   @ApiBearerAuth()

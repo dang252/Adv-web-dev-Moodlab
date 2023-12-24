@@ -648,17 +648,71 @@ export class ClassesService {
     try {
       console.log('[API GET /classes/:id/points]');
 
-      const points = await this.prisma.exam.findMany({
+      const points = await this.prisma.grade.findFirst({
         where: {
-          gradeComposition: {
-            classId: parseInt(classId),
-          },
+          studentId: studentId,
+          classId: parseInt(classId),
         },
         include: {
-          points: true,
+          student: {
+            select: {
+              firstName: true,
+              lastName: true,
+              points: {
+                select: {
+                  exam: true,
+                  point: true,
+                },
+              },
+            },
+          },
         },
       });
-      return res.status(HttpStatus.OK).send();
+
+      return res.status(HttpStatus.OK).send(points);
+    } catch (error) {
+      // If the error has a status property, set the corresponding HTTP status code
+      if (error.status) {
+        console.log(
+          `[API GET /classes/:id/points] Unknown error: ${error.status} - ${error.message}`,
+        );
+        return res.status(error.status).send(error.message);
+      }
+
+      // If the error doesn't have a status property, set a generic 500 Internal Server Error status code
+      console.log('[API GET /classes/:id/points] Internal error');
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .send(HTTP_MSG_INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  // [GET] /:id/points
+  async showStudentsPoints(classId: string, res: Response) {
+    try {
+      console.log('[API GET /classes/:id/points]');
+
+      const points = await this.prisma.grade.findMany({
+        where: {
+          classId: parseInt(classId),
+        },
+        include: {
+          student: {
+            select: {
+              firstName: true,
+              lastName: true,
+              points: {
+                select: {
+                  exam: true,
+                  point: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return res.status(HttpStatus.OK).send(points);
     } catch (error) {
       // If the error has a status property, set the corresponding HTTP status code
       if (error.status) {
