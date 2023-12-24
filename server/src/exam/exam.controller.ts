@@ -154,118 +154,37 @@ export class ExamController {
     return this.examService.createReview(examId, req.user['sub'], review, res);
   }
 
-  @ApiBearerAuth()
-  @UseGuards(AccessTokenGuard)
-  @Get('/:examId/review/:reviewId')
-  @ApiOperation({ summary: 'show a grade review of an exam' })
-  @ApiResponse({
-    status: 200,
-    schema: {
-      type: 'string',
-      example: HTTP_MSG_SUCCESS,
-    },
-  })
-  @ApiResponse({
-    status: 403,
-    description: HTTP_MSG_FORBIDDEN,
-  })
-  @ApiResponse({
-    status: 500,
-    description: HTTP_MSG_INTERNAL_SERVER_ERROR,
-  })
-  showReview(
-    @Param('examId') examId: string,
-    @Req() req: Request,
-    @Res() res: Response,
-  ) {
-    return this.examService.showReview(examId, res);
-  }
-
-  @ApiBearerAuth()
-  @UseGuards(AccessTokenGuard)
-  @Put('/:examId/review/:reviewId')
-  @ApiOperation({ summary: 'make final decision for review' })
-  @ApiResponse({
-    status: 200,
-    schema: {
-      type: 'string',
-      example: HTTP_MSG_SUCCESS,
-    },
-  })
-  @ApiResponse({
-    status: 403,
-    description: HTTP_MSG_FORBIDDEN,
-  })
-  @ApiResponse({
-    status: 500,
-    description: HTTP_MSG_INTERNAL_SERVER_ERROR,
-  })
-  updateReview(
-    @Param('examId') examId: string,
-    @Req() req: Request,
-    @Res() res: Response,
-  ) {
-    return this.examService.updateReview(examId, res);
-  }
-
-  @ApiBearerAuth()
-  @UseGuards(AccessTokenGuard)
-  @Get('/:examId/review/:reviewId/comments')
-  @ApiOperation({ summary: 'get comments in a review' })
-  @ApiResponse({
-    status: 200,
-    schema: {
-      type: 'string',
-      example: HTTP_MSG_SUCCESS,
-    },
-  })
-  @ApiResponse({
-    status: 403,
-    description: HTTP_MSG_FORBIDDEN,
-  })
-  @ApiResponse({
-    status: 500,
-    description: HTTP_MSG_INTERNAL_SERVER_ERROR,
-  })
-  getComments(
-    @Param('examId') examId: string,
-    @Req() req: Request,
-    @Res() res: Response,
-  ) {
-    return this.examService.getComments(examId, res);
-  }
-
-  @ApiBearerAuth()
-  @UseGuards(AccessTokenGuard)
-  @Post('/:examId/review/:reviewId/comments')
-  @ApiOperation({ summary: 'add comment in a review' })
-  @ApiResponse({
-    status: 200,
-    schema: {
-      type: 'string',
-      example: HTTP_MSG_SUCCESS,
-    },
-  })
-  @ApiResponse({
-    status: 403,
-    description: HTTP_MSG_FORBIDDEN,
-  })
-  @ApiResponse({
-    status: 500,
-    description: HTTP_MSG_INTERNAL_SERVER_ERROR,
-  })
-  addComment(
-    @Param('examId') examId: string,
-    @Req() req: Request,
-    @Res() res: Response,
-  ) {
-    return this.examService.addComment(examId, res);
-  }
+  // @ApiBearerAuth()
+  // @UseGuards(AccessTokenGuard)
+  // @Get('/:examId/review/:reviewId')
+  // @ApiOperation({ summary: 'show a grade review of an exam' })
+  // @ApiResponse({
+  //   status: 200,
+  //   schema: {
+  //     type: 'string',
+  //     example: HTTP_MSG_SUCCESS,
+  //   },
+  // })
+  // @ApiResponse({
+  //   status: 403,
+  //   description: HTTP_MSG_FORBIDDEN,
+  // })
+  // @ApiResponse({
+  //   status: 500,
+  //   description: HTTP_MSG_INTERNAL_SERVER_ERROR,
+  // })
+  // showReview(
+  //   @Param('examId') examId: string,
+  //   @Req() req: Request,
+  //   @Res() res: Response,
+  // ) {
+  //   return this.examService.showReview(examId, res);
+  // }
 
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @Get('/:examId/reviews')
-  @ApiOperation({ summary: 'show all reviews in a class' })
+  @ApiOperation({ summary: 'show all reviews of an exam' })
   @ApiResponse({
     status: 200,
     schema: {

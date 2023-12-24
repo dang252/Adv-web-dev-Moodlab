@@ -9,7 +9,13 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
 import {
   HTTP_MSG_SUCCESS,
@@ -365,6 +371,7 @@ export class ClassesController {
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @Get('/:id/reviews')
+  @ApiOperation({ summary: 'show all reviews of class' })
   showAllReviews(@Param('id') id: string, @Res() res: Response) {
     return this.classesService.showAllReviews(id, res);
   }

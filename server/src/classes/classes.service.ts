@@ -689,6 +689,22 @@ export class ClassesService {
             },
           },
         },
+        include: {
+          exam: {
+            include: {
+              points: true,
+            },
+          },
+          reporter: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+          comments: true,
+        },
       });
 
       return res.status(HttpStatus.OK).send({ reviews: reviews });

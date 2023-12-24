@@ -1,24 +1,13 @@
 import { Module } from '@nestjs/common';
+import { join } from 'path';
+import { HandlebarsAdapter, MailerModule } from '@nest-modules/mailer';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { HandlebarsAdapter, MailerModule } from '@nest-modules/mailer';
-import { join } from 'path';
-import { UserController } from './user/user.controller';
-import { UserService } from './user/user.service';
 import { UserModule } from './user/user.module';
-import { ClassesController } from './classes/classes.controller';
-import { ClassesService } from './classes/classes.service';
 import { ClassesModule } from './classes/classes.module';
-import { ExamController } from './exam/exam.controller';
-import { ExamService } from './exam/exam.service';
 import { ExamModule } from './exam/exam.module';
-import { AuthController } from './auth/auth.controller';
-import { AuthService } from './auth/auth.service';
-import { JwtService } from '@nestjs/jwt';
-import { ReviewController } from './review/review.controller';
-import { ReviewService } from './review/review.service';
 import { ReviewModule } from './review/review.module';
 
 @Module({
@@ -50,7 +39,7 @@ import { ReviewModule } from './review/review.module';
     ExamModule,
     ReviewModule,
   ],
-  controllers: [AppController, ReviewController],
-  providers: [AppService, ReviewService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
