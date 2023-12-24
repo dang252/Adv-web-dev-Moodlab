@@ -29,7 +29,7 @@ model User {
 }
 
 model Account {
-  userId   Int    @unique
+  userId   Int    @id @unique
   username String @unique
   password String
   status   String
@@ -99,7 +99,7 @@ model Exam {
 model Point {
   studentId Int
   examId    Int
-  points    Float @default(-1)
+  point     Float @default(-1)
 
   student User @relation(fields: [studentId], references: [id])
   exam    Exam @relation(fields: [examId], references: [id])

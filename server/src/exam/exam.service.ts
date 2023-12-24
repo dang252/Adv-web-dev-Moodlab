@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import {
   HTTP_MSG_SUCCESS,
   HTTP_MSG_INTERNAL_SERVER_ERROR,
+  HTTP_MSG_NOTFOUND,
 } from 'src/constants';
 
 @Injectable()
@@ -19,7 +20,24 @@ export class ExamService {
         where: {
           id: parseInt(examId),
         },
+        include: {
+          points: {
+            include: {
+              student: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  email: true,
+                },
+              },
+            },
+          },
+        },
       });
+
+      if (exam == null) {
+        return res.status(HttpStatus.NOT_FOUND).send(HTTP_MSG_NOTFOUND);
+      }
 
       return res.status(HttpStatus.OK).send(exam);
     } catch (error) {
