@@ -353,27 +353,19 @@ export class ClassesController {
 
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
-  @Post('/:id/points')
-  @ApiBody({})
+  @Get('/:id/points')
   showStudentPoints(
     @Param('id') id: string,
     @Req() req: Request,
     @Res() res: Response,
-    @Body() dto: GradeDto[],
   ) {
-    // return this.classesService.showStudentPoints(id, req.user['sub'], dto, res);
+    return this.classesService.showStudentPoints(id, req.user['sub'], res);
   }
 
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
-  @Post('/:id/reviews')
-  @ApiBody({})
-  showAllReviews(
-    @Param('id') id: string,
-    @Req() req: Request,
-    @Res() res: Response,
-    @Body() dto: GradeDto[],
-  ) {
-    // return this.classesService.showAllReviews(id, req.user['sub'], dto, res);
+  @Get('/:id/reviews')
+  showAllReviews(@Param('id') id: string, @Res() res: Response) {
+    return this.classesService.showAllReviews(id, res);
   }
 }
