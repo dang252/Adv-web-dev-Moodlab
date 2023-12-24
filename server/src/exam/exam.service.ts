@@ -250,11 +250,16 @@ export class ExamService {
   }
 
   // [GET] /:examId/reviews
-  async getAllReviews(examId: string, res: Response) {
+  async getAllReviewsInExam(examId: string, res: Response) {
     try {
       console.log('[API GET /exam/:examId/reviews]');
 
-      return res.status(HttpStatus.OK).send(HTTP_MSG_SUCCESS);
+      const reviews = await this.prisma.review.findMany({
+        where: {
+          examId: parseInt(examId),
+        },
+      });
+      return res.status(HttpStatus.OK).send(reviews);
     } catch (error) {
       // If the error has a status property, set the corresponding HTTP status code
       if (error.status) {

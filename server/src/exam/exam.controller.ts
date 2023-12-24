@@ -281,11 +281,11 @@ export class ExamController {
     status: 500,
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
-  getAllReviews(
+  getAllReviewsInExam(
     @Param('examId') examId: string,
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    return this.examService.getAllReviews(examId, res);
+    return this.examService.getAllReviewsInExam(examId, res);
   }
 }
