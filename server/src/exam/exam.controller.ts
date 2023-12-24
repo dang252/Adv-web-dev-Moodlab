@@ -24,7 +24,7 @@ import {
   HTTP_MSG_FORBIDDEN,
   HTTP_MSG_INTERNAL_SERVER_ERROR,
 } from 'src/constants';
-import { PointDto } from './dto';
+import { PointDto, ReviewDto } from './dto';
 
 @Controller('/exam')
 @ApiTags('/exam')
@@ -115,6 +115,21 @@ export class ExamController {
   @UseGuards(AccessTokenGuard)
   @Post('/:examId/review')
   @ApiOperation({ summary: 'students request for a grade review of an exam' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        expectationPoint: {
+          type: 'number',
+          example: 10,
+        },
+        explaination: {
+          type: 'string',
+          example: 'Bài em làm đúng mà?',
+        },
+      },
+    },
+  })
   @ApiResponse({
     status: 200,
     schema: {
@@ -132,10 +147,11 @@ export class ExamController {
   })
   createReview(
     @Param('examId') examId: string,
+    @Body() review: ReviewDto,
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    return this.examService.createReview(examId, res);
+    return this.examService.createReview(examId, req.user['sub'], review, res);
   }
 
   @ApiBearerAuth()

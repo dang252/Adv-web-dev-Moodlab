@@ -5,8 +5,10 @@ import {
   HTTP_MSG_SUCCESS,
   HTTP_MSG_INTERNAL_SERVER_ERROR,
   HTTP_MSG_NOTFOUND,
+  REVIEW_STATUS_OPENED,
+  HTTP_MSG_BAD_REQUEST,
 } from 'src/constants';
-import { PointDto } from './dto';
+import { PointDto, ReviewDto } from './dto';
 
 @Injectable()
 export class ExamService {
@@ -100,9 +102,28 @@ export class ExamService {
   }
 
   // [POST] /:examId/review
-  async createReview(examId: string, res: Response) {
+  async createReview(
+    examId: string,
+    userId: number,
+    review: ReviewDto,
+    res: Response,
+  ) {
     try {
       console.log('[API POST /exam/:examId/review]');
+
+      const newReview = await this.prisma.review.create({
+        data: {
+          examId: parseInt(examId),
+          reporterId: userId,
+          expectationPoint: review.expectationPoint,
+          explaination: review.explaination,
+          status: REVIEW_STATUS_OPENED,
+        },
+      });
+
+      if (newReview == null) {
+        return res.status(HttpStatus.BAD_REQUEST).send(HTTP_MSG_BAD_REQUEST);
+      }
 
       return res.status(HttpStatus.OK).send(HTTP_MSG_SUCCESS);
     } catch (error) {
