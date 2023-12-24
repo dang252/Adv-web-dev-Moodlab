@@ -24,7 +24,7 @@ import {
 } from 'src/constants';
 import { ReviewService } from './review.service';
 import { Request, Response } from 'express';
-import { ReviewDto } from './dto';
+import { FinalDecisionDto, ReviewDto } from './dto';
 import { CommentDto } from './dto/comment.dto';
 
 @Controller('/review')
@@ -36,6 +36,15 @@ export class ReviewController {
   @UseGuards(AccessTokenGuard)
   @Put('/:reviewId')
   @ApiOperation({ summary: 'make final decision for review' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        studentId: { type: 'number', example: 1 },
+        newPoint: { type: 'number', example: 10 },
+      },
+    },
+  })
   @ApiResponse({
     status: 200,
     schema: {
@@ -52,11 +61,11 @@ export class ReviewController {
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   updateReview(
-    @Param('examId') examId: string,
-    @Req() req: Request,
+    @Param('reviewId') reviewId: string,
+    @Body() finalDecision: FinalDecisionDto,
     @Res() res: Response,
   ) {
-    return this.reviewService.updateReview(examId, res);
+    return this.reviewService.updateReview(reviewId, finalDecision, res);
   }
 
   //   @ApiBearerAuth()

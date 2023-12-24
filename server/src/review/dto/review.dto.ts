@@ -9,3 +9,13 @@ export class ReviewDto {
   @IsString()
   explaination: string;
 }
+
+export class FinalDecisionDto {
+  @IsNotEmpty()
+  @IsNumber()
+  studentId: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  newPoint: number;
+}
