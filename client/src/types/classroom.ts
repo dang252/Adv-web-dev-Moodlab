@@ -38,3 +38,43 @@ export interface gradeCol {
   name: string;
   scale: number;
 }
+
+export interface Exam {
+  gradeComposition?: { name: string; scale: number };
+  isFinalized?: boolean;
+  name?: string;
+  position?: number;
+}
+
+export interface Point {
+  exam?: Exam;
+  point?: number;
+}
+
+export interface Grade {
+  id?: number;
+  classId?: number;
+  studentId?: number;
+  overall?: number;
+  student: { firstName: string; lastName: string };
+  points: Point[];
+}
+
+export interface Review {
+  comments: Comment[];
+  exam: any;
+  examId: number;
+  expectationPoint: number;
+  explaination: string;
+  id: number;
+  reporter: { id: number; email: string; firstName: string; lastName: string };
+  reporterId: number;
+  status: string;
+}
+
+export interface Comment {
+  id: number;
+  reviewId?: number;
+  userId?: number;
+  content: string;
+}

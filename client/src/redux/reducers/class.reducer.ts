@@ -1,7 +1,7 @@
 import { createAsyncThunk, createReducer } from "@reduxjs/toolkit";
 import axios from "axios";
 
-import { ClassType } from "../../types/classroom";
+import { ClassType, Grade, Review } from "../../types/classroom";
 
 import {
   PendingAction,
@@ -17,7 +17,8 @@ interface ClassState {
   isError: boolean;
   classList: any[];
   detailClass: ClassType | null;
-
+  detailClassGrades: Grade[];
+  detailClassReviews: Review[];
 }
 
 // InitialState value
@@ -28,6 +29,8 @@ const initialState: ClassState = {
   isError: false,
   classList: [],
   detailClass: null,
+  detailClassGrades: [],
+  detailClassReviews: [],
 };
 
 export const getClasses = createAsyncThunk(
@@ -210,10 +213,10 @@ export const getClassMembers = createAsyncThunk(
   "class/getClassMembers",
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
-  async (body: { id: string; }, thunkAPI) => {
+  async (body: { id: string }, thunkAPI) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/classes/${body.id}/members`,
+        `${import.meta.env.VITE_API_URL}/classes/${body.id}/members`
       );
       return response.data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -222,7 +225,6 @@ export const getClassMembers = createAsyncThunk(
     }
   }
 );
-
 
 export const getClassGradeStructure = createAsyncThunk(
   "class/getClassGradeStructure",
@@ -264,15 +266,49 @@ export const postClassGradeStructure = createAsyncThunk(
 
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/classes/${body.classId}/grades`,
-        {
-
-        },
+        {},
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         }
       );
+      return response.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const getClassAllGrades = createAsyncThunk(
+  "class/getClassAllGrades",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+  async (classId: number, thunkAPI) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/classes/${classId}/points`
+      );
+
+      return response.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const getClassAllReviews = createAsyncThunk(
+  "class/getClassAllReviews",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+  async (classId: number, thunkAPI) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/classes/${classId}/reviews`
+      );
+
       return response.data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -307,7 +343,7 @@ const classReducer = createReducer(initialState, (builder) => {
 
     .addCase(getClassGradeStructure.rejected, (state, _) => {
       if (state.detailClass) {
-        state.detailClass.gradeStructure = null
+        state.detailClass.gradeStructure = null;
       }
     })
 
@@ -315,6 +351,14 @@ const classReducer = createReducer(initialState, (builder) => {
       if (state.detailClass) {
         state.detailClass.gradeStructure = [...action.payload];
       }
+    })
+
+    .addCase(getClassAllGrades.fulfilled, (state, action) => {
+      state.detailClassGrades = action.payload;
+    })
+
+    .addCase(getClassAllReviews.fulfilled, (state, action) => {
+      state.detailClassReviews = action.payload.reviews;
     })
 
     .addMatcher(

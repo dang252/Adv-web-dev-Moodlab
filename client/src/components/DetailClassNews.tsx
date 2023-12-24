@@ -9,13 +9,14 @@ import {
   Empty,
   Modal,
 } from "antd";
-
 import {
   InfoOutlined,
   FullscreenOutlined,
   UserOutlined,
   CopyOutlined,
 } from "@ant-design/icons";
+import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "../redux/hooks";
@@ -30,12 +31,10 @@ import copy from "copy-text-to-clipboard";
 
 import { RootState } from "../redux/store";
 
-import { ClassType, Post } from "../types/classroom";
+import { ClassType, Review } from "../types/classroom";
 
 import PostCard from "./PostCard";
 import ClassNewEditModal from "./ClassNewEditModal";
-import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
 
 const { TextArea } = Input;
 
@@ -47,24 +46,24 @@ interface PropType {
   detailClass: ClassType | null;
 }
 
-const postList: Post[] = [
-  {
-    id: 1,
-    name: "sadboiz phu nhuan",
-    content:
-      "She had been an angel for coming up on 10 years and in all that time nobody had told her this was possible. The fact that it could ever happen never even entered her mind. Yet there she stood, with the undeniable evidence sitting on the ground before her. Angels could lose their wings.",
-    time: "15:52",
-    comments: [],
-  },
-  {
-    id: 2,
-    name: "your memory",
-    content:
-      "He had disappointed himself more than anyone else. That wasn't to say that he hadn't disappointed others. The fact was that he had disappointed a lot of people who were close to him. The fact that they were disappointed in him was something that made him even more disappointed in himself. Yet here he was, about to do the exact same things that had caused all the disappointment in the first place because he didn't know what else to do.",
-    time: "8:35",
-    comments: [],
-  },
-];
+// const postList: Post[] = [
+//   {
+//     id: 1,
+//     name: "sadboiz phu nhuan",
+//     content:
+//       "She had been an angel for coming up on 10 years and in all that time nobody had told her this was possible. The fact that it could ever happen never even entered her mind. Yet there she stood, with the undeniable evidence sitting on the ground before her. Angels could lose their wings.",
+//     time: "15:52",
+//     comments: [],
+//   },
+//   {
+//     id: 2,
+//     name: "your memory",
+//     content:
+//       "He had disappointed himself more than anyone else. That wasn't to say that he hadn't disappointed others. The fact was that he had disappointed a lot of people who were close to him. The fact that they were disappointed in him was something that made him even more disappointed in himself. Yet here he was, about to do the exact same things that had caused all the disappointment in the first place because he didn't know what else to do.",
+//     time: "8:35",
+//     comments: [],
+//   },
+// ];
 
 const DetailClassNews = (props: PropType) => {
   const { detailClass } = props;
@@ -87,6 +86,10 @@ const DetailClassNews = (props: PropType) => {
 
   const classId = useSelector<RootState, number | undefined>(
     (state) => state.classes.detailClass?.id
+  );
+
+  const reviews = useSelector<RootState, Review[]>(
+    (state) => state.classes.detailClassReviews
   );
 
   //==================== Post form
@@ -130,7 +133,7 @@ const DetailClassNews = (props: PropType) => {
   };
 
   //==================== Invite modal
-  const handleInviteOk = () => { };
+  const handleInviteOk = () => {};
 
   const handleInviteCancel = () => {
     setOpenInviteModal(false);
@@ -150,10 +153,10 @@ const DetailClassNews = (props: PropType) => {
     const email: string = values.email;
 
     if (classId) {
-      const body: { id: number, email: string } = {
+      const body: { id: number; email: string } = {
         id: classId,
         email: email,
-      }
+      };
 
       const res = await dispatchAsync(inviteToClassByEmail(body));
 
@@ -271,8 +274,9 @@ const DetailClassNews = (props: PropType) => {
               setThemeUrl={setThemeUrl}
             />
             <img
-              className={`w-[100%] h-[120px] md:h-[150px] xl:h-[200px] object-cover ${openInfor ? "rounded-t-xl" : "rounded-xl"
-                }`}
+              className={`w-[100%] h-[120px] md:h-[150px] xl:h-[200px] object-cover ${
+                openInfor ? "rounded-t-xl" : "rounded-xl"
+              }`}
               src={`../../class theme/${detailClass?.theme}`}
               alt="theme"
             />
@@ -300,15 +304,16 @@ const DetailClassNews = (props: PropType) => {
           </div>
 
           <div
-            className={`w-[100%] p-5 rounded-b-xl ${openInfor ? "flex" : "hidden"
-              } ${isDarkMode ? " bg-zinc-800 " : " bg-white "}`}
+            className={`w-[100%] p-5 rounded-b-xl ${
+              openInfor ? "flex" : "hidden"
+            } ${isDarkMode ? " bg-zinc-800 " : " bg-white "}`}
           >
             <div className="flex items-center gap-5">
               <p className="font-bold">Code</p>
               <p>whyilostyou</p>
               <div
                 className="w-[30px] h-[30px] flex items-center justify-center rounded-full hover:bg-gray-200 hover:cursor-pointer"
-                onClick={() => { }}
+                onClick={() => {}}
               >
                 <FullscreenOutlined />
               </div>
@@ -317,8 +322,9 @@ const DetailClassNews = (props: PropType) => {
 
           {!openCreateNoti ? (
             <Card
-              className={`w-[100%] mt-5 hover:text-blue-500 ${isDarkMode ? "" : "text-gray-400"
-                }`}
+              className={`w-[100%] mt-5 hover:text-blue-500 ${
+                isDarkMode ? "" : "text-gray-400"
+              }`}
               hoverable
               onClick={() => {
                 setOpenCreateNoti(true);
@@ -343,10 +349,11 @@ const DetailClassNews = (props: PropType) => {
                 <Form form={form} name="post-form" onFinish={onFinish}>
                   <Form.Item name="post" rules={[{ required: true }]}>
                     <TextArea
-                      className={`${isDarkMode
-                        ? "bg-zinc-800 hover:bg-zinc-900"
-                        : "bg-gray-100 hover:bg-gray-200"
-                        }`}
+                      className={`${
+                        isDarkMode
+                          ? "bg-zinc-800 hover:bg-zinc-900"
+                          : "bg-gray-100 hover:bg-gray-200"
+                      }`}
                       rows={4}
                       placeholder="Notify something new for your classroom"
                     />
@@ -375,17 +382,9 @@ const DetailClassNews = (props: PropType) => {
           )}
 
           <div className="mt-5 w-[100%] flex flex-col gap-5">
-            {postList.length !== 0 ? (
-              postList.map((post) => {
-                return (
-                  <PostCard
-                    id={post.id}
-                    key={post.id}
-                    name={post.name}
-                    time={post.time}
-                    content={post.content}
-                  />
-                );
+            {reviews.length !== 0 ? (
+              reviews.map((review) => {
+                return <PostCard key={review.id} review={review} />;
               })
             ) : (
               <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />

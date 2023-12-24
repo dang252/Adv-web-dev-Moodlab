@@ -2,19 +2,24 @@ import { useEffect } from "react";
 import { Tabs, Spin } from "antd";
 import type { TabsProps } from "antd";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "../redux/hooks";
 import { RootState } from "../redux/store";
 
-import { getDetailClass, getInviteCode } from "../redux/reducers/class.reducer";
+import {
+  getClassAllGrades,
+  getClassAllReviews,
+  getDetailClass,
+  getInviteCode,
+} from "../redux/reducers/class.reducer";
 
 import DetailClassNews from "../components/DetailClassNews";
 import DetailClassMembers from "../components/DetailClassMembers";
 import DetailClassGrades from "../components/DetailClassGrades";
 
 import { ClassType } from "../types/classroom";
-import { toast } from "react-toastify";
 
 interface PropType {
   isDarkMode: boolean;
@@ -29,7 +34,9 @@ const DetailClass = (props: PropType) => {
 
   const dispatchAsync = useAppDispatch();
 
-  const USER_ROLE = useSelector<RootState, string>((state) => state.persisted.users.role);
+  const USER_ROLE = useSelector<RootState, string>(
+    (state) => state.persisted.users.role
+  );
 
   const isLoading = useSelector<RootState, boolean>(
     (state) => state.classes.isLoading
@@ -84,6 +91,32 @@ const DetailClass = (props: PropType) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inviteCode]);
+
+  useEffect(() => {
+    const handleGetClassAllGrades = async (classId: number) => {
+      console.log("GRADES:", classId);
+      await dispatchAsync(getClassAllGrades(3));
+    };
+
+    if (detailClass?.id) {
+      handleGetClassAllGrades(detailClass.id);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [detailClass]);
+
+  useEffect(() => {
+    const handleGetClassAllGrades = async (classId: number) => {
+      console.log("REVIEWS:", classId);
+      await dispatchAsync(getClassAllReviews(3));
+    };
+
+    if (detailClass?.id) {
+      handleGetClassAllGrades(detailClass.id);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [detailClass]);
 
   const onChange = (key: string) => {
     console.log(key);
@@ -140,7 +173,7 @@ const DetailClass = (props: PropType) => {
             items={USER_ROLE === "TEACHER" ? teacherItems : studentItems}
             onChange={onChange}
             className="w-[100%]"
-          // indicatorSize={(origin) => origin - 16}
+            // indicatorSize={(origin) => origin - 16}
           />
         </div>
       )}
