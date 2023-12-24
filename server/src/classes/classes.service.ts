@@ -660,7 +660,19 @@ export class ClassesService {
               lastName: true,
               points: {
                 select: {
-                  exam: true,
+                  exam: {
+                    select: {
+                      name: true,
+                      position: true,
+                      isFinalized: true,
+                      gradeComposition: {
+                        select: {
+                          name: true,
+                          scale: true,
+                        },
+                      },
+                    },
+                  },
                   point: true,
                 },
               },
@@ -668,6 +680,58 @@ export class ClassesService {
           },
         },
       });
+
+      let totalPoint = 0;
+      let prevGrade = '';
+      let prevScale = 1;
+      let prevNumberOfPoints = 0;
+      let compositions = [];
+      points.student.points.forEach(async (point) => {
+        if (point.exam.gradeComposition.name != prevGrade) {
+          compositions.push({
+            grade: prevGrade,
+            scale: prevScale,
+            totalPoint: totalPoint,
+            numberOfPoints: prevNumberOfPoints,
+          });
+
+          totalPoint = 0;
+          prevGrade = point.exam.gradeComposition.name;
+          prevScale = point.exam.gradeComposition.scale;
+          prevNumberOfPoints = 0;
+        }
+
+        totalPoint += point.point;
+        prevNumberOfPoints++;
+      });
+
+      compositions.push({
+        grade: prevGrade,
+        scale: prevScale,
+        totalPoint: totalPoint,
+        numberOfPoints: prevNumberOfPoints,
+      });
+
+      let overall = 0;
+      compositions.forEach((composition) => {
+        if (composition.numberOfPoints != 0) {
+          overall +=
+            ((composition.totalPoint / composition.numberOfPoints) *
+              composition.scale) /
+            100;
+        }
+      });
+
+      await this.prisma.grade.update({
+        data: {
+          overall: overall,
+        },
+        where: {
+          id: points.id,
+        },
+      });
+
+      points.overall = overall;
 
       return res.status(HttpStatus.OK).send(points);
     } catch (error) {
@@ -692,7 +756,7 @@ export class ClassesService {
     try {
       console.log('[API GET /classes/:id/points]');
 
-      const points = await this.prisma.grade.findMany({
+      const listPoints = await this.prisma.grade.findMany({
         where: {
           classId: parseInt(classId),
         },
@@ -703,7 +767,19 @@ export class ClassesService {
               lastName: true,
               points: {
                 select: {
-                  exam: true,
+                  exam: {
+                    select: {
+                      name: true,
+                      position: true,
+                      isFinalized: true,
+                      gradeComposition: {
+                        select: {
+                          name: true,
+                          scale: true,
+                        },
+                      },
+                    },
+                  },
                   point: true,
                 },
               },
@@ -712,7 +788,60 @@ export class ClassesService {
         },
       });
 
-      return res.status(HttpStatus.OK).send(points);
+      for (const points of listPoints) {
+        let totalPoint = 0;
+        let prevGrade = '';
+        let prevScale = 1;
+        let prevNumberOfPoints = 0;
+        let compositions = [];
+        points.student.points.forEach(async (point) => {
+          if (point.exam.gradeComposition.name != prevGrade) {
+            compositions.push({
+              grade: prevGrade,
+              scale: prevScale,
+              totalPoint: totalPoint,
+              numberOfPoints: prevNumberOfPoints,
+            });
+
+            totalPoint = 0;
+            prevGrade = point.exam.gradeComposition.name;
+            prevScale = point.exam.gradeComposition.scale;
+            prevNumberOfPoints = 0;
+          }
+
+          totalPoint += point.point;
+          prevNumberOfPoints++;
+        });
+
+        compositions.push({
+          grade: prevGrade,
+          scale: prevScale,
+          totalPoint: totalPoint,
+          numberOfPoints: prevNumberOfPoints,
+        });
+
+        let overall = 0;
+        compositions.forEach((composition) => {
+          if (composition.numberOfPoints != 0) {
+            overall +=
+              ((composition.totalPoint / composition.numberOfPoints) *
+                composition.scale) /
+              100;
+          }
+        });
+
+        await this.prisma.grade.update({
+          data: {
+            overall: overall,
+          },
+          where: {
+            id: points.id,
+          },
+        });
+
+        points.overall = overall;
+      }
+      return res.status(HttpStatus.OK).send(listPoints);
     } catch (error) {
       // If the error has a status property, set the corresponding HTTP status code
       if (error.status) {
