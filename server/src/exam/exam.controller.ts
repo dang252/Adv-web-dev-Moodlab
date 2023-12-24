@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
@@ -10,6 +11,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -22,6 +24,7 @@ import {
   HTTP_MSG_FORBIDDEN,
   HTTP_MSG_INTERNAL_SERVER_ERROR,
 } from 'src/constants';
+import { PointDto } from './dto';
 
 @Controller('/exam')
 @ApiTags('/exam')
@@ -47,11 +50,7 @@ export class ExamController {
     status: 500,
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
-  getExamGrade(
-    @Param('examId') examId: string,
-    @Req() req: Request,
-    @Res() res: Response,
-  ) {
+  getExamGrade(@Param('examId') examId: string, @Res() res: Response) {
     return this.examService.getExamGrade(examId, res);
   }
 
@@ -59,6 +58,36 @@ export class ExamController {
   @UseGuards(AccessTokenGuard)
   @Put('/:examId')
   @ApiOperation({ summary: 'update grade board of an exam' })
+  @ApiBody({
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          studentId: {
+            type: 'number',
+          },
+          point: {
+            type: 'number',
+          },
+        },
+      },
+      example: [
+        {
+          studentId: 2,
+          point: 7.5,
+        },
+        {
+          studentId: 3,
+          point: 8.5,
+        },
+        {
+          studentId: 4,
+          point: 9.5,
+        },
+      ],
+    },
+  })
   @ApiResponse({
     status: 200,
     schema: {
@@ -76,10 +105,10 @@ export class ExamController {
   })
   updateExamGrade(
     @Param('examId') examId: string,
-    @Req() req: Request,
+    @Body() points: PointDto[],
     @Res() res: Response,
   ) {
-    return this.examService.updateExamGrade(examId, res);
+    return this.examService.updateExamGrade(examId, points, res);
   }
 
   @ApiBearerAuth()

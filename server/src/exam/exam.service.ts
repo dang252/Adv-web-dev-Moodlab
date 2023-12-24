@@ -6,6 +6,7 @@ import {
   HTTP_MSG_INTERNAL_SERVER_ERROR,
   HTTP_MSG_NOTFOUND,
 } from 'src/constants';
+import { PointDto } from './dto';
 
 @Injectable()
 export class ExamService {
@@ -60,9 +61,23 @@ export class ExamService {
   }
 
   // [PUT] /:examId
-  async updateExamGrade(examId: string, res: Response) {
+  async updateExamGrade(examId: string, points: PointDto[], res: Response) {
     try {
       console.log('[API PUT /exam/:examId]');
+
+      points.forEach(async (point) => {
+        await this.prisma.point.update({
+          where: {
+            studentId_examId: {
+              studentId: point.studentId,
+              examId: parseInt(examId),
+            },
+          },
+          data: {
+            point: point.point,
+          },
+        });
+      });
 
       return res.status(HttpStatus.OK).send(HTTP_MSG_SUCCESS);
     } catch (error) {
