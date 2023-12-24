@@ -258,6 +258,15 @@ export class ExamService {
         where: {
           examId: parseInt(examId),
         },
+        include: {
+          exam: {
+            include: {
+              points: true,
+            },
+          },
+          reporter: true,
+          comments: true,
+        },
       });
       return res.status(HttpStatus.OK).send(reviews);
     } catch (error) {

@@ -17,6 +17,9 @@ import { ExamModule } from './exam/exam.module';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
+import { ReviewController } from './review/review.controller';
+import { ReviewService } from './review/review.service';
+import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [
@@ -45,8 +48,9 @@ import { JwtService } from '@nestjs/jwt';
     UserModule,
     ClassesModule,
     ExamModule,
+    ReviewModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, ReviewController],
+  providers: [AppService, ReviewService],
 })
 export class AppModule {}
