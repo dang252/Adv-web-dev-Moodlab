@@ -7,7 +7,19 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import ExcelJS from "exceljs";
 
-import { Button, Empty, Modal, Form, Input, Card, Drawer } from "antd";
+import {
+  Button,
+  Empty,
+  Modal,
+  Form,
+  Input,
+  Card,
+  Drawer,
+  DatePicker,
+  Dropdown,
+  Space,
+} from "antd";
+import type { MenuProps } from "antd";
 import {
   CaretUpOutlined,
   CaretDownOutlined,
@@ -20,7 +32,11 @@ import CreateClassGradeModal from "./CreateClassGradeModal";
 import ContentTable from "./ContentTable";
 import { ClassType, Grade } from "../types/classroom";
 
-import { SHEET_GRADES_COLUMN } from "../utils/grades";
+import {
+  SHEET_STUDENTS_GRADES_COLUMN,
+  SHEET_GRADES_COLUMN,
+  SHEET_ALL_GRADES_COLUMN,
+} from "../utils/grades";
 
 type FieldType = {
   name?: string;
@@ -37,6 +53,19 @@ interface FieldContentType {
   fieldId: number;
   name: string;
 }
+
+const templateDownloadItems: MenuProps["items"] = [
+  {
+    label: "Template",
+    key: "1",
+    icon: <DownloadOutlined />,
+  },
+  {
+    label: "Student template",
+    key: "2",
+    icon: <DownloadOutlined />,
+  },
+];
 
 const getFieldContentByIdLength = (source: any[], fieldId: number) => {
   return source.filter((content) => {
@@ -185,6 +214,92 @@ const DetailClassGrades = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [grades]);
 
+  //==================== All Grades
+  const handleExportAllGradesExcel = () => {
+    const SHEET_NAME = "Grades";
+
+    const workbook = new ExcelJS.Workbook();
+
+    const sheet = workbook.addWorksheet(SHEET_NAME);
+
+    sheet.properties.defaultRowHeight = 20;
+
+    const columnsData = [
+      {
+        header: "#",
+        key: "#",
+        width: 5,
+      },
+      {
+        header: "Student ID",
+        key: "studentId",
+        width: 20,
+      },
+      {
+        header: "Student Name",
+        key: "studentName",
+        width: 40,
+      },
+    ];
+
+    const points = grades.map((grade: any) => {
+      return grade.student.points;
+    });
+
+    const examName = findMaxExamGrades(points).map((value: any) => {
+      return value.exam.name;
+    });
+
+    examName.map((exam: any) => {
+      columnsData.push({
+        header: exam,
+        key: exam,
+        width: 10,
+      });
+    });
+
+    columnsData.push({
+      header: "Overall",
+      key: "overall",
+      width: 10,
+    });
+
+    sheet.columns = columnsData;
+
+    gradeBody?.map((g) => {
+      const keys = [];
+
+      for (const key in g) {
+        keys.push(key);
+      }
+
+      const row: any = { ["#"]: g.order };
+
+      keys.map((key) => {
+        row[key] = g[key];
+      });
+
+      sheet.addRow(row);
+    });
+
+    workbook.xlsx.writeBuffer().then(function (data) {
+      const blob = new Blob([data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `${
+        detailClass !== null
+          ? detailClass.name + "-" + detailClass.code
+          : "grades"
+      }.xlsx`;
+      anchor.click();
+      window.URL.revokeObjectURL(url);
+    });
+  };
+
   //==================== Create Field
   const updateClassGradeStructure = async (data: any) => {
     try {
@@ -247,12 +362,22 @@ const DetailClassGrades = () => {
   };
 
   const onCreateContentFinish = (values: any) => {
-    const { name } = values;
+    const { name, datePicker } = values;
+
+    const date = datePicker.$M + "/" + datePicker.$D + "/" + datePicker.$y;
+    // +
+    // "-" +
+    // datePicker.$H +
+    // ":" +
+    // datePicker.$m +
+    // ":" +
+    // datePicker.$s;
 
     const newFieldContent = {
       id: uuidv4(),
       fieldId: targetField?.id,
       name: name,
+      due: date,
     };
 
     console.log(newFieldContent);
@@ -283,14 +408,14 @@ const DetailClassGrades = () => {
     setData([]);
   };
 
-  const handleDownloadGradesTemplate = () => {
+  const handleDownloadGradesTemplate = (SHEET_COLUMN: any[]) => {
     const workbook = new ExcelJS.Workbook();
 
     const sheet = workbook.addWorksheet("Grades");
 
     sheet.properties.defaultRowHeight = 20;
 
-    sheet.columns = SHEET_GRADES_COLUMN;
+    sheet.columns = SHEET_COLUMN;
 
     workbook.xlsx.writeBuffer().then(function (data) {
       const blob = new Blob([data], {
@@ -304,6 +429,19 @@ const DetailClassGrades = () => {
       anchor.click();
       window.URL.revokeObjectURL(url);
     });
+  };
+
+  const handleMenuClick: MenuProps["onClick"] = (e) => {
+    const { key } = e;
+    console.log("click", key);
+
+    if (key === "1") handleDownloadGradesTemplate(SHEET_GRADES_COLUMN);
+    if (key === "2") handleDownloadGradesTemplate(SHEET_STUDENTS_GRADES_COLUMN);
+  };
+
+  const templateDownloadMenuProps = {
+    items: templateDownloadItems,
+    onClick: handleMenuClick,
   };
 
   const handleImportExcel = (e: any) => {
@@ -351,7 +489,7 @@ const DetailClassGrades = () => {
 
     sheet.properties.defaultRowHeight = 20;
 
-    sheet.columns = SHEET_GRADES_COLUMN;
+    sheet.columns = SHEET_STUDENTS_GRADES_COLUMN;
 
     data?.map((d) => {
       sheet.addRow({
@@ -361,6 +499,8 @@ const DetailClassGrades = () => {
         Grades: d.grades,
       });
     });
+
+    console.log(sheet);
 
     workbook.xlsx.writeBuffer().then(function (data) {
       const blob = new Blob([data], {
@@ -428,6 +568,20 @@ const DetailClassGrades = () => {
             <Input />
           </Form.Item>
 
+          <Form.Item
+            name="datePicker"
+            label="Due date"
+            rules={[
+              {
+                type: "object" as const,
+                required: true,
+                message: "Please select time!",
+              },
+            ]}
+          >
+            <DatePicker />
+          </Form.Item>
+
           <Form.Item wrapperCol={{ offset: 5, span: 19 }}>
             <div className="flex justify-end gap-3">
               <Button
@@ -455,6 +609,15 @@ const DetailClassGrades = () => {
         open={showAllGrades}
         extra={
           <div className="flex items-center gap-3">
+            <Button
+              type="primary"
+              onClick={() => {
+                handleExportAllGradesExcel();
+              }}
+              danger
+            >
+              Export
+            </Button>
             <Button onClick={onCloseViewAllGrades}>Close</Button>
           </div>
         }
@@ -479,7 +642,9 @@ const DetailClassGrades = () => {
                 })}
               </tr>
             </thead>
-            <tbody className={`${isDarkMode ? "bg-[#141414]" : "bg-white"}`}>
+            <tbody
+              className={`${isDarkMode ? "bg-[#141414]" : "bg-white border"}`}
+            >
               {gradeBody.map((body) => {
                 const uid = uuidv4();
                 const keys = [];
@@ -493,7 +658,14 @@ const DetailClassGrades = () => {
                     {keys.map((key) => {
                       const uid2 = uuidv4();
                       return (
-                        <td key={uid2} className="p-4">
+                        <td
+                          key={uid2}
+                          className={`p-4 ${
+                            isDarkMode
+                              ? ""
+                              : "border-[1px] border-solid border-gray-200"
+                          }`}
+                        >
                           {body[key]}
                         </td>
                       );
@@ -641,14 +813,22 @@ const DetailClassGrades = () => {
         >
           View All Grades
         </Button>
-        <Button
+        {/* <Button
           icon={<DownloadOutlined />}
           onClick={() => {
-            handleDownloadGradesTemplate();
+            handleDownloadGradesTemplate(SHEET_STUDENTS_GRADES_COLUMN);
           }}
         >
           Download Grades Template
-        </Button>
+        </Button> */}
+        <Dropdown menu={templateDownloadMenuProps}>
+          <Button>
+            <Space>
+              Download Grades Template
+              <CaretDownOutlined />
+            </Space>
+          </Button>
+        </Dropdown>
         <Button
           type="primary"
           icon={!showCreateGrade ? <CaretUpOutlined /> : <CaretDownOutlined />}
@@ -714,7 +894,9 @@ const DetailClassGrades = () => {
                             return (
                               <Card
                                 key={content?.id}
-                                title={<p className="truncate">{content.id}</p>}
+                                title={
+                                  <p className="truncate">{content.name}</p>
+                                }
                                 extra={
                                   <div className="pl-5 flex gap-3">
                                     <Button
@@ -749,7 +931,7 @@ const DetailClassGrades = () => {
                                 }
                                 style={{ width: 280 }}
                               >
-                                <p>{content?.name}</p>
+                                <p>Due: {content?.due}</p>
                               </Card>
                             );
                           }

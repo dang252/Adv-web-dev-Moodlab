@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Carousel } from "antd";
+import { v4 as uuidv4 } from "uuid";
 
 import DndCalendar from "../components/DndCalendar";
 import Board from "../components/Kanban/Board";
@@ -37,8 +38,9 @@ const Home = (props: PropType) => {
         infinite={true}
       >
         {bannerArray?.map((banner) => {
+          const uid = uuidv4();
           return (
-            <div>
+            <div key={uid}>
               <img
                 src={`./banner/${banner}`}
                 alt="banner"
