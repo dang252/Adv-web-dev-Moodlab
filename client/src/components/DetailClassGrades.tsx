@@ -44,6 +44,26 @@ const getFieldContentByIdLength = (source: any[], fieldId: number) => {
   }).length;
 };
 
+const findMaxExamGrades = (data: any[]) => {
+  let max = data[0].length;
+
+  for (let i = 0; i < data.length; ++i) {
+    if (data[i].length > max) {
+      max = data[i];
+    }
+  }
+
+  return max;
+};
+
+const getExamPoint = (examName: string, studentGrades: any[]) => {
+  for (let i = 0; i < studentGrades.length; ++i) {
+    if (studentGrades[i].exam.name === examName) return studentGrades[i].point;
+  }
+
+  return null;
+};
+
 const DetailClassGrades = () => {
   const [form] = Form.useForm();
   const [createDetailContentForm] = Form.useForm();
@@ -66,6 +86,8 @@ const DetailClassGrades = () => {
   const [formFields, setFormFields] = useState<any[]>([]);
 
   const [showAllGrades, setShowAllGrades] = useState<boolean>(false);
+  const [gradeHeading, setGradeHeading] = useState<string[]>([]);
+  const [gradeBody, setGradeBody] = useState<any[]>([]);
 
   const isDarkMode = useSelector<RootState, boolean | undefined>(
     (state) => state.persisted.users.isDarkMode
@@ -110,7 +132,58 @@ const DetailClassGrades = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // eslint-disable-next-line no-unsafe-optional-chaining
+  useEffect(() => {
+    if (grades.length !== 0) {
+      const headingData = ["#", "Student ID", "Student name"];
+      const bodyData: any[] = [];
+
+      // Heading handle
+      const points = grades.map((grade: any) => {
+        return grade.student.points;
+      });
+
+      const examName = findMaxExamGrades(points).map((value: any) => {
+        return value.exam.name;
+      });
+
+      examName.map((name: string) => {
+        headingData.push(name);
+      });
+
+      headingData.push("Overall");
+
+      setGradeHeading(headingData);
+
+      // Body handle
+      grades.map((grade: any, index) => {
+        const student: any = {
+          order: index + 1,
+          studentId: grade.studentId,
+        };
+
+        const name = grade.student.firstName + " " + grade.student.lastName;
+
+        student["studentName"] = name;
+
+        const pointList = grade.student.points;
+
+        // Grades
+        for (let i = 0; i < examName.length; ++i) {
+          const point = getExamPoint(examName[i], pointList);
+          if (point === null) student[examName[i]] = "";
+          else student[examName[i]] = point;
+        }
+
+        student["overall"] = grade.overall;
+
+        bodyData.push(student);
+      });
+
+      setGradeBody(bodyData);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [grades]);
 
   //==================== Create Field
   const updateClassGradeStructure = async (data: any) => {
@@ -387,9 +460,54 @@ const DetailClassGrades = () => {
         }
       >
         <div className={`${isDarkMode ? "text-white" : "text-black"}`}>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
+          <table
+            className={`rounded-md w-[100%] border border-solid ${
+              isDarkMode ? "border-gray-500" : "border-gray-300"
+            }`}
+          >
+            <thead
+              className={`${isDarkMode ? "bg-[#1d1d1d]" : "bg-[#fafafa]"}`}
+            >
+              <tr>
+                {gradeHeading.map((heading) => {
+                  const uid = uuidv4();
+                  return (
+                    <th key={uid} className="p-4">
+                      <p className="text-left font-bold">{heading}</p>
+                    </th>
+                  );
+                })}
+              </tr>
+            </thead>
+            <tbody className={`${isDarkMode ? "bg-[#141414]" : "bg-white"}`}>
+              {gradeBody.map((body) => {
+                const uid = uuidv4();
+                const keys = [];
+
+                for (const key in body) {
+                  keys.push(key);
+                }
+
+                return (
+                  <tr key={uid}>
+                    {keys.map((key) => {
+                      const uid2 = uuidv4();
+                      return (
+                        <td key={uid2} className="p-4">
+                          {body[key]}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <div className="mt-10 flex items-center justify-end gap-1">
+            <Button>1</Button>
+            <Button>2</Button>
+            <Button>3</Button>
+          </div>
         </div>
       </Drawer>
 
@@ -518,7 +636,7 @@ const DetailClassGrades = () => {
           danger
           onClick={() => {
             setShowAllGrades(true);
-            console.log(grades);
+            // console.log(grades);
           }}
         >
           View All Grades

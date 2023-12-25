@@ -56,7 +56,7 @@ export interface Grade {
   classId?: number;
   studentId?: number;
   overall?: number;
-  student: { firstName: string; lastName: string };
+  student: { firstName: string; lastName: string; points?: any[] };
   points: Point[];
 }
 
