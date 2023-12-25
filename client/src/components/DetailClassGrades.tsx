@@ -35,7 +35,6 @@ import { ClassType, Grade } from "../types/classroom";
 import {
   SHEET_STUDENTS_GRADES_COLUMN,
   SHEET_GRADES_COLUMN,
-  SHEET_ALL_GRADES_COLUMN,
 } from "../utils/grades";
 
 type FieldType = {
