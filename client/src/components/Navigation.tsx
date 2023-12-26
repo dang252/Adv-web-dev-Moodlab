@@ -40,15 +40,21 @@ const Navigation = (props: propType) => {
             to="/dashboard"
             className={`${
               isDarkMode
-                ? "text-white hover:cursor-pointer flex hover:text-white"
-                : "text-black hover:cursor-pointer flex hover:text-black"
+                ? "text-white hover:cursor-pointer flex items-center hover:text-white"
+                : "text-black hover:cursor-pointer flex items-center hover:text-black"
             }`}
             onClick={() => {
               setNavValue("1");
             }}
           >
             <IoLogoOctocat className="text-3xl" />
-            <p className="hidden text-xl font-bold ml-4 sm:block">Moodlab</p>
+            {window.location.href.includes("/admin") ? (
+              <p className="hidden text-[15px] font-bold ml-4 sm:block">
+                Moodlab | Admin
+              </p>
+            ) : (
+              <p className="hidden text-xl font-bold ml-4 sm:block">Moodlab</p>
+            )}
           </Link>
         </div>
         <Menu

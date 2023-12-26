@@ -11,10 +11,12 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import NonAuthRoute from "./components/NonAuthRoute";
+import RoleProtectedRoute from "./components/RoleProtectedRoute";
 
 import { RootState } from "./redux/store";
 
@@ -63,12 +65,12 @@ const App = () => {
 
   useEffect(() => {
     const stopLoading = () => {
-      dispathAsync(stopLoad())
-    }
-    window.addEventListener('beforeunload', stopLoading)
+      dispathAsync(stopLoad());
+    };
+    window.addEventListener("beforeunload", stopLoading);
 
     return () => {
-      window.removeEventListener('beforeunload', stopLoading)
+      window.removeEventListener("beforeunload", stopLoading);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -153,7 +155,24 @@ const App = () => {
             </NonAuthRoute>
           }
         />
-        <Route path="/dashboard/*" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route
+          path="/dashboard/*"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/*"
+          element={
+            <ProtectedRoute>
+              <RoleProtectedRoute roles={["ADMIN", "TEACHER"]}>
+                <Admin />
+              </RoleProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/*"
           element={<NotFound baseUrl="/" isDarkMode={isDarkMode} />}
