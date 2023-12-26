@@ -24,7 +24,7 @@ import {
 } from 'src/constants';
 import { ClassesService } from './classes.service';
 import { Request, Response } from 'express';
-import { ChangeTheme, ClassDto, GradeDto, InviteEmailDto } from './dto';
+import { ClassDto, GradeDto, InviteEmailDto, UpdateClassDto } from './dto';
 
 @Controller('classes')
 @ApiTags('/classes')
@@ -50,7 +50,11 @@ export class ClassesController {
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   listClasses(@Req() req: Request, @Res() res: Response) {
-    return this.classesService.listClasses(req.user['sub'], res);
+    return this.classesService.listClasses(
+      req.user['sub'],
+      req.user['role'],
+      res,
+    );
   }
 
   @ApiBearerAuth()
@@ -135,6 +139,10 @@ export class ClassesController {
           type: 'string',
           example: '20120434',
         },
+        status: {
+          type: 'string',
+          example: 'ACTIVED',
+        },
       },
     },
   })
@@ -153,12 +161,13 @@ export class ClassesController {
     status: 500,
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
-  changeTheme(
+  updateClass(
     @Param('id') id: string,
-    @Body() dto: ChangeTheme,
+    @Body() dto: UpdateClassDto,
+    @Req() req: Request,
     @Res() res: Response,
   ) {
-    return this.classesService.changeTheme(id, dto.theme, res);
+    return this.classesService.updateClass(req.user['role'], id, dto, res);
   }
 
   @ApiBearerAuth()

@@ -43,7 +43,7 @@ export class UserController {
     description: HTTP_MSG_INTERNAL_SERVER_ERROR,
   })
   getProfile(@Req() req: Request, @Res() res: Response) {
-    return this.userService.getProfile(req.user['sub'], res);
+    return this.userService.getProfile(req.user['sub'], req.user['role'], res);
   }
 
   @ApiBearerAuth()
@@ -60,6 +60,14 @@ export class UserController {
         last_name: {
           type: 'string',
           example: 'Tran',
+        },
+        user_id: {
+          type: 'number',
+          example: 1,
+        },
+        status: {
+          type: 'string',
+          example: 'BLOCKED',
         },
       },
     },
@@ -81,6 +89,11 @@ export class UserController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    return this.userService.updateProfile(req.user['sub'], userInfo, res);
+    return this.userService.updateProfile(
+      req.user['sub'],
+      req.user['role'],
+      userInfo,
+      res,
+    );
   }
 }

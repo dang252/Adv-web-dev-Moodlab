@@ -13,6 +13,11 @@ import {
   HTTP_MSG_SUCCESS,
   HTTP_MSG_INTERNAL_SERVER_ERROR,
   HTTP_MSG_NOTFOUND,
+  HTTP_MSG_FORBIDDEN,
+  ACCOUNT_STATUS_ACTIVED,
+  ACCOUNT_STATUS_BLOCKED,
+  ACCOUNT_STATUS_CLOSED,
+  ACCOUNT_STATUS_PENDING,
 } from 'src/constants';
 import { Request, Response } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -22,10 +27,51 @@ import { UserDto } from './dto';
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
+  isUserStatus(status: string) {
+    if (status == ACCOUNT_STATUS_PENDING) {
+      return true;
+    }
+
+    if (status == ACCOUNT_STATUS_ACTIVED) {
+      return true;
+    }
+
+    if (status == ACCOUNT_STATUS_BLOCKED) {
+      return true;
+    }
+
+    if (status == ACCOUNT_STATUS_CLOSED) {
+      return true;
+    }
+
+    return false;
+  }
+
   // [GET] /
-  async getProfile(userId: number, res: Response) {
+  async getProfile(userId: number, userRole: string, res: Response) {
     try {
       console.log('[API /user]');
+
+      if (userRole == 'ADMIN') {
+        const listUsers = await this.prisma.user.findMany({
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            role: true,
+            account: {
+              select: {
+                username: true,
+                status: true,
+              },
+            },
+          },
+        });
+
+        return res.status(HttpStatus.OK).send(listUsers);
+      }
+
       const user = await this.prisma.user.findUnique({
         where: {
           id: userId,
@@ -57,22 +103,52 @@ export class UserService {
   }
 
   // [PUT] /
-  async updateProfile(userId: number, userInfo: UserDto, res: Response) {
+  async updateProfile(
+    userId: number,
+    userRole: string,
+    userInfo: UserDto,
+    res: Response,
+  ) {
     try {
       console.log('[API PUT /user]');
-      const user = await this.prisma.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          firstName: userInfo.first_name,
-          lastName: userInfo.last_name,
-        },
-      });
 
-      if (user == null) {
-        console.log('[API PUT /user] Not found user');
-        return res.status(HttpStatus.NOT_FOUND).send(HTTP_MSG_NOTFOUND);
+      if (userInfo.first_name != null || userInfo.last_name != null) {
+        const user = await this.prisma.user.findUnique({
+          where: {
+            id: userId,
+          },
+        });
+
+        if (user == null) {
+          console.log('[API PUT /user] Not found user');
+          return res.status(HttpStatus.NOT_FOUND).send(HTTP_MSG_NOTFOUND);
+        }
+
+        await this.prisma.user.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            firstName: userInfo.first_name || user.firstName,
+            lastName: userInfo.last_name || user.lastName,
+          },
+        });
+      }
+
+      // for admin to change status of account
+      if (userInfo.user_id != null && this.isUserStatus(userInfo.status)) {
+        if (userRole == 'ADMIN') {
+          await this.prisma.account.update({
+            where: {
+              userId: userInfo.user_id,
+            },
+            data: {
+              status: userInfo.status,
+            },
+          });
+        } else {
+          return res.status(HttpStatus.FORBIDDEN).send(HTTP_MSG_FORBIDDEN);
+        }
       }
 
       return res.status(HttpStatus.OK).send(HTTP_MSG_SUCCESS);

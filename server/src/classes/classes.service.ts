@@ -1,13 +1,14 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import {
   CLASS_STATUS_ACTIVED,
+  CLASS_STATUS_CLOSED,
   HTTP_MSG_FORBIDDEN,
   HTTP_MSG_INTERNAL_SERVER_ERROR,
   HTTP_MSG_SUCCESS,
 } from 'src/constants';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Request, Response } from 'express';
-import { ClassDto, GradeDto } from './dto';
+import { ClassDto, GradeDto, UpdateClassDto } from './dto';
 import { MailerService } from '@nest-modules/mailer';
 
 const classCodeLength = 6;
@@ -32,9 +33,16 @@ export class ClassesService {
   }
 
   // [GET] /
-  async listClasses(userId: number, res: Response) {
+  async listClasses(userId: number, userRole: string, res: Response) {
     try {
       console.log('[API GET /class]');
+
+      // for admin
+      if (userRole == 'ADMIN') {
+        const classes = await this.prisma.class.findMany();
+
+        return res.status(HttpStatus.OK).send(classes);
+      }
 
       const classes = await this.prisma.class.findMany({
         where: {
@@ -50,6 +58,7 @@ export class ClassesService {
               },
             },
           ],
+          status: CLASS_STATUS_ACTIVED,
         },
         include: {
           teacher: {
@@ -207,21 +216,46 @@ export class ClassesService {
   }
 
   // [PUT] /:id
-  async changeTheme(classId: string, newTheme: string, res: Response) {
+  async updateClass(
+    userRole: string,
+    classId: string,
+    data: UpdateClassDto,
+    res: Response,
+  ) {
     try {
       console.log('[API PUT /classes/:id]');
 
-      await this.prisma.class.update({
-        where: {
-          id: parseInt(classId),
-        },
-        data: {
-          theme: {
-            set: newTheme,
-          },
-        },
-      } as any);
-      console.log('[API PUT /classes/:id] Change theme successfully');
+      if (userRole == 'ADMIN') {
+        if (
+          data.status == CLASS_STATUS_ACTIVED ||
+          data.status == CLASS_STATUS_CLOSED
+        ) {
+          await this.prisma.class.update({
+            where: {
+              id: parseInt(classId),
+            },
+            data: {
+              status: {
+                set: data.status,
+              },
+            },
+          });
+        }
+      } else if (userRole == 'TEACHER') {
+        if (data.theme != null) {
+          await this.prisma.class.update({
+            where: {
+              id: parseInt(classId),
+            },
+            data: {
+              theme: {
+                set: data.theme,
+              },
+            },
+          });
+        }
+        console.log('[API PUT /classes/:id] Change theme successfully');
+      }
 
       return res.status(HttpStatus.OK).send(HTTP_MSG_SUCCESS);
     } catch (error) {
