@@ -9,6 +9,9 @@ import { UserModule } from './user/user.module';
 import { ClassesModule } from './classes/classes.module';
 import { ExamModule } from './exam/exam.module';
 import { ReviewModule } from './review/review.module';
+import { NotificationController } from './notification/notification.controller';
+import { NotificationService } from './notification/notification.service';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -38,6 +41,7 @@ import { ReviewModule } from './review/review.module';
     ClassesModule,
     ExamModule,
     ReviewModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

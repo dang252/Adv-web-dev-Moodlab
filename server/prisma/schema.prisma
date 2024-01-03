@@ -18,12 +18,14 @@ model User {
   role         String
   refreshToken String
 
-  account  Account?
-  classes  Class[]
-  grades   Grade[]
-  points   Point[]
-  comments Comment[]
-  reviews  Review[]
+  account               Account?
+  classes               Class[]
+  grades                Grade[]
+  points                Point[]
+  comments              Comment[]
+  reviews               Review[]
+  sentNotifications     Notification[] @relation("sentNotifications")
+  receivedNotifications Notification[] @relation("receivedNotifications")
 
   @@map("users")
 }
@@ -133,4 +135,19 @@ model Comment {
   user   User   @relation(fields: [userId], references: [id])
 
   @@map("comments")
+}
+
+model Notification {
+  id         Int      @id @default(autoincrement())
+  reporterId Int
+  receiverId Int
+  postId     Int
+  action     String   @default("commented")
+  isSeen     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  reporter User @relation("sentNotifications", fields: [reporterId], references: [id])
+  receiver User @relation("receivedNotifications", fields: [receiverId], references: [id])
+
+  @@map("notifications")
 }

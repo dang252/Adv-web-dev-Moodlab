@@ -1,14 +1,4 @@
-import {
-  Get,
-  HttpStatus,
-  Injectable,
-  Post,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import {
   HTTP_MSG_SUCCESS,
   HTTP_MSG_INTERNAL_SERVER_ERROR,
@@ -19,7 +9,7 @@ import {
   ACCOUNT_STATUS_CLOSED,
   ACCOUNT_STATUS_PENDING,
 } from 'src/constants';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserDto } from './dto';
 
@@ -75,6 +65,9 @@ export class UserService {
       const user = await this.prisma.user.findUnique({
         where: {
           id: userId,
+        },
+        include: {
+          sentNotifications: true,
         },
       });
 
