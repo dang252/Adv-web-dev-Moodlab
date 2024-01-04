@@ -1,15 +1,31 @@
-import { IsArray, IsNumber, IsOptional } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class NotificationDto {
-  @IsOptional()
+  @IsNotEmpty()
   @IsNumber()
   reporterId: number;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsArray()
   receiversId: number[];
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsNumber()
   postId: number;
+}
+
+export class UpdateStatusNotificationDto {
+  @IsNotEmpty()
+  @IsNumber()
+  notificationId: number;
+
+  @IsOptional()
+  @IsString()
+  status: string;
 }

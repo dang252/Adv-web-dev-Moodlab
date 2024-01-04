@@ -47,7 +47,6 @@ export class NotificationService {
   }
 
   // [POST] /
-
   async createNotification(
     userId: number,
     notiInfo: NotificationDto,
@@ -80,6 +79,47 @@ export class NotificationService {
 
       // If the error doesn't have a status property, set a generic 500 Internal Server Error status code
       console.log('[API POST /notifications] Internal error');
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .send(HTTP_MSG_INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  // [PUT] /
+  async updateNotifications(
+    userId: number,
+    notificationId: number,
+    res: Response,
+  ) {
+    try {
+      console.log('[API PUT /notifications]');
+
+      const notifications = await this.prisma.notification.update({
+        where: {
+          id: notificationId,
+        },
+        data: {
+          isSeen: true,
+        },
+      });
+
+      if (notifications == null) {
+        console.log('[API PUT /notifications] Not found user');
+        return res.status(HttpStatus.NOT_FOUND).send(HTTP_MSG_NOTFOUND);
+      }
+
+      return res.status(HttpStatus.OK).send(notifications);
+    } catch (error) {
+      // If the error has a status property, set the corresponding HTTP status code
+      if (error.status) {
+        console.log(
+          `[API PUT /notifications] Unknown error: ${error.status} - ${error.message}`,
+        );
+        return res.status(error.status).send(error.message);
+      }
+
+      // If the error doesn't have a status property, set a generic 500 Internal Server Error status code
+      console.log('[API PUT /notifications] Internal error');
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .send(HTTP_MSG_INTERNAL_SERVER_ERROR);

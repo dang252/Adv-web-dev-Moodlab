@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Req,
   Res,
   UseGuards,
@@ -16,7 +17,7 @@ import {
 } from 'src/constants';
 import { NotificationService } from './notification.service';
 import { Request, Response } from 'express';
-import { NotificationDto } from './dto';
+import { NotificationDto, UpdateStatusNotificationDto } from './dto';
 
 @Controller('notification')
 @ApiTags('/notification')
@@ -90,6 +91,47 @@ export class NotificationController {
     return this.notificationService.createNotification(
       req.user['sub'],
       notificationInfo,
+      res,
+    );
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
+  @Put()
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        notificationId: {
+          type: 'number',
+          example: 1,
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      type: 'string',
+      example: HTTP_MSG_SUCCESS,
+    },
+  })
+  @ApiResponse({
+    status: 403,
+    description: HTTP_MSG_FORBIDDEN,
+  })
+  @ApiResponse({
+    status: 500,
+    description: HTTP_MSG_INTERNAL_SERVER_ERROR,
+  })
+  updateNotifications(
+    @Body() data: UpdateStatusNotificationDto,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    return this.notificationService.updateNotifications(
+      req.user['sub'],
+      data.notificationId,
       res,
     );
   }
