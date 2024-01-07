@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Space, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import axios from "axios";
@@ -11,6 +11,7 @@ interface UserData {
   username: string;
   email: string;
   status: string;
+  rawData: ResponseUser;
 }
 
 interface ResponseUser {
@@ -25,50 +26,6 @@ interface ResponseUser {
   }
 }
 
-const columns: ColumnsType<UserData> = [
-  {
-    title: "#",
-    dataIndex: "order",
-    key: "order",
-    render: (text) => <p>{text}</p>,
-  },
-  {
-    title: "Account ID",
-    dataIndex: "accountId",
-    key: "accountId",
-    render: (text) => <p>{text}</p>,
-  },
-  {
-    title: "Username",
-    dataIndex: "username",
-    key: "username",
-    render: (text) => <p>{text}</p>,
-  },
-  {
-    title: "Email",
-    dataIndex: "email",
-    key: "email",
-    render: (text) => <p>{text}</p>,
-  },
-  {
-    title: "Status",
-    dataIndex: "status",
-    key: "status",
-    render: (text) => <p>{text}</p>,
-  },
-  {
-    title: "Action",
-    key: "action",
-    render: (_) => (
-      <Space size="middle">
-        <Button type="primary" danger>
-          Lock
-        </Button>
-      </Space>
-    ),
-  },
-];
-
 interface PropType {
   isDarkMode: boolean;
   colorBgContainer: string;
@@ -82,6 +39,85 @@ const AdminManageUser = (props: PropType) => {
   }, []);
 
   const [data, setData] = useState<UserData[]>([])
+
+  const banAccount = async (record: UserData) => {
+    try {
+      console.log(record)
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+      console.log("get token ok")
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/user`,
+        {
+          "first_name": record.rawData.firstName,
+          "last_name": record.rawData.lastName,
+          "user_id": record.accountId,
+          "status": "BLOCKED"
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      console.log("send request ok")
+      toast.success("Ban user successfully!")
+      //reset data 
+      const dataCopy = data.map((user: UserData) => {
+        if (user == record) {
+          return { ...user, status: "BLOCKED" }
+        }
+        return user;
+      })
+      setData(dataCopy)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(
+        "Cannot get users data right now! Try again later!"
+      );
+    }
+  }
+  const unbanAccount = async (record: UserData) => {
+    console.log(record)
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/user`,
+        {
+          "first_name": record.rawData.firstName,
+          "last_name": record.rawData.lastName,
+          "user_id": record.accountId,
+          "status": "ACTIVED"
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      toast.success("Unban user successfully!")
+      //reset data 
+      const dataCopy = data.map((user: UserData) => {
+        if (user == record) {
+          return { ...user, status: "ACTIVED" }
+        }
+        return user;
+      })
+      setData(dataCopy)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(
+        "Cannot get users data right now! Try again later!"
+      );
+    }
+  }
+  const userRawData = useRef([])
 
   useEffect(() => {
     const getAllUser = async () => {
@@ -99,7 +135,7 @@ const AdminManageUser = (props: PropType) => {
             },
           }
         );
-        console.log(response.data)
+        userRawData.current = response.data;
         const mapDataType = response.data.map((user: ResponseUser, index: number) => {
           return ({
             key: index,
@@ -108,8 +144,10 @@ const AdminManageUser = (props: PropType) => {
             username: user.account.username,
             email: user.email,
             status: user.account.status,
+            rawData: user
           })
         })
+        console.log("map data", mapDataType)
         setData(mapDataType)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
@@ -120,6 +158,57 @@ const AdminManageUser = (props: PropType) => {
     }
     getAllUser();
   }, [])
+
+  const columns: ColumnsType<UserData> = [
+    {
+      title: "#",
+      dataIndex: "order",
+      key: "order",
+      render: (text) => <p>{text}</p>,
+    },
+    {
+      title: "Account ID",
+      dataIndex: "accountId",
+      key: "accountId",
+      render: (text) => <p>{text}</p>,
+    },
+    {
+      title: "Username",
+      dataIndex: "username",
+      key: "username",
+      render: (text) => <p>{text}</p>,
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+      render: (text) => <p>{text}</p>,
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (text) => <p>{text}</p>,
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (record) => (
+        <Space size="middle">
+          <Button type="primary" danger onClick={() => {
+            banAccount(record)
+          }}>
+            Ban
+          </Button>
+          <Button type="primary" onClick={() => {
+            unbanAccount(record)
+          }}>
+            Unban
+          </Button>
+        </Space>
+      ),
+    },
+  ];
 
   return (
     <div
