@@ -129,16 +129,32 @@ export class UserService {
       }
 
       // for admin to change status of account
-      if (userInfo.user_id != null && this.isUserStatus(userInfo.status)) {
+      if (
+        userInfo.user_id != null &&
+        (this.isUserStatus(userInfo.status) || userInfo.student_id != '')
+      ) {
         if (userRole == 'ADMIN') {
-          await this.prisma.account.update({
-            where: {
-              userId: userInfo.user_id,
-            },
-            data: {
-              status: userInfo.status,
-            },
-          });
+          if (userInfo.status != '') {
+            await this.prisma.account.update({
+              where: {
+                userId: userInfo.user_id,
+              },
+              data: {
+                status: userInfo.status,
+              },
+            });
+          }
+
+          if (userInfo.student_id != '') {
+            await this.prisma.user.update({
+              where: {
+                id: userInfo.user_id,
+              },
+              data: {
+                studentId: userInfo.student_id,
+              },
+            });
+          }
         } else {
           return res.status(HttpStatus.FORBIDDEN).send(HTTP_MSG_FORBIDDEN);
         }

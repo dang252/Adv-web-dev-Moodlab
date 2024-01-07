@@ -16,4 +16,8 @@ export class UserDto {
   @IsOptional()
   @IsString()
   status: string;
+
+  @IsOptional()
+  @IsString()
+  student_id: string;
 }
