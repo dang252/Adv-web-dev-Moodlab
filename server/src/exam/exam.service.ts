@@ -31,6 +31,7 @@ export class ExamService {
                   firstName: true,
                   lastName: true,
                   email: true,
+                  studentId: true,
                 },
               },
             },
@@ -182,7 +183,18 @@ export class ExamService {
         include: {
           exam: {
             include: {
-              points: true,
+              points: {
+                include: {
+                  student: {
+                    select: {
+                      // firstName: true,
+                      // lastName: true,
+                      // email: true,
+                      studentId: true,
+                    },
+                  },
+                },
+              },
             },
           },
           reporter: true,
