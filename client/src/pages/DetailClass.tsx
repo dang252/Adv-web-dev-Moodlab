@@ -31,6 +31,7 @@ const DetailClass = (props: PropType) => {
 
   const params = useParams();
   const { inviteCode } = params;
+  console.log("inv code", inviteCode);
 
   const dispatchAsync = useAppDispatch();
 
@@ -63,26 +64,23 @@ const DetailClass = (props: PropType) => {
           const data = error.response.data;
 
           if (data === "No permission") {
-            if (detailClass) {
-              const body = {
-                id: detailClass?.id.toString(),
-                code: inviteCode,
-              };
+            const body = {
+              code: inviteCode,
+            };
 
-              // 403: Recall /classes/:id/:code
-              const inviteCodePromise = dispatchAsync(
-                getInviteCode(body)
+            // 403: Recall /classes/:id/:code
+            const inviteCodePromise = dispatchAsync(
+              getInviteCode(body)
+            ).unwrap();
+
+            inviteCodePromise.then(() => {
+              const retrypromise = dispatchAsync(
+                getDetailClass(inviteCode)
               ).unwrap();
-
-              inviteCodePromise.then(() => {
-                const retrypromise = dispatchAsync(
-                  getDetailClass(inviteCode)
-                ).unwrap();
-                retrypromise.then(() => {
-                  toast.success("Join class successfully");
-                });
+              retrypromise.then(() => {
+                toast.success("Join class successfully");
               });
-            }
+            });
           } else {
             toast.error("Get detail class failed");
           }
@@ -173,7 +171,7 @@ const DetailClass = (props: PropType) => {
             items={USER_ROLE === "TEACHER" ? teacherItems : studentItems}
             onChange={onChange}
             className="w-[100%]"
-            // indicatorSize={(origin) => origin - 16}
+          // indicatorSize={(origin) => origin - 16}
           />
         </div>
       )}

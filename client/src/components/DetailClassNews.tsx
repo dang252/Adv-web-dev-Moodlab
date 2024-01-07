@@ -15,7 +15,7 @@ import {
   UserOutlined,
   CopyOutlined,
 } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import { useSelector } from "react-redux";
@@ -66,6 +66,13 @@ interface PropType {
 // ];
 
 const DetailClassNews = (props: PropType) => {
+  const location = useLocation();
+
+  const getUrl = () => {
+    const url = window.location.href.split("/")
+    console.log(url)
+    return url[0] + "//" + url[2];
+  };
   const { detailClass } = props;
 
   const [form] = Form.useForm();
@@ -133,7 +140,7 @@ const DetailClassNews = (props: PropType) => {
   };
 
   //==================== Invite modal
-  const handleInviteOk = () => {};
+  const handleInviteOk = () => { };
 
   const handleInviteCancel = () => {
     setOpenInviteModal(false);
@@ -144,8 +151,10 @@ const DetailClassNews = (props: PropType) => {
     toast.success("Copy invite link successfully");
   };
 
-  const handleCopyInviteLink = (inviteLink: string) => {
-    copy(inviteLink);
+  const handleCopyInviteLink = (inviteCode: string) => {
+    console.log(getUrl())
+    const newpath = getUrl() + "/dashboard/classes/" + inviteCode;
+    copy(newpath);
     toast.success("Copy invite link successfully");
   };
 
@@ -211,7 +220,7 @@ const DetailClassNews = (props: PropType) => {
                   type="primary"
                   icon={<CopyOutlined />}
                   onClick={() => {
-                    handleCopyInviteLink(detailClass.inviteLink);
+                    handleCopyInviteLink(detailClass?.inviteCode);
                   }}
                 >
                   Copy class invite link
@@ -274,9 +283,8 @@ const DetailClassNews = (props: PropType) => {
               setThemeUrl={setThemeUrl}
             />
             <img
-              className={`w-[100%] h-[120px] md:h-[150px] xl:h-[200px] object-cover ${
-                openInfor ? "rounded-t-xl" : "rounded-xl"
-              }`}
+              className={`w-[100%] h-[120px] md:h-[150px] xl:h-[200px] object-cover ${openInfor ? "rounded-t-xl" : "rounded-xl"
+                }`}
               src={`../../class theme/${detailClass?.theme}`}
               alt="theme"
             />
@@ -304,16 +312,15 @@ const DetailClassNews = (props: PropType) => {
           </div>
 
           <div
-            className={`w-[100%] p-5 rounded-b-xl ${
-              openInfor ? "flex" : "hidden"
-            } ${isDarkMode ? " bg-zinc-800 " : " bg-white "}`}
+            className={`w-[100%] p-5 rounded-b-xl ${openInfor ? "flex" : "hidden"
+              } ${isDarkMode ? " bg-zinc-800 " : " bg-white "}`}
           >
             <div className="flex items-center gap-5">
               <p className="font-bold">Code</p>
               <p>whyilostyou</p>
               <div
                 className="w-[30px] h-[30px] flex items-center justify-center rounded-full hover:bg-gray-200 hover:cursor-pointer"
-                onClick={() => {}}
+                onClick={() => { }}
               >
                 <FullscreenOutlined />
               </div>
@@ -322,9 +329,8 @@ const DetailClassNews = (props: PropType) => {
 
           {!openCreateNoti ? (
             <Card
-              className={`w-[100%] mt-5 hover:text-blue-500 ${
-                isDarkMode ? "" : "text-gray-400"
-              }`}
+              className={`w-[100%] mt-5 hover:text-blue-500 ${isDarkMode ? "" : "text-gray-400"
+                }`}
               hoverable
               onClick={() => {
                 setOpenCreateNoti(true);
@@ -349,11 +355,10 @@ const DetailClassNews = (props: PropType) => {
                 <Form form={form} name="post-form" onFinish={onFinish}>
                   <Form.Item name="post" rules={[{ required: true }]}>
                     <TextArea
-                      className={`${
-                        isDarkMode
-                          ? "bg-zinc-800 hover:bg-zinc-900"
-                          : "bg-gray-100 hover:bg-gray-200"
-                      }`}
+                      className={`${isDarkMode
+                        ? "bg-zinc-800 hover:bg-zinc-900"
+                        : "bg-gray-100 hover:bg-gray-200"
+                        }`}
                       rows={4}
                       placeholder="Notify something new for your classroom"
                     />

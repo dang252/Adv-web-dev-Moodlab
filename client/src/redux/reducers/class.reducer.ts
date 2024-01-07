@@ -186,7 +186,7 @@ export const getInviteCode = createAsyncThunk(
   "class/getInviteCode",
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
-  async (body: { id: string; code: string }, thunkAPI) => {
+  async (body: { code: string }, thunkAPI) => {
     try {
       const accessToken = localStorage
         .getItem("accessToken")
@@ -194,7 +194,7 @@ export const getInviteCode = createAsyncThunk(
         .replace(/^"(.*)"$/, "$1");
 
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/classes/${body.id}/join/${body.code}`,
+        `${import.meta.env.VITE_API_URL}/classes/join/${body.code}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,

@@ -99,7 +99,13 @@ export const getUser = createAsyncThunk(
           }
         }
       );
-      return response.data
+      if (response.data.length == 1) {
+        return response.data
+      }
+      else {
+        const userInfo = response.data.filter((user: any) => user.role == "ADMIN")
+        return userInfo[0]
+      }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error);
@@ -221,6 +227,7 @@ const userReducer = createReducer(initialState, (builder) => {
     .addCase(getUser.rejected, () => {
     })
     .addCase(getUser.fulfilled, (state, action) => {
+      // console.log("payload", action.payload)
       if (action.payload) {
         state.lastname = action.payload.lastName;
         state.firstname = action.payload.firstName;

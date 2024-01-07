@@ -47,7 +47,7 @@ const Admin = () => {
   } = theme.useToken();
 
   useEffect(() => {
-    document.title = "Moodlab | Dashboard";
+    document.title = "Moodlab | Admin";
   }, []);
 
   useEffect(() => {

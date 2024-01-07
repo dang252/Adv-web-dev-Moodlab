@@ -1,5 +1,9 @@
 import { Modal, Button, Form, Input, Avatar } from "antd";
 import { UserOutlined } from "@ant-design/icons";
+import { useAppDispatch } from "../redux/hooks";
+import { getInviteCode } from "../redux/reducers/class.reducer";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 interface PropType {
   isModalOpen: boolean;
@@ -18,11 +22,27 @@ const JoinClassModal = (props: PropType) => {
 
   const [form] = Form.useForm();
 
+  const dispatchAsync = useAppDispatch();
+  const navigate = useNavigate();
+
   const onFinish = (values: any) => {
     console.log(values);
+    const body = {
+      code: values.classCode,
+    };
 
-    form.resetFields();
-    setIsModalJoinOpen(false);
+    const inviteCodePromise = dispatchAsync(
+      getInviteCode(body)
+    ).unwrap();
+
+    inviteCodePromise
+      .then(() => {
+        console.log("f")
+        navigate(`/dashboard/classes/${values.classCode}`)
+      })
+      .catch(() => {
+        toast.error("Join class failed! try again later");
+      })
   };
 
   const onFinishFailed = (errorInfo: any) => {
@@ -48,7 +68,7 @@ const JoinClassModal = (props: PropType) => {
         initialValues={{ studentName: "Minh Trí đẹp trai" }}
         autoComplete="off"
       >
-        <div className="flex flex-col gap-5">
+        {/* <div className="flex flex-col gap-5">
           <p className="text-md font-bold ml-[120px]">
             You're joining class with:
           </p>
@@ -58,7 +78,7 @@ const JoinClassModal = (props: PropType) => {
           >
             <Input disabled />
           </Form.Item>
-        </div>
+        </div> */}
 
         <div className="mt-5 flex flex-col gap-5">
           <p className="text-md font-bold ml-[120px]">

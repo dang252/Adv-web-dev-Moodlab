@@ -11,13 +11,6 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 
 const DetailClassMembers = () => {
-  // const teachers = [
-  //   "Minh Trí đẹp trai",
-  //   "sadboiz phu nhuan",
-  //   "nguoi tung ben anh",
-  // ];
-
-  // const students = ["student a", "student b", "student c"];
 
   const [teachers, setTeachers] = useState<string[]>([])
   const [students, setStudents] = useState<string[]>([])
@@ -38,7 +31,7 @@ const DetailClassMembers = () => {
         // })
         setTeachers([response.data.teacher.firstName + " " + response.data.teacher.lastName])
         setStudents(response.data.students.map((student: any) => {
-          return "student " + student.studentId
+          return student.student.firstName + " " + student.student.lastName;
         }))
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {

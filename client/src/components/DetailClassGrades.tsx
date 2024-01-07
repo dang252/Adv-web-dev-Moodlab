@@ -55,12 +55,12 @@ interface FieldContentType {
 
 const templateDownloadItems: MenuProps["items"] = [
   {
-    label: "Template",
+    label: "Student List Template",
     key: "1",
     icon: <DownloadOutlined />,
   },
   {
-    label: "Student template",
+    label: "Grades template template",
     key: "2",
     icon: <DownloadOutlined />,
   },
@@ -129,6 +129,7 @@ const DetailClassGrades = () => {
     (state) => state.classes.detailClassGrades
   );
 
+  //load grade on enter
   useEffect(() => {
     const getClassGradeStructure = async () => {
       try {
@@ -145,6 +146,7 @@ const DetailClassGrades = () => {
             },
           }
         );
+        console.log(response.data)
         setFields(response.data);
         setFormFields(response.data);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -289,11 +291,10 @@ const DetailClassGrades = () => {
       const url = window.URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = `${
-        detailClass !== null
-          ? detailClass.name + "-" + detailClass.code
-          : "grades"
-      }.xlsx`;
+      anchor.download = `${detailClass !== null
+        ? detailClass.name + "-" + detailClass.code
+        : "grades"
+        }.xlsx`;
       anchor.click();
       window.URL.revokeObjectURL(url);
     });
@@ -338,15 +339,14 @@ const DetailClassGrades = () => {
 
     for (let i = 0; i < formFields.length; ++i) {
       if (formFields[i].key !== undefined) {
-        const formField = { ...grades[formFields[i].key], id: i, position: i };
+        const formField = { ...grades[formFields[i].key], position: i };
         data.push(formField);
       } else {
-        const formField = { ...formFields[i], grade_id: i, position: i };
+        const formField = { ...formFields[i], gradeCompositionId: formFields[i].id, position: i };
         data.push(formField);
       }
     }
     console.log(data);
-    // console.log(typeof data[data.length - 1].scale)
     updateClassGradeStructure(data);
     // setFields(data);
   };
@@ -363,23 +363,45 @@ const DetailClassGrades = () => {
   const onCreateContentFinish = (values: any) => {
     const { name, datePicker } = values;
 
-    const date = datePicker.$M + "/" + datePicker.$D + "/" + datePicker.$y;
-    // +
-    // "-" +
-    // datePicker.$H +
-    // ":" +
-    // datePicker.$m +
-    // ":" +
-    // datePicker.$s;
+    // const date = datePicker.$M + "/" + datePicker.$D + "/" + datePicker.$y;
+    // // +
+    // // "-" +
+    // // datePicker.$H +
+    // // ":" +
+    // // datePicker.$m +
+    // // ":" +
+    // // datePicker.$s;
 
+    // console.log(datePicker.format("YYYY-MM-DDTHH:mm:ss.SSS[Z]"))
     const newFieldContent = {
-      id: uuidv4(),
-      fieldId: targetField?.id,
+      id: NaN,
+      gradeCompositionId: targetField?.id,
       name: name,
-      due: date,
+      dueDate: datePicker.format("YYYY-MM-DDTHH:mm:ss.SSS[Z]"),
+      isFinalized: false,
     };
 
     console.log(newFieldContent);
+
+    const fieldCopy = targetField
+
+    fieldCopy.exams = [...fieldCopy.exams, newFieldContent];
+    //update fields
+    const nextFields = fields.map((field) => {
+      if (field.id == fieldCopy.id) {
+        return fieldCopy;
+      }
+      return field
+    })
+    setFields(nextFields)
+    //update form fields
+    const nextFormFields = formFields.map((field) => {
+      if (field.id == fieldCopy.id) {
+        return fieldCopy;
+      }
+      return field
+    })
+    setFormFields(nextFormFields)
 
     setFieldsContents([...fieldsContents, newFieldContent]);
     setCreateFieldContentModal(false);
@@ -394,8 +416,46 @@ const DetailClassGrades = () => {
     setShowAllGrades(false);
   };
 
+
+  const loadModifyModalContent = async (content: any) => {
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/exam/${content?.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
+      return response.data.points
+    }
+    catch (error) {
+      return null
+    }
+  }
+  // useEffect(() => {
+  //   console.log(data)
+  // }, data)
+
   //==================== Modify Field Content
-  const showModifyContentModal = (content: FieldContentType) => {
+  const showModifyContentModal = async (content: FieldContentType) => {
+    const loadedData = await loadModifyModalContent(content);
+    if (loadedData) {
+      const mapDataToExcel = loadedData.map((data: any, index: any) => {
+        return ({
+          key: index,
+          id: data.studentId,
+          name: data.student.firstName + " " + data.student.lastName,
+          grades: data.point
+        })
+      })
+      setData(mapDataToExcel)
+    }
     setModifyContentModal(true);
     setTargetContent(content);
   };
@@ -471,9 +531,37 @@ const DetailClassGrades = () => {
     };
   };
 
-  const handleSaveDetailContentData = () => {
+  const handleSaveDetailContentData = async (examId: number) => {
     console.log(data);
-    toast.success("Save data successfully");
+    if (isNaN(examId)) {
+      toast.error("Cannot save grade for this exam, Please update this exam first by clicking save button in grades menu");
+      return
+    }
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+      const mapData = data.map((student) => {
+        return ({
+          studentId: Number(student.id),
+          point: Number(student.grades)
+        })
+      })
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/exam/${examId}`,
+        mapData,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      toast.success("Save data successfully");
+    }
+    catch (error) {
+      toast.error("Cannot save right now! try again later!");
+    }
   };
 
   const handleExportExcel = () => {
@@ -623,9 +711,8 @@ const DetailClassGrades = () => {
       >
         <div className={`${isDarkMode ? "text-white" : "text-black"}`}>
           <table
-            className={`rounded-md w-[100%] border border-solid ${
-              isDarkMode ? "border-gray-500" : "border-gray-300"
-            }`}
+            className={`rounded-md w-[100%] border border-solid ${isDarkMode ? "border-gray-500" : "border-gray-300"
+              }`}
           >
             <thead
               className={`${isDarkMode ? "bg-[#1d1d1d]" : "bg-[#fafafa]"}`}
@@ -659,11 +746,10 @@ const DetailClassGrades = () => {
                       return (
                         <td
                           key={uid2}
-                          className={`p-4 ${
-                            isDarkMode
-                              ? ""
-                              : "border-[1px] border-solid border-gray-200"
-                          }`}
+                          className={`p-4 ${isDarkMode
+                            ? ""
+                            : "border-[1px] border-solid border-gray-200"
+                            }`}
                         >
                           {body[key]}
                         </td>
@@ -713,7 +799,7 @@ const DetailClassGrades = () => {
             <Button
               onClick={() => {
                 setIsSaveData(true);
-                handleSaveDetailContentData();
+                handleSaveDetailContentData(Number(targetContent?.id));
               }}
             >
               Save
@@ -736,7 +822,7 @@ const DetailClassGrades = () => {
       >
         <div className={`${isDarkMode ? "text-white" : "text-black"}`}>
           <p className="text-center text-2xl font-bold my-5">
-            Modify Content For {targetContent?.name}
+            Modify Grades of {targetContent?.name}
           </p>
 
           <Form
@@ -823,7 +909,7 @@ const DetailClassGrades = () => {
         <Dropdown menu={templateDownloadMenuProps}>
           <Button>
             <Space>
-              Download Grades Template
+              Download Template
               <CaretDownOutlined />
             </Space>
           </Button>
@@ -860,11 +946,10 @@ const DetailClassGrades = () => {
                   {field.id !== undefined && (
                     <div
                       className={`min-w-[300px] p-4
-                                  border border-solid rounded-md ${
-                                    isDarkMode
-                                      ? "border-zinc-700"
-                                      : "border-zinc-300 shadow-md"
-                                  }`}
+                                  border border-solid rounded-md ${isDarkMode
+                          ? "border-zinc-700"
+                          : "border-zinc-300 shadow-md"
+                        }`}
                     >
                       <div className="flex items-center justify-between mb-5">
                         <p className="font-bold">
@@ -885,14 +970,14 @@ const DetailClassGrades = () => {
                         className="mt-10 flex flex-col gap-3 min-h-[400px] max-h-[400px]
                                       overflow-x-hidden overflow-y-auto"
                       >
-                        {getFieldContentByIdLength(fieldsContents, field.id) ===
-                          0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
+                        {/* {getFieldContentByIdLength(fieldsContents, field.id) ===
+                          0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />} */}
 
-                        {fieldsContents?.map((content) => {
-                          if (content?.fieldId === field.id) {
+                        {field.exams?.length == 0 ? <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /> : field.exams?.map((content: any) => {
+                          if (content?.gradeCompositionId === field.id) {
                             return (
                               <Card
-                                key={content?.id}
+                                key={isNaN(content?.id) ? uuidv4() : content?.id}
                                 title={
                                   <p className="truncate">{content.name}</p>
                                 }
@@ -914,6 +999,27 @@ const DetailClassGrades = () => {
                                             "Are you sure to delete this content?"
                                           ) == true
                                         ) {
+                                          const fieldCopy = field;
+                                          fieldCopy.exams = fieldCopy.exams.filter(
+                                            (exam: any) => {
+                                              return exam.id != content.id
+                                            }
+                                          )
+                                          const nextFields = fields.map((field) => {
+                                            if (field.id == fieldCopy.id) {
+                                              return fieldCopy;
+                                            }
+                                            return field
+                                          })
+                                          //update form fields
+                                          const nextFormFields = formFields.map((field) => {
+                                            if (field.id == fieldCopy.id) {
+                                              return fieldCopy;
+                                            }
+                                            return field
+                                          })
+                                          setFormFields(nextFormFields)
+                                          setFields(nextFields)
                                           const result = fieldsContents.filter(
                                             (field) => {
                                               return field.id !== content.id;
@@ -930,7 +1036,7 @@ const DetailClassGrades = () => {
                                 }
                                 style={{ width: 280 }}
                               >
-                                <p>Due: {content?.due}</p>
+                                <p>Due: {content?.dueDate}</p>
                               </Card>
                             );
                           }

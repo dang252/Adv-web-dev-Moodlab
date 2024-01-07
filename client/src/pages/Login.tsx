@@ -85,9 +85,12 @@ const Login = (props: PropType) => {
       };
 
       await dispathAsync(loginAccount(UserAccount)).unwrap();
-      await dispathAsync(getUser()).unwrap();
+      const user = await dispathAsync(getUser()).unwrap();
       toast.success("Login successfully");
-      navigate("/dashboard");
+      if (user.role == "ADMIN") {
+        navigate("/admin")
+      }
+      else navigate("/dashboard");
     } catch (err) {
       console.log("login failed", err);
       toast.error("Login failed! please try again later");

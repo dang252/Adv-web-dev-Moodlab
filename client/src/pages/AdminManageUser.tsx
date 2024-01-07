@@ -1,8 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button, Space, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
+import axios from "axios";
+import { toast } from "react-toastify";
 
-interface DataType {
+interface UserData {
   key: string;
   order: number;
   accountId: number;
@@ -11,7 +13,19 @@ interface DataType {
   status: string;
 }
 
-const columns: ColumnsType<DataType> = [
+interface ResponseUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  account: {
+    username: string;
+    status: string;
+  }
+}
+
+const columns: ColumnsType<UserData> = [
   {
     title: "#",
     dataIndex: "order",
@@ -55,33 +69,6 @@ const columns: ColumnsType<DataType> = [
   },
 ];
 
-const data: DataType[] = [
-  {
-    key: "1",
-    order: 1,
-    accountId: 32,
-    username: "minhtrideptrai",
-    email: "tri@gmail.com",
-    status: "OK",
-  },
-  {
-    key: "2",
-    order: 2,
-    accountId: 55,
-    username: "minhtrideptrai123",
-    email: "tri456@gmail.com",
-    status: "BAN",
-  },
-  {
-    key: "3",
-    order: 3,
-    accountId: 104,
-    username: "minhtrideptrai345",
-    email: "tri123@gmail.com",
-    status: "OK",
-  },
-];
-
 interface PropType {
   isDarkMode: boolean;
   colorBgContainer: string;
@@ -94,11 +81,50 @@ const AdminManageUser = (props: PropType) => {
     window.scrollTo(0, 0);
   }, []);
 
+  const [data, setData] = useState<UserData[]>([])
+
+  useEffect(() => {
+    const getAllUser = async () => {
+      try {
+        const accessToken = localStorage
+          .getItem("accessToken")
+          ?.toString()
+          .replace(/^"(.*)"$/, "$1");
+
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/user`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        console.log(response.data)
+        const mapDataType = response.data.map((user: ResponseUser, index: number) => {
+          return ({
+            key: index,
+            order: user.id,
+            accountId: user.id,
+            username: user.account.username,
+            email: user.email,
+            status: user.account.status,
+          })
+        })
+        setData(mapDataType)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        toast.error(
+          "Cannot get users data right now! Try again later!"
+        );
+      }
+    }
+    getAllUser();
+  }, [])
+
   return (
     <div
-      className={`rounded-md flex flex-col gap-[100px] md:gap-[200px] ${
-        isDarkMode ? "" : ""
-      }`}
+      className={`rounded-md flex flex-col gap-[100px] md:gap-[200px] ${isDarkMode ? "" : ""
+        }`}
       style={{
         minHeight: "100vh",
         padding: 24,
