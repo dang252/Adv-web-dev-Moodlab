@@ -297,7 +297,19 @@ export class ClassesService {
         `[API GET /classes/:id/members] Get members in class (id: ${classId}) successfully`,
       );
 
-      return res.status(HttpStatus.OK).send(classMembers);
+      // Filter students with role "TEACHER"
+      const teachers = classMembers.students.filter(
+        (student) => student.student.role === 'TEACHER',
+      );
+
+      // Remove students with role "TEACHER" from the students array
+      classMembers.students = classMembers.students.filter(
+        (student) => student.student.role !== 'TEACHER',
+      );
+
+      return res
+        .status(HttpStatus.OK)
+        .send({ classMembers, otherTeachers: teachers });
     } catch (error) {
       // If the error has a status property, set the corresponding HTTP status code
       if (error.status) {
@@ -790,7 +802,7 @@ export class ClassesService {
     try {
       console.log('[API GET /classes/:id/points]');
 
-      const listPoints = await this.prisma.grade.findMany({
+      let listPoints = await this.prisma.grade.findMany({
         where: {
           classId: parseInt(classId),
         },
@@ -817,10 +829,15 @@ export class ClassesService {
                   point: true,
                 },
               },
+              role: true,
             },
           },
         },
       });
+
+      listPoints = listPoints.filter(
+        (student) => student.student.role !== 'TEACHER',
+      );
 
       for (const points of listPoints) {
         let totalPoint = 0;
