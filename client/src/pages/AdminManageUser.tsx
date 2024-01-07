@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Space, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import axios from "axios";
@@ -42,12 +42,12 @@ const AdminManageUser = (props: PropType) => {
 
   const banAccount = async (record: UserData) => {
     try {
-      console.log(record)
+      // console.log(record)
       const accessToken = localStorage
         .getItem("accessToken")
         ?.toString()
         .replace(/^"(.*)"$/, "$1");
-      console.log("get token ok")
+      // console.log("get token ok")
       await axios.put(
         `${import.meta.env.VITE_API_URL}/user`,
         {
@@ -62,7 +62,7 @@ const AdminManageUser = (props: PropType) => {
           },
         }
       );
-      console.log("send request ok")
+      // console.log("send request ok")
       toast.success("Ban user successfully!")
       //reset data 
       const dataCopy = data.map((user: UserData) => {
@@ -117,7 +117,6 @@ const AdminManageUser = (props: PropType) => {
       );
     }
   }
-  const userRawData = useRef([])
 
   useEffect(() => {
     const getAllUser = async () => {
@@ -135,11 +134,10 @@ const AdminManageUser = (props: PropType) => {
             },
           }
         );
-        userRawData.current = response.data;
         const mapDataType = response.data.map((user: ResponseUser, index: number) => {
           return ({
-            key: index,
-            order: user.id,
+            key: index + 1,
+            order: index + 1,
             accountId: user.id,
             username: user.account.username,
             email: user.email,

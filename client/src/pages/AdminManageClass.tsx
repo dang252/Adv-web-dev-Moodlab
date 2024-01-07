@@ -1,86 +1,29 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button, Space, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
+import axios from "axios";
+import { toast } from "react-toastify";
 
-interface DataType {
+interface ClassData {
   key: string;
   order: number;
   code: string;
   name: string;
-  teacherName: string;
+  inviteCode: string;
   status: string;
+  rawData: RawClassData
 }
 
-const columns: ColumnsType<DataType> = [
-  {
-    title: "#",
-    dataIndex: "order",
-    key: "order",
-    render: (text) => <p>{text}</p>,
-  },
-  {
-    title: "Code",
-    dataIndex: "code",
-    key: "code",
-    render: (text) => <p>{text}</p>,
-  },
-  {
-    title: "Username",
-    dataIndex: "username",
-    key: "username",
-    render: (text) => <p>{text}</p>,
-  },
-  {
-    title: "Name",
-    dataIndex: "name",
-    key: "name",
-    render: (text) => <p>{text}</p>,
-  },
-  {
-    title: "Teacher name",
-    dataIndex: "teacherName",
-    key: "teacherName",
-    render: (text) => <p>{text}</p>,
-  },
-  {
-    title: "Action",
-    key: "action",
-    render: (_) => (
-      <Space size="middle">
-        <Button type="primary" danger>
-          Inactive
-        </Button>
-      </Space>
-    ),
-  },
-];
-
-const data: DataType[] = [
-  {
-    key: "1",
-    order: 1,
-    code: "FKasddgf",
-    name: "Thiet ke phan mem",
-    teacherName: "Tran Gia Bao",
-    status: "Active",
-  },
-  {
-    key: "2",
-    order: 2,
-    code: "YHCVgfyt",
-    name: "Lap trinh web",
-    teacherName: "Tran Gia Bao",
-    status: "Inactive",
-  },
-  {
-    key: "3",
-    order: 3,
-    code: "Vdfgdfg",
-    name: "Lap trinh huong toi tuong",
-    teacherName: "Tran Gia Bao",
-    status: "Active",
-  },
-];
+interface RawClassData {
+  id: number;
+  code: string;
+  name: string;
+  teacherId: number;
+  inviteCode: string;
+  status: string;
+  theme: string;
+  description: string;
+}
 
 interface PropType {
   isDarkMode: boolean;
@@ -90,15 +33,179 @@ interface PropType {
 const AdminManageClass = (props: PropType) => {
   const { isDarkMode } = props;
 
+  const [data, setData] = useState<ClassData[]>([])
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  const closeClass = async (record: ClassData) => {
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+      console.log("get token ok")
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/classes/${record.rawData.id}`,
+        {
+          "theme": record.rawData.theme,
+          "status": "CLOSED"
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      console.log("send request ok")
+      toast.success("Close class successfully!")
+      //reset data 
+      const dataCopy = data.map((classInfo: ClassData) => {
+        if (classInfo == record) {
+          return { ...classInfo, status: "CLOSED" }
+        }
+        return classInfo;
+      })
+      setData(dataCopy)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(
+        "Can't do it right now! Try again later!"
+      );
+    }
+  }
+  const reopenClass = async (record: ClassData) => {
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/classes/${record.rawData.id}`,
+        {
+          "theme": record.rawData.theme,
+          "status": "ACTIVED"
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      toast.success("Reopen class successfully!")
+      //reset data 
+      const dataCopy = data.map((classInfo: ClassData) => {
+        if (classInfo == record) {
+          return { ...classInfo, status: "ACTIVED" }
+        }
+        return classInfo;
+      })
+      setData(dataCopy)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(
+        "Can't do it right now! Try again later!"
+      );
+    }
+  }
+
+  useEffect(() => {
+    const getAllClass = async () => {
+      try {
+        const accessToken = localStorage
+          .getItem("accessToken")
+          ?.toString()
+          .replace(/^"(.*)"$/, "$1");
+
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/classes`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        const mapDataType = response.data.map((classInfo: RawClassData, index: number) => {
+          return ({
+            key: index + 1,
+            order: index + 1,
+            code: classInfo.code,
+            name: classInfo.name,
+            teacherName: classInfo.teacherId,
+            inviteCode: classInfo.inviteCode,
+            status: classInfo.status,
+            rawData: classInfo
+          })
+        })
+        setData(mapDataType)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        toast.error(
+          "Cannot get users data right now! Try again later!"
+        );
+      }
+    }
+    getAllClass();
+  }, [])
+
+  const columns: ColumnsType<ClassData> = [
+    {
+      title: "#",
+      dataIndex: "order",
+      key: "order",
+      render: (text) => <p>{text}</p>,
+    },
+    {
+      title: "Code",
+      dataIndex: "code",
+      key: "code",
+      render: (text) => <p>{text}</p>,
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      render: (text) => <p>{text}</p>,
+    },
+    {
+      title: "Invite Code",
+      dataIndex: "inviteCode",
+      key: "inviteCode",
+      render: (text) => <p>{text}</p>,
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (text) => <p>{text}</p>,
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (record: ClassData) => (
+        <Space size="middle">
+          <Button type="primary" danger onClick={() => {
+            closeClass(record);
+          }}>
+            Close
+          </Button>
+          <Button type="primary" onClick={() => {
+            reopenClass(record);
+          }}>
+            Re-open
+          </Button>
+        </Space>
+      ),
+    },
+  ];
+
+
   return (
     <div
-      className={`rounded-md flex flex-col gap-[100px] md:gap-[200px] ${
-        isDarkMode ? "" : ""
-      }`}
+      className={`rounded-md flex flex-col gap-[100px] md:gap-[200px] ${isDarkMode ? "" : ""
+        }`}
       style={{
         minHeight: "100vh",
         padding: 24,
