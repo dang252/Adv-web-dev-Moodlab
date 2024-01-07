@@ -17,7 +17,7 @@ export class NotificationService {
     try {
       console.log('[API GET /notifications]');
 
-      const notifications = await this.prisma.notification.findUnique({
+      const notifications = await this.prisma.notification.findMany({
         where: {
           id: userId,
         },
