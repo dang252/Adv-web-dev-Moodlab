@@ -100,11 +100,13 @@ const App = () => {
         <Route
           path="/"
           element={
-            <Landing
-              triggerOpen={triggerOpen}
-              setTriggerOpen={setTriggerOpen}
-              switchMode={switchMode}
-            />
+            <NonAuthRoute>
+              <Landing
+                triggerOpen={triggerOpen}
+                setTriggerOpen={setTriggerOpen}
+                switchMode={switchMode}
+              />
+            </NonAuthRoute>
           }
         />
         <Route

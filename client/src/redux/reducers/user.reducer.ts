@@ -99,12 +99,12 @@ export const getUser = createAsyncThunk(
           }
         }
       );
-      if (response.data.length == 1) {
-        return response.data
-      }
-      else {
+      if (Array.isArray(response.data)) {
         const userInfo = response.data.filter((user: any) => user.role == "ADMIN")
         return userInfo[0]
+      }
+      else {
+        return response.data
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

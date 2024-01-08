@@ -19,7 +19,6 @@ const DetailClassMembers = () => {
   const classId = useSelector<RootState, number | undefined>(
     (state) => state.classes.detailClass?.id
   );
-
   useEffect(() => {
     const getClassMembers = async () => {
       try {
@@ -29,8 +28,8 @@ const DetailClassMembers = () => {
         // const teacherList = response.data.teacher.map((t: any) => {
         //   return t.firstName + t.lastName
         // })
-        setTeachers([response.data.teacher.firstName + " " + response.data.teacher.lastName])
-        setStudents(response.data.students.map((student: any) => {
+        setTeachers([response?.data?.classMembers.teacher.firstName + " " + response?.data?.classMembers.teacher.lastName])
+        setStudents(response?.data?.classMembers.students.map((student: any) => {
           return student.student.firstName + " " + student.student.lastName;
         }))
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
