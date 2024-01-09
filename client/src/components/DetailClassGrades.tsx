@@ -361,10 +361,18 @@ const DetailClassGrades = () => {
       }
     }
     console.log(data);
-    // updateClassGradeStructure(data);
+    updateClassGradeStructure(data);
   };
 
   //==================== Create Field Content
+  const creatAbleFieldContent = (field: any) => {
+    if (field?.id == null) {
+      toast.error("Can't create Exam for this grade column! Please save first!")
+      return false;
+    }
+    return true;
+  }
+
   const showCreateFieldContentModal = () => {
     setCreateFieldContentModal(true);
   };
@@ -961,8 +969,10 @@ const DetailClassGrades = () => {
                         <Button
                           type="primary"
                           onClick={() => {
-                            showCreateFieldContentModal();
-                            setTargetField(field);
+                            if (creatAbleFieldContent(field)) {
+                              showCreateFieldContentModal();
+                              setTargetField(field);
+                            }
                           }}
                         >
                           Add

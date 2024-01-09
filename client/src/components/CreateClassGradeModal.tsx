@@ -68,7 +68,7 @@ const CreateClassGradeModal = (props: PropType) => {
   const checkRemovableField = (name: string) => {
     if (fields) {
       for (let i = 0; i < fields.length; i++) {
-        if (fields[i].name == name && fields[i].exams.length != 0) {
+        if (fields[i].name == name && fields[i].exams && fields[i].exams?.length != 0) {
           return false;
         }
       }

@@ -3,6 +3,8 @@ import { Button, Space, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
 interface UserData {
   key: string;
@@ -118,6 +120,10 @@ const AdminManageUser = (props: PropType) => {
     }
   }
 
+  // const adminId = useSelector<RootState, number>(
+  //   (state) => state.persisted.users.userId
+  // )
+
   useEffect(() => {
     const getAllUser = async () => {
       try {
@@ -134,7 +140,8 @@ const AdminManageUser = (props: PropType) => {
             },
           }
         );
-        const mapDataType = response.data.map((user: ResponseUser, index: number) => {
+        const rawData = response.data.filter((user: ResponseUser) => user.role != "ADMIN")
+        const mapDataType = rawData.map((user: ResponseUser, index: number) => {
           return ({
             key: index + 1,
             order: index + 1,
@@ -145,7 +152,6 @@ const AdminManageUser = (props: PropType) => {
             rawData: user
           })
         })
-        console.log("map data", mapDataType)
         setData(mapDataType)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
