@@ -8,6 +8,7 @@ import {
   Form,
   Empty,
   Modal,
+  InputNumber,
 } from "antd";
 import {
   InfoOutlined,
@@ -353,6 +354,16 @@ const DetailClassNews = (props: PropType) => {
             >
               <div className="flex flex-col gap-5">
                 <Form form={form} name="post-form" onFinish={onFinish}>
+                  <Form.Item name="post" rules={[{ required: true }]}>
+                    <InputNumber
+                      min={1} max={10}
+                      className={`${isDarkMode
+                        ? "bg-zinc-800 hover:bg-zinc-900"
+                        : "bg-gray-100 hover:bg-gray-200"
+                        }`}
+                      placeholder="Notify something new for your classroom"
+                    />
+                  </Form.Item>
                   <Form.Item name="post" rules={[{ required: true }]}>
                     <TextArea
                       className={`${isDarkMode

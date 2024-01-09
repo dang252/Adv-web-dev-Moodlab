@@ -31,7 +31,6 @@ const DetailClass = (props: PropType) => {
 
   const params = useParams();
   const { inviteCode } = params;
-  console.log("inv code", inviteCode);
 
   const dispatchAsync = useAppDispatch();
 
@@ -92,8 +91,8 @@ const DetailClass = (props: PropType) => {
 
   useEffect(() => {
     const handleGetClassAllGrades = async (classId: number) => {
-      console.log("GRADES:", classId);
-      await dispatchAsync(getClassAllGrades(3));
+      // console.log("GRADES:", classId);
+      await dispatchAsync(getClassAllGrades(classId));
     };
 
     if (detailClass?.id) {
@@ -105,8 +104,8 @@ const DetailClass = (props: PropType) => {
 
   useEffect(() => {
     const handleGetClassAllGrades = async (classId: number) => {
-      console.log("REVIEWS:", classId);
-      await dispatchAsync(getClassAllReviews(3));
+      // console.log("REVIEWS:", classId);
+      await dispatchAsync(getClassAllReviews(classId));
     };
 
     if (detailClass?.id) {
@@ -116,9 +115,9 @@ const DetailClass = (props: PropType) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [detailClass]);
 
-  const onChange = (key: string) => {
-    console.log(key);
-  };
+  // const onChange = (key: string) => {
+  //   console.log(key);
+  // };
 
   const studentItems: TabsProps["items"] = [
     {
@@ -131,6 +130,11 @@ const DetailClass = (props: PropType) => {
       label: "Members",
       children: <DetailClassMembers />,
     },
+    // {
+    //   key: "3",
+    //   label: "Grades",
+    //   children: <DetailClassGrades />,
+    // },
   ];
 
   const teacherItems: TabsProps["items"] = [
@@ -169,7 +173,7 @@ const DetailClass = (props: PropType) => {
           <Tabs
             defaultActiveKey="1"
             items={USER_ROLE === "TEACHER" ? teacherItems : studentItems}
-            onChange={onChange}
+            // onChange={onChange}
             className="w-[100%]"
           // indicatorSize={(origin) => origin - 16}
           />

@@ -66,22 +66,36 @@ const templateDownloadItems: MenuProps["items"] = [
   },
 ];
 
-const getFieldContentByIdLength = (source: any[], fieldId: number) => {
-  return source.filter((content) => {
-    return content.fieldId === fieldId;
-  }).length;
-};
+// const getFieldContentByIdLength = (source: any[], fieldId: number) => {
+//   return source.filter((content) => {
+//     return content.fieldId === fieldId;
+//   }).length;
+// };
+
+// const findMaxExamGrades = (data: any[]) => {
+//   let max = data[0].length;
+
+//   for (let i = 0; i < data.length; ++i) {
+//     if (data[i].length > max) {
+//       max = data[i];
+//     }
+//   }
+
+//   return max;
+// };
 
 const findMaxExamGrades = (data: any[]) => {
   let max = data[0].length;
+  let maxElement: any = data[0];
 
   for (let i = 0; i < data.length; ++i) {
     if (data[i].length > max) {
-      max = data[i];
+      max = data[i].length;
+      maxElement = data[i];
     }
   }
 
-  return max;
+  return maxElement;
 };
 
 const getExamPoint = (examName: string, studentGrades: any[]) => {
@@ -98,7 +112,7 @@ const DetailClassGrades = () => {
 
   const [showCreateGrade, setShowCreateGrade] = useState<boolean>(true);
 
-  const [fieldsContents, setFieldsContents] = useState<any[]>([]);
+  // const [fieldsContents, setFieldsContents] = useState<any[]>([]);
   const [createFieldContentModal, setCreateFieldContentModal] = useState(false);
   const [targetField, setTargetField] = useState<any>(null);
 
@@ -129,35 +143,35 @@ const DetailClassGrades = () => {
     (state) => state.classes.detailClassGrades
   );
 
+  const getClassGradeStructure = async () => {
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/classes/${detailClass?.id}/grades`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      console.log("get class all grades structure", response.data)
+      setFields(response.data);
+      setFormFields(response.data);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(
+        "Can not see grade structure for now! Please try again later"
+      );
+    }
+  };
+
   //load grade on enter
   useEffect(() => {
-    const getClassGradeStructure = async () => {
-      try {
-        const accessToken = localStorage
-          .getItem("accessToken")
-          ?.toString()
-          .replace(/^"(.*)"$/, "$1");
-
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/classes/${detailClass?.id}/grades`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-        console.log(response.data)
-        setFields(response.data);
-        setFormFields(response.data);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        toast.error(
-          "Can not see grade structure for now! Please try again later"
-        );
-      }
-    };
-
-    setFields(data);
+    // setFields(data);
     getClassGradeStructure();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -172,11 +186,11 @@ const DetailClassGrades = () => {
         return grade.student.points;
       });
 
-      const examName = findMaxExamGrades(points).map((value: any) => {
+      const examName = findMaxExamGrades(points)?.map((value: any) => {
         return value.exam.name;
       });
 
-      examName.map((name: string) => {
+      examName?.map((name: string) => {
         headingData.push(name);
       });
 
@@ -251,7 +265,7 @@ const DetailClassGrades = () => {
       return value.exam.name;
     });
 
-    examName.map((exam: any) => {
+    examName?.map((exam: any) => {
       columnsData.push({
         header: exam,
         key: exam,
@@ -317,12 +331,10 @@ const DetailClassGrades = () => {
           },
         }
       );
-
-      setFields(formFields);
-
       if (formFields.length === 0) toast.success("Create grades successfully");
       if (formFields.length !== 0) toast.success("Update grades successfully");
 
+      getClassGradeStructure()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setFormFields(fields);
@@ -335,6 +347,8 @@ const DetailClassGrades = () => {
 
   const handleCreateGradeOk = async (values: any) => {
     const { grades } = values;
+    console.log("handle Create grade ok, grades: ", values);
+    console.log("handle Create grade ok, fields: ", formFields);
     const data = [];
 
     for (let i = 0; i < formFields.length; ++i) {
@@ -342,13 +356,12 @@ const DetailClassGrades = () => {
         const formField = { ...grades[formFields[i].key], position: i };
         data.push(formField);
       } else {
-        const formField = { ...formFields[i], gradeCompositionId: formFields[i].id, position: i };
+        const formField = { ...grades[formFields[i].name], gradeCompositionId: formFields[i].id, position: i };
         data.push(formField);
       }
     }
     console.log(data);
-    updateClassGradeStructure(data);
-    // setFields(data);
+    // updateClassGradeStructure(data);
   };
 
   //==================== Create Field Content
@@ -360,20 +373,10 @@ const DetailClassGrades = () => {
     setCreateFieldContentModal(false);
   };
 
+  //create new exam
   const onCreateContentFinish = (values: any) => {
     const { name, datePicker } = values;
-
-    // const date = datePicker.$M + "/" + datePicker.$D + "/" + datePicker.$y;
-    // // +
-    // // "-" +
-    // // datePicker.$H +
-    // // ":" +
-    // // datePicker.$m +
-    // // ":" +
-    // // datePicker.$s;
-
-    // console.log(datePicker.format("YYYY-MM-DDTHH:mm:ss.SSS[Z]"))
-    const newFieldContent = {
+    const newExamContent = {
       id: NaN,
       gradeCompositionId: targetField?.id,
       name: name,
@@ -381,11 +384,11 @@ const DetailClassGrades = () => {
       isFinalized: false,
     };
 
-    console.log(newFieldContent);
+    console.log(newExamContent);
 
     const fieldCopy = targetField
 
-    fieldCopy.exams = [...fieldCopy.exams, newFieldContent];
+    fieldCopy.exams = [...fieldCopy.exams, newExamContent];
     //update fields
     const nextFields = fields.map((field) => {
       if (field.id == fieldCopy.id) {
@@ -403,7 +406,7 @@ const DetailClassGrades = () => {
     })
     setFormFields(nextFormFields)
 
-    setFieldsContents([...fieldsContents, newFieldContent]);
+    // setFieldsContents([...fieldsContents, newFieldContent]);
     setCreateFieldContentModal(false);
     form.resetFields();
   };
@@ -1020,13 +1023,13 @@ const DetailClassGrades = () => {
                                           })
                                           setFormFields(nextFormFields)
                                           setFields(nextFields)
-                                          const result = fieldsContents.filter(
-                                            (field) => {
-                                              return field.id !== content.id;
-                                            }
-                                          );
+                                          // const result = fieldsContents.filter(
+                                          //   (field) => {
+                                          //     return field.id !== content.id;
+                                          //   }
+                                          // );
 
-                                          setFieldsContents(result);
+                                          // setFieldsContents(result);
                                         }
                                       }}
                                     >
