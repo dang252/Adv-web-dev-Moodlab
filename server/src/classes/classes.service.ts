@@ -332,10 +332,17 @@ export class ClassesService {
     try {
       console.log('[API GET /classes/:id/:code]');
 
+      const classFromInviteCode = await this.prisma.class.findFirst({
+        where: {
+          code: classInviteCode,
+        },
+      });
+
       // Check if user has been in this class
       const user = await this.prisma.grade.findFirst({
         where: {
           studentId: userId,
+          classId: classFromInviteCode.id,
         },
         include: {
           class: true,
