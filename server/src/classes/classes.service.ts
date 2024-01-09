@@ -542,7 +542,9 @@ export class ClassesService {
         },
       });
 
-      grades.forEach(async (grade) => {
+      for (let i = 0; i < grades.length; i++) {
+        let grade = grades[i];
+
         const isExistComposition = listGradeCompositions.some(
           (composition) => composition.id === grade.gradeCompositionId,
         );
@@ -632,23 +634,17 @@ export class ClassesService {
               scale: grade.scale,
             },
           });
-
-          await this.prisma.exam.updateMany({
-            where: {
-              gradeCompositionId: grade.gradeCompositionId,
-            },
-            data: {
-              gradeCompositionId: newGrade.id,
-            },
-          });
+          console.log('New grade: ', newGrade);
         }
-      });
+      }
 
       console.log(
         `[API PUT /classes/:id/grades] List of compositions need to delete:`,
       );
       console.log('\t[');
-      listGradeCompositions.forEach(async (composition) => {
+      for (let i = 0; i < listGradeCompositions.length; i++) {
+        let composition = listGradeCompositions[i];
+
         console.log(
           `\t\t{\n\t\t\tid: ${composition.id},\n\t\t\tclassId: ${composition.classId},\n\t\t\tposition: ${composition.position},\n\t\t\tname: ${composition.name},\n\t\t\tscale: ${composition.scale},\n\t\t},`,
         );
@@ -657,7 +653,7 @@ export class ClassesService {
             id: composition.id,
           },
         });
-      });
+      }
       console.log('\t]');
 
       const result = await this.prisma.gradeComposition.findMany({
