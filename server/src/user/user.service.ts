@@ -49,6 +49,7 @@ export class UserService {
             firstName: true,
             lastName: true,
             email: true,
+            studentId: true,
             role: true,
             account: {
               select: {
@@ -128,11 +129,20 @@ export class UserService {
         });
       }
 
+      // update student's id
+      if (userInfo.student_id != null) {
+        await this.prisma.user.update({
+          where: {
+            id: userInfo.user_id != null ? userInfo.user_id : userId,
+          },
+          data: {
+            studentId: userInfo.student_id,
+          },
+        });
+      }
+
       // for admin to change status of account
-      if (
-        userInfo.user_id != null &&
-        (this.isUserStatus(userInfo.status) || userInfo.student_id != '')
-      ) {
+      if (userInfo.user_id != null && this.isUserStatus(userInfo.status)) {
         if (userRole == 'ADMIN') {
           if (userInfo.status != '') {
             await this.prisma.account.update({

@@ -68,7 +68,8 @@ export class ExamService {
     try {
       console.log('[API PUT /exam/:examId]');
 
-      points.forEach(async (point) => {
+      for (let i = 0; i < points.length; i++) {
+        let point = points[i];
         await this.prisma.point.update({
           where: {
             studentId_examId: {
@@ -80,7 +81,7 @@ export class ExamService {
             point: point.point,
           },
         });
-      });
+      }
 
       return res.status(HttpStatus.OK).send(HTTP_MSG_SUCCESS);
     } catch (error) {
