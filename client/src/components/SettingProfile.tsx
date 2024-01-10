@@ -159,7 +159,7 @@ const SettingProfile = () => {
             <Input />
           </Form.Item>
 
-          {user && user.role == "student" &&
+          {user && user.role == "STUDENT" &&
             <Form.Item<FieldType>
               label="Student Id"
               name="studentId"
