@@ -18,7 +18,7 @@ export class ClassesService {
   constructor(
     private prisma: PrismaService,
     private mailerService: MailerService,
-  ) {}
+  ) { }
 
   // Generate class's code
   generateClassCode(length: number): string {
@@ -331,10 +331,10 @@ export class ClassesService {
   async joinClass(userId: number, classInviteCode: string, res: Response) {
     try {
       console.log('[API GET /classes/:id/:code]');
-
+      console.log(userId, classInviteCode);
       const classFromInviteCode = await this.prisma.class.findFirst({
         where: {
-          code: classInviteCode,
+          inviteCode: classInviteCode,
         },
       });
 
@@ -577,7 +577,6 @@ export class ClassesService {
               exams: true,
             },
           });
-
           if (grade.exams != null) {
             let upsertRecords = [];
 

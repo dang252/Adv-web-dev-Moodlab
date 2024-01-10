@@ -96,14 +96,15 @@ const SettingProfile = () => {
                   </Col>
                 </Row>
 
-                <Row>
-                  <Col span={10}>
-                    <p className="font-bold">Student Id:</p>
-                  </Col>
-                  <Col span={12}>
-                    <p>{user.studentId}</p>
-                  </Col>
-                </Row>
+                {user && user.role == "student" &&
+                  <Row>
+                    <Col span={10}>
+                      <p className="font-bold">Student Id:</p>
+                    </Col>
+                    <Col span={12}>
+                      <p>{user.studentId}</p>
+                    </Col>
+                  </Row>}
               </div>
             </div>
             <div className="flex flex-col justify-center items-center gap-5 mx-auto xl:mx-0 text-blue-500">
@@ -158,13 +159,15 @@ const SettingProfile = () => {
             <Input />
           </Form.Item>
 
-          <Form.Item<FieldType>
-            label="Student Id"
-            name="studentId"
-            rules={[{ required: true, message: "Please input your phone!" }]}
-          >
-            <Input />
-          </Form.Item>
+          {user && user.role == "student" &&
+            <Form.Item<FieldType>
+              label="Student Id"
+              name="studentId"
+              rules={[{ required: true, message: "Please input your phone!" }]}
+            >
+              <Input />
+            </Form.Item>
+          }
 
           <Form.Item<FieldType>
             label="Username"

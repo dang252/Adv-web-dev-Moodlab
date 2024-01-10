@@ -106,6 +106,7 @@ const getExamPoint = (examName: string, studentGrades: any[]) => {
   return null;
 };
 
+
 const DetailClassGrades = () => {
   const [form] = Form.useForm();
   const [createDetailContentForm] = Form.useForm();
@@ -346,22 +347,22 @@ const DetailClassGrades = () => {
   };
 
   const handleCreateGradeOk = async (values: any) => {
-    const { grades } = values;
-    console.log("handle Create grade ok, grades: ", values);
-    console.log("handle Create grade ok, fields: ", formFields);
-    const data = [];
+    if (confirm("Commit all the change you made?") == true) {
+      const { grades } = values;
+      const data = [];
 
-    for (let i = 0; i < formFields.length; ++i) {
-      if (formFields[i].key !== undefined) {
-        const formField = { ...grades[formFields[i].key], position: i };
-        data.push(formField);
-      } else {
-        const formField = { ...grades[formFields[i].name], gradeCompositionId: formFields[i].id, position: i };
-        data.push(formField);
+      for (let i = 0; i < formFields.length; ++i) {
+        if (formFields[i].key !== undefined) {
+          const formField = { ...grades[formFields[i].key], position: i };
+          data.push(formField);
+        } else {
+          const formField = { ...grades[formFields[i].name], gradeCompositionId: formFields[i].id, position: i, exams: [...formFields[i].exams] };
+          data.push(formField);
+        }
       }
+      console.log(data);
+      updateClassGradeStructure(data);
     }
-    console.log(data);
-    updateClassGradeStructure(data);
   };
 
   //==================== Create Field Content
@@ -394,25 +395,10 @@ const DetailClassGrades = () => {
 
     console.log(newExamContent);
 
-    const fieldCopy = targetField
+    const fieldCopy = { ...targetField }
 
     fieldCopy.exams = [...fieldCopy.exams, newExamContent];
-    //update fields
-    const nextFields = fields.map((field) => {
-      if (field.id == fieldCopy.id) {
-        return fieldCopy;
-      }
-      return field
-    })
-    setFields(nextFields)
-    //update form fields
-    const nextFormFields = formFields.map((field) => {
-      if (field.id == fieldCopy.id) {
-        return fieldCopy;
-      }
-      return field
-    })
-    setFormFields(nextFormFields)
+    syncUpdateField(fieldCopy)
 
     // setFieldsContents([...fieldsContents, newFieldContent]);
     setCreateFieldContentModal(false);
@@ -639,6 +625,55 @@ const DetailClassGrades = () => {
     console.log("Failed:", errorInfo);
   };
 
+  const syncUpdateField = (modifiedField: any) => {
+    const nextFields = fields.map((field) => {
+      if (field.id == modifiedField.id) {
+        return modifiedField;
+      }
+      return field
+    })
+    //update form fields
+    const nextFormFields = formFields.map((field) => {
+      if (field.id == modifiedField.id) {
+        return modifiedField;
+      }
+      return field
+    })
+    setFormFields(nextFormFields)
+    setFields(nextFields)
+  }
+
+  const onFinalize = (field: any, examId: number) => {
+    if (confirm("Are you sure to finalize this exam? This mean student in this class can see the result!") == true) {
+      const fieldCopy = { ...field };
+      fieldCopy.exams = fieldCopy.exams.map(
+        (exam: any) => {
+          if (exam.id != examId)
+            return exam
+          else {
+            return { ...exam, isFinalized: true }
+          }
+        }
+      )
+      syncUpdateField(fieldCopy)
+    }
+  }
+
+  const onDeleteExam = (field: any, examId: number) => {
+    if (
+      confirm(
+        "Are you sure to delete this content?"
+      ) == true
+    ) {
+      const fieldCopy = { ...field };
+      fieldCopy.exams = fieldCopy.exams.filter(
+        (exam: any) => {
+          return exam.id != examId
+        }
+      )
+      syncUpdateField(fieldCopy)
+    }
+  }
   return (
     <div className="w-[100%] md:w-[80%] 2xl:w-[70%] mx-auto flex flex-col items-center">
       <Modal
@@ -1007,40 +1042,7 @@ const DetailClassGrades = () => {
                                     <div
                                       className="flex items-center hover:text-blue-500 hover:cursor-pointer"
                                       onClick={() => {
-                                        if (
-                                          confirm(
-                                            "Are you sure to delete this content?"
-                                          ) == true
-                                        ) {
-                                          const fieldCopy = field;
-                                          fieldCopy.exams = fieldCopy.exams.filter(
-                                            (exam: any) => {
-                                              return exam.id != content.id
-                                            }
-                                          )
-                                          const nextFields = fields.map((field) => {
-                                            if (field.id == fieldCopy.id) {
-                                              return fieldCopy;
-                                            }
-                                            return field
-                                          })
-                                          //update form fields
-                                          const nextFormFields = formFields.map((field) => {
-                                            if (field.id == fieldCopy.id) {
-                                              return fieldCopy;
-                                            }
-                                            return field
-                                          })
-                                          setFormFields(nextFormFields)
-                                          setFields(nextFields)
-                                          // const result = fieldsContents.filter(
-                                          //   (field) => {
-                                          //     return field.id !== content.id;
-                                          //   }
-                                          // );
-
-                                          // setFieldsContents(result);
-                                        }
+                                        onDeleteExam(field, content.id)
                                       }}
                                     >
                                       <MdDelete size={25} />
@@ -1049,7 +1051,30 @@ const DetailClassGrades = () => {
                                 }
                                 style={{ width: 280 }}
                               >
-                                <p>Due: {content?.dueDate}</p>
+                                <div className="flex items-center justify-between">
+                                  <p>Due: {content?.dueDate.substring(0, 10)}</p>
+                                  {
+                                    content?.isFinalized
+                                      ?
+                                      <Button
+                                        type="primary"
+                                        htmlType="button"
+                                        disabled
+                                        ghost
+                                      >
+                                        Finalized
+                                      </Button>
+                                      : <Button
+                                        type="primary"
+                                        htmlType="button"
+                                        onClick={() => {
+                                          onFinalize(field, content.id)
+                                        }}
+                                      >
+                                        Finalize
+                                      </Button>
+                                  }
+                                </div>
                               </Card>
                             );
                           }

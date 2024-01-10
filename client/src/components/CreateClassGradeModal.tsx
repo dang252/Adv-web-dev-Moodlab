@@ -136,12 +136,17 @@ const CreateClassGradeModal = (props: PropType) => {
         <Col xs={{ span: 7 }} md={{ span: 5 }} xxl={{ span: 4 }}>
           <Form.Item>
             <div className="flex justify-end gap-3">
-              <MinusCircleOutlined
+              <Button
+                danger
+                type="primary"
+                htmlType="button"
                 onClick={() => {
                   // console.log("DELETE", name);
                   handleRemoveFeild(name);
                 }}
-              />
+              >
+                Remove
+              </Button>
               {/* <Button
                 type="primary"
                 htmlType="button"
