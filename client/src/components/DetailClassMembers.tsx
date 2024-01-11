@@ -13,6 +13,7 @@ import { RootState } from "../redux/store";
 const DetailClassMembers = () => {
 
   const [teachers, setTeachers] = useState<string[]>([])
+  const [otherTeachers, setotherTeachers] = useState<string[]>([])
   const [students, setStudents] = useState<string[]>([])
 
 
@@ -28,9 +29,13 @@ const DetailClassMembers = () => {
         // const teacherList = response.data.teacher.map((t: any) => {
         //   return t.firstName + t.lastName
         // })
+        console.log(response.data)
         setTeachers([response?.data?.classMembers.teacher.firstName + " " + response?.data?.classMembers.teacher.lastName])
         setStudents(response?.data?.classMembers.students.map((student: any) => {
           return student.student.firstName + " " + student.student.lastName;
+        }))
+        setotherTeachers(response?.data?.otherTeachers.map((teacher: any) => {
+          return teacher.student.firstName + " " + teacher.student.lastName;
         }))
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
@@ -40,6 +45,9 @@ const DetailClassMembers = () => {
 
     getClassMembers()
   }, [classId])
+
+  console.log(otherTeachers);
+
   return (
     <div className="w-[100%] 2xl:w-[70%] mx-auto flex flex-col">
       <div className="mt-10">
@@ -68,9 +76,39 @@ const DetailClassMembers = () => {
               </div>
             );
           })}
+
         </div>
       </div>
-
+      {
+        otherTeachers && otherTeachers.length != 0 &&
+        otherTeachers.map((teacher) => {
+          return (
+            <div className="mt-20">
+              <div className="flex items-center justify-between">
+                <p className="text-2xl text-blue-500 font-bold">Teaching Assistant</p>
+                <div>
+                  <UserAddOutlined className="text-2xl hover:cursor-pointer hover:text-blue-500" />
+                </div>
+              </div>
+              <div className="w-[100%] h-[2px] bg-blue-500 my-5"></div>
+              <div className="flex flex-col gap-10">
+                <div key={uuidv4()} className="flex items-center justify-between">
+                  <div className="flex items-center gap-5">
+                    <Avatar size={40} icon={<UserOutlined />} />
+                    <p>{teacher}</p>
+                  </div>
+                  <UserDeleteOutlined
+                    className="text-2xl hover:cursor-pointer hover:text-blue-500"
+                    onClick={() => {
+                      //
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          )
+        })
+      }
       <div className="mt-20">
         <div className="flex items-center justify-between">
           <p className="text-2xl text-blue-500 font-bold">Students</p>
