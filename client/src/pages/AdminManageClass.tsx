@@ -11,6 +11,7 @@ interface ClassData {
   name: string;
   inviteCode: string;
   status: string;
+  classId: number;
   rawData: RawClassData
 }
 
@@ -136,6 +137,7 @@ const AdminManageClass = (props: PropType) => {
             teacherName: classInfo.teacherId,
             inviteCode: classInfo.inviteCode,
             status: classInfo.status,
+            classId: classInfo.id,
             rawData: classInfo
           })
         })
@@ -155,6 +157,12 @@ const AdminManageClass = (props: PropType) => {
       title: "#",
       dataIndex: "order",
       key: "order",
+      render: (text) => <p>{text}</p>,
+    },
+    {
+      title: "Class Id",
+      dataIndex: "classId",
+      key: "classId",
       render: (text) => <p>{text}</p>,
     },
     {

@@ -66,37 +66,31 @@ const templateDownloadItems: MenuProps["items"] = [
   },
 ];
 
-// const getFieldContentByIdLength = (source: any[], fieldId: number) => {
-//   return source.filter((content) => {
-//     return content.fieldId === fieldId;
-//   }).length;
-// };
-
-// const findMaxExamGrades = (data: any[]) => {
-//   let max = data[0].length;
-
-//   for (let i = 0; i < data.length; ++i) {
-//     if (data[i].length > max) {
-//       max = data[i];
-//     }
-//   }
-
-//   return max;
-// };
-
 const findMaxExamGrades = (data: any[]) => {
-  let max = data[0].length;
-  let maxElement: any = data[0];
+  let max = data[0];
 
   for (let i = 0; i < data.length; ++i) {
-    if (data[i].length > max) {
-      max = data[i].length;
-      maxElement = data[i];
+    if (data[i].length > max.length) {
+      max = data[i];
     }
   }
 
-  return maxElement;
+  return max;
 };
+
+// const findMaxExamGrades = (data: any[]) => {
+//   let max = data[0].length;
+//   let maxElement: any = data[0];
+
+//   for (let i = 0; i < data.length; ++i) {
+//     if (data[i].length > max) {
+//       max = data[i].length;
+//       maxElement = data[i];
+//     }
+//   }
+
+//   return maxElement;
+// };
 
 const getExamPoint = (examName: string, studentGrades: any[]) => {
   for (let i = 0; i < studentGrades.length; ++i) {
@@ -144,13 +138,12 @@ const DetailClassGrades = () => {
     (state) => state.classes.detailClassGrades
   );
 
-  const getClassGradeStructure = async () => {
+  const getClassGrade = async () => {
     try {
       const accessToken = localStorage
         .getItem("accessToken")
         ?.toString()
         .replace(/^"(.*)"$/, "$1");
-
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/classes/${detailClass?.id}/grades`,
         {
@@ -159,7 +152,6 @@ const DetailClassGrades = () => {
           },
         }
       );
-      console.log("get class all grades structure", response.data)
       setFields(response.data);
       setFormFields(response.data);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -173,7 +165,7 @@ const DetailClassGrades = () => {
   //load grade on enter
   useEffect(() => {
     // setFields(data);
-    getClassGradeStructure();
+    getClassGrade();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -335,7 +327,7 @@ const DetailClassGrades = () => {
       if (formFields.length === 0) toast.success("Create grades successfully");
       if (formFields.length !== 0) toast.success("Update grades successfully");
 
-      getClassGradeStructure()
+      getClassGrade()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setFormFields(fields);
@@ -940,19 +932,10 @@ const DetailClassGrades = () => {
           danger
           onClick={() => {
             setShowAllGrades(true);
-            // console.log(grades);
           }}
         >
           View All Grades
         </Button>
-        {/* <Button
-          icon={<DownloadOutlined />}
-          onClick={() => {
-            handleDownloadGradesTemplate(SHEET_STUDENTS_GRADES_COLUMN);
-          }}
-        >
-          Download Grades Template
-        </Button> */}
         <Dropdown menu={templateDownloadMenuProps}>
           <Button>
             <Space>
