@@ -70,7 +70,7 @@ export class ExamService {
 
       for (let i = 0; i < points.length; i++) {
         let point = points[i];
-        await this.prisma.point.update({
+        const updatedPoint = await this.prisma.point.update({
           where: {
             studentId_examId: {
               studentId: point.studentId,
@@ -81,6 +81,16 @@ export class ExamService {
             point: point.point,
           },
         });
+
+        if (updatedPoint == null) {
+          await this.prisma.point.create({
+            data: {
+              studentId: point.studentId,
+              examId: parseInt(examId),
+              point: point.point,
+            },
+          });
+        }
       }
 
       return res.status(HttpStatus.OK).send(HTTP_MSG_SUCCESS);
