@@ -39,6 +39,7 @@ const JoinClassModal = (props: PropType) => {
       .then(() => {
         console.log("f")
         navigate(`/dashboard/classes/${values.classCode}`)
+        setIsModalJoinOpen(false)
       })
       .catch(() => {
         toast.error("Join class failed! try again later");

@@ -555,6 +555,7 @@ const DetailClassGrades = () => {
         }
       );
       toast.success("Save data successfully");
+      setIsSaveData(true);
     }
     catch (error) {
       toast.error("Cannot save right now! try again later!");
@@ -844,7 +845,7 @@ const DetailClassGrades = () => {
 
             <Button
               onClick={() => {
-                setIsSaveData(true);
+                // setIsSaveData(true);
                 handleSaveDetailContentData(Number(targetContent?.id));
               }}
             >

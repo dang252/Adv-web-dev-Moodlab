@@ -287,8 +287,17 @@ export const getClassAllGrades = createAsyncThunk(
 
   async (classId: number, thunkAPI) => {
     try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/classes/${classId}/points`
+        `${import.meta.env.VITE_API_URL}/classes/${classId}/points`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
       );
 
       return response.data;
@@ -356,6 +365,34 @@ export const postClassReview = createAsyncThunk(
     }
   }
 );
+
+export const getClassAllNotification = createAsyncThunk(
+  "class/getClassAllNotification",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+  async (classId: number, thunkAPI) => {
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/notification`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      return response.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
 
 const classReducer = createReducer(initialState, (builder) => {
   builder

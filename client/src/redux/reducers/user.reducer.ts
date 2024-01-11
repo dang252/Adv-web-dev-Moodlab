@@ -22,6 +22,7 @@ export interface UserState {
   firstname: string;
   lastname: string;
   role: string;
+  notification: any[];
   isDarkMode: boolean;
   isLoading: boolean; // global variable
   isError: boolean; // global variable
@@ -184,6 +185,33 @@ export const refresh = createAsyncThunk(
   }
 );
 
+export const getAllNotification = createAsyncThunk(
+  "class/getAllNotification",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+  async (_, thunkAPI) => {
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/notification`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      return response.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
 export const logoutAccount = createAsyncThunk(
   "user/logout_account",
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -229,6 +257,7 @@ const initialState: UserState = {
   firstname: "",
   lastname: "",
   role: "",
+  notification: [],
   isDarkMode: false,
   isLoading: false,
   isError: false,
@@ -269,15 +298,10 @@ const userReducer = createReducer(initialState, (builder) => {
     })
     .addCase(getUser.rejected, () => {
     })
-    .addCase(putUser.fulfilled, () => {
-      // console.log("payload", action.payload)
-      // if (action.payload) {
-      //   state.lastname = action.payload.lastName;
-      //   state.firstname = action.payload.firstName;
-      //   state.email = action.payload.email;
-      //   state.role = action.payload.role;
-      //   state.studentId = action.payload.studentId;
-      // } 
+    .addCase(getAllNotification.fulfilled, (state, action) => {
+      if (action.payload) {
+        state.notification = action.payload
+      }
     })
     .addCase(getUser.fulfilled, (state, action) => {
       // console.log("payload", action.payload)

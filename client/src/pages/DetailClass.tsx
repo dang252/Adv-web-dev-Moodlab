@@ -20,6 +20,7 @@ import DetailClassMembers from "../components/DetailClassMembers";
 import DetailClassGrades from "../components/DetailClassGrades";
 
 import { ClassType } from "../types/classroom";
+import DetailClassGradesStudent from "../components/DetailClassGradesStudent";
 
 interface PropType {
   isDarkMode: boolean;
@@ -130,11 +131,11 @@ const DetailClass = (props: PropType) => {
       label: "Members",
       children: <DetailClassMembers />,
     },
-    // {
-    //   key: "3",
-    //   label: "Grades",
-    //   children: <DetailClassGrades />,
-    // },
+    {
+      key: "3",
+      label: "Grades",
+      children: <DetailClassGradesStudent />,
+    },
   ];
 
   const teacherItems: TabsProps["items"] = [
