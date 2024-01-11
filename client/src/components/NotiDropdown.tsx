@@ -9,42 +9,27 @@ import { useAppSelector } from "../redux/hooks";
 
 const NotiDropdown = () => {
   const notifications = useAppSelector((state) => state.persisted.users.notification)
-  const items: MenuProps["items"] = [
-    // {
-    //   label: (
-    //     <div className="p-2 rounded-md flex items-center justify-between hover:cursor-pointer">
-    //       <div className="flex items-center">
-    //         <div>
-    //           <Avatar size={50} icon={<UserOutlined />} />
-    //         </div>
-    //         <div className="flex flex-col ml-3">
-    //           <p className="text-sm leading-none mt-1">
-    //             Minh Trí đã yêu cầu tham gia lớp học: Quên đi một người
-    //           </p>
-    //         </div>
-    //       </div>
-    //     </div>
-    //   ),
-    //   key: "1",
-    // },
-    // {
-    //   label: (
-    //     <div className="p-2 rounded-md flex items-center justify-between hover:cursor-pointer">
-    //       <div className="flex items-center">
-    //         <div>
-    //           <Avatar size={50} icon={<UserOutlined />} />
-    //         </div>
-    //         <div className="flex flex-col ml-3">
-    //           <p className="text-sm leading-none mt-1">
-    //             Minh Trí đã yêu cầu tham gia lớp học: Một ngày không có em
-    //           </p>
-    //         </div>
-    //       </div>
-    //     </div>
-    //   ),
-    //   key: "2",
-    // },
-  ];
+  const items: MenuProps["items"] = notifications.map((noti, index) => {
+    return (
+      {
+        label: (
+          <div className="p-2 rounded-md flex items-center justify-between hover:cursor-pointer">
+            <div className="flex items-center">
+              <div>
+                <Avatar size={50} icon={<UserOutlined />} />
+              </div>
+              <div className="flex flex-col ml-3">
+                <p className="text-sm leading-none mt-1">
+                  {noti}
+                </p>
+              </div>
+            </div>
+          </div>
+        ),
+        key: index,
+      }
+    )
+  })
 
   return (
     <Dropdown menu={{ items }} trigger={["click"]}>
