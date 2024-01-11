@@ -1,12 +1,14 @@
 import { Avatar, Dropdown, Badge } from "antd";
 import type { MenuProps } from "antd";
 import { UserOutlined, BellOutlined } from "@ant-design/icons";
+import { useAppSelector } from "../redux/hooks";
 
 // interface PropType {
 //   isDarkMode: boolean;
 // }
 
 const NotiDropdown = () => {
+  const notifications = useAppSelector((state) => state.persisted.users.notification)
   const items: MenuProps["items"] = [
     // {
     //   label: (
@@ -47,7 +49,7 @@ const NotiDropdown = () => {
   return (
     <Dropdown menu={{ items }} trigger={["click"]}>
       <Badge
-        count={0}
+        count={notifications.length}
         className="relative hover:cursor-pointer hover:text-blue-500"
       >
         <BellOutlined className="text-2xl" />

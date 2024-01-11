@@ -21,6 +21,7 @@ import DetailClassGrades from "../components/DetailClassGrades";
 
 import { ClassType } from "../types/classroom";
 import DetailClassGradesStudent from "../components/DetailClassGradesStudent";
+import { getAllNotification } from "../redux/reducers/user.reducer";
 
 interface PropType {
   isDarkMode: boolean;
@@ -96,29 +97,25 @@ const DetailClass = (props: PropType) => {
       await dispatchAsync(getClassAllGrades(classId));
     };
 
-    if (detailClass?.id) {
-      handleGetClassAllGrades(detailClass.id);
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [detailClass]);
-
-  useEffect(() => {
-    const handleGetClassAllGrades = async (classId: number) => {
+    const handleGetClassAllReviews = async (classId: number) => {
       // console.log("REVIEWS:", classId);
       await dispatchAsync(getClassAllReviews(classId));
     };
 
+    const handleGetNotification = async () => {
+      // console.log("REVIEWS:", classId);
+      await dispatchAsync(getAllNotification());
+    };
+
     if (detailClass?.id) {
       handleGetClassAllGrades(detailClass.id);
+      handleGetClassAllReviews(detailClass.id);
+      handleGetNotification();
     }
+
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [detailClass]);
-
-  // const onChange = (key: string) => {
-  //   console.log(key);
-  // };
 
   const studentItems: TabsProps["items"] = [
     {

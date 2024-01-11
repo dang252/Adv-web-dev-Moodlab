@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 
 import { Button, Form, Input, Row, Col, InputNumber } from "antd";
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 
 import { MdDragIndicator } from "react-icons/md";
 import { toast } from "react-toastify";

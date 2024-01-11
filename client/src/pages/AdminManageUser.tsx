@@ -163,33 +163,35 @@ const AdminManageUser = (props: PropType) => {
 
   const columns: ColumnsType<UserData> = [
     {
-      title: "#",
-      dataIndex: "order",
-      key: "order",
-      render: (text) => <p>{text}</p>,
-    },
-    {
       title: "Account ID",
       dataIndex: "accountId",
       key: "accountId",
+      sorter: (a, b) => a.accountId - b.accountId,
+      sortDirections: ['ascend', 'descend'],
       render: (text) => <p>{text}</p>,
     },
     {
       title: "Username",
       dataIndex: "username",
       key: "username",
+      sorter: (a, b) => ('' + a.username).localeCompare(b.username),
+      sortDirections: ['ascend', 'descend'],
       render: (text) => <p>{text}</p>,
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
+      sorter: (a, b) => ('' + a.email).localeCompare(b.email),
+      sortDirections: ['ascend', 'descend'],
       render: (text) => <p>{text}</p>,
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
+      sorter: (a, b) => ('' + a.status).localeCompare(b.status),
+      sortDirections: ['ascend', 'descend'],
       render: (text) => <p>{text}</p>,
     },
     {

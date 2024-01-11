@@ -597,17 +597,18 @@ const DetailClassGrades = () => {
     const { id, name, grades } = values;
     let key = null;
 
-    if (contentList.length === 0) key = 1;
-    if (contentList.length !== 0) key = contentList.length + 1;
+    if (data.length === 0) key = 1;
+    if (data.length !== 0) key = data.length + 1;
 
     const newDetail = {
-      "#": key,
-      ID: Number(id),
-      Name: name,
-      Grades: Number(grades),
+      key: key,
+      id: Number(id),
+      name: name,
+      grades: Number(grades),
     };
+    console.log("new detail", newDetail)
 
-    setContentList([...contentList, newDetail]);
+    setData([...data, newDetail]);
 
     createDetailContentForm.resetFields();
 
@@ -1018,7 +1019,12 @@ const DetailClassGrades = () => {
                                     <Button
                                       type="primary"
                                       onClick={() => {
-                                        showModifyContentModal(content);
+                                        if (!isNaN(content?.id)) {
+                                          showModifyContentModal(content);
+                                        }
+                                        else {
+                                          toast.error("Cant modify now! Please save first")
+                                        }
                                       }}
                                     >
                                       Modify

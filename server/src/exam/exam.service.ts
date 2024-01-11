@@ -12,7 +12,7 @@ import { PointDto, ReviewDto } from './dto';
 
 @Injectable()
 export class ExamService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   // [GET] /:examId
   async getExamGrade(examId: string, res: Response) {
@@ -70,15 +70,11 @@ export class ExamService {
 
       for (let i = 0; i < points.length; i++) {
         let point = points[i];
-        const updatedPoint = await this.prisma.point.update({
+
+        const updatedPoint = await this.prisma.point.findFirst({
           where: {
-            studentId_examId: {
-              studentId: point.studentId,
-              examId: parseInt(examId),
-            },
-          },
-          data: {
-            point: point.point,
+            studentId: point.studentId,
+            examId: parseInt(examId),
           },
         });
 
@@ -91,10 +87,24 @@ export class ExamService {
             },
           });
         }
+        else {
+          await this.prisma.point.update({
+            where: {
+              studentId_examId: {
+                studentId: point.studentId,
+                examId: parseInt(examId),
+              },
+            },
+            data: {
+              point: point.point,
+            },
+          });
+        }
       }
 
       return res.status(HttpStatus.OK).send(HTTP_MSG_SUCCESS);
     } catch (error) {
+      console.log(error)
       // If the error has a status property, set the corresponding HTTP status code
       if (error.status) {
         console.log(

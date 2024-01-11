@@ -326,8 +326,13 @@ export const getClassAllReviews = createAsyncThunk(
           },
         }
       );
-
-      return response.data;
+      const reviews = [...response.data.reviews]
+      reviews.sort(function (a, b) {
+        return -(a.id - b.id) || a.name.localeCompare(b.name);
+      });
+      // return reviews;
+      // console.log(reviews)
+      return { ...response.data, reviews: reviews }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error);

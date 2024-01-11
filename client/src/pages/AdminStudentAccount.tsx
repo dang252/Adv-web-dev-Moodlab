@@ -1,5 +1,4 @@
-import { Button, Form, Input, InputNumber, Popconfirm, Space, Table, Typography } from "antd";
-import { ColumnsType } from "antd/es/table";
+import { Button, Form, Input, InputNumber, Popconfirm, Table, Typography } from "antd";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -142,7 +141,7 @@ const AdminStudentAccount = (props: PropType) => {
     getAllUser();
   }, [])
 
-  const save = async (key: React.Key) => {
+  const save = async () => {
     // try {
     //   const row = (await form.validateFields()) as UserData;
 
@@ -204,7 +203,7 @@ const AdminStudentAccount = (props: PropType) => {
             {editable ? (
               <span>
                 <Typography.Link
-                  onClick={() => save(record.key)}
+                  onClick={() => save()}
                   style={{ marginRight: 8 }}
                 >
                   Save
