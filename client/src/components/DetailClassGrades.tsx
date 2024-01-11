@@ -595,7 +595,7 @@ const DetailClassGrades = () => {
       const url = window.URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = `${targetField.name}.xlsx`;
+      anchor.download = `${targetContent?.name}.xlsx`;
       anchor.click();
       window.URL.revokeObjectURL(url);
     });

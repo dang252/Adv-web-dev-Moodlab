@@ -36,16 +36,7 @@ import {
   SHEET_STUDENTS_GRADES_COLUMN,
   SHEET_GRADES_COLUMN,
 } from "../utils/grades";
-
-type FieldType = {
-  name?: string;
-};
-
-type AddDetailContentType = {
-  id?: string;
-  name?: string;
-  grades?: number;
-};
+import ContentTableStudent from "./ContentTableStudent";
 
 interface FieldContentType {
   id: string;
@@ -99,12 +90,12 @@ const DetailClassGradesStudent = () => {
   const [createFieldContentModal, setCreateFieldContentModal] = useState(false);
   const [targetField, setTargetField] = useState<any>(null);
 
-  const [contentList, setContentList] = useState<any[]>([]);
   const [modifyContentModal, setModifyContentModal] = useState(false);
   const [targetContent, setTargetContent] = useState<FieldContentType | null>(
     null
   );
   const [data, setData] = useState<any[]>([]);
+  const [excelData, setExcelData] = useState<any[]>([]);
 
   const [fields, setFields] = useState<any[]>([]);
 
@@ -308,7 +299,7 @@ const DetailClassGradesStudent = () => {
 
     sheet.columns = SHEET_STUDENTS_GRADES_COLUMN;
 
-    data?.map((d) => {
+    excelData?.map((d) => {
       sheet.addRow({
         ["#"]: d.key,
         ID: d.id,
@@ -319,15 +310,15 @@ const DetailClassGradesStudent = () => {
 
     console.log(sheet);
 
-    workbook.xlsx.writeBuffer().then(function (data) {
-      const blob = new Blob([data], {
+    workbook.xlsx.writeBuffer().then(function (excelData) {
+      const blob = new Blob([excelData], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
 
       const url = window.URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = `${targetField.name}.xlsx`;
+      anchor.download = `${targetContent?.name}.xlsx`;
       anchor.click();
       window.URL.revokeObjectURL(url);
     });
@@ -355,6 +346,7 @@ const DetailClassGradesStudent = () => {
       return response.data.points
     }
     catch (error) {
+      toast.error("Can't get result now! Try again later!")
       return null
     }
   }
@@ -371,48 +363,17 @@ const DetailClassGradesStudent = () => {
           grades: data.point
         })
       })
-      setData(mapDataToExcel)
+      setExcelData(mapDataToExcel)
+      setData(loadedData)
+      setModifyContentModal(true);
+      setTargetContent(content);
     }
-    setModifyContentModal(true);
-    setTargetContent(content);
   };
 
   const onClose = () => {
     setModifyContentModal(false);
     setTargetContent(null);
-    setContentList([]);
     setData([]);
-  };
-
-  const handleDownloadGradesTemplate = (SHEET_COLUMN: any[]) => {
-    const workbook = new ExcelJS.Workbook();
-
-    const sheet = workbook.addWorksheet("Grades");
-
-    sheet.properties.defaultRowHeight = 20;
-
-    sheet.columns = SHEET_COLUMN;
-
-    workbook.xlsx.writeBuffer().then(function (data) {
-      const blob = new Blob([data], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-
-      const url = window.URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = `template.xlsx`;
-      anchor.click();
-      window.URL.revokeObjectURL(url);
-    });
-  };
-
-  const handleMenuClick: MenuProps["onClick"] = (e) => {
-    const { key } = e;
-    console.log("click", key);
-
-    if (key === "1") handleDownloadGradesTemplate(SHEET_GRADES_COLUMN);
-    if (key === "2") handleDownloadGradesTemplate(SHEET_STUDENTS_GRADES_COLUMN);
   };
 
   return (
@@ -528,14 +489,12 @@ const DetailClassGradesStudent = () => {
       >
         <div className={`${isDarkMode ? "text-white" : "text-black"}`}>
           <p className="text-center text-2xl font-bold my-5">
-            Modify Grades of {targetContent?.name}
+            Result of {targetContent?.name}
           </p>
 
-          <ContentTable
-            contentList={contentList}
-            setContentList={setContentList}
+          <ContentTableStudent
             data={data}
-            setData={setData}
+            isDarkMode={isDarkMode} colorBgContainer={""}
           />
         </div>
       </Drawer>
@@ -598,6 +557,7 @@ const DetailClassGradesStudent = () => {
                                     <Button
                                       type="primary"
                                       onClick={() => {
+                                        setTargetField(field);
                                         showModifyContentModal(content);
                                       }}
                                     >

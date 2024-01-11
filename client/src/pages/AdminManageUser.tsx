@@ -3,8 +3,6 @@ import { Button, Space, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useSelector } from "react-redux";
-import { RootState } from "../redux/store";
 
 interface UserData {
   key: string;
