@@ -1,5 +1,4 @@
-import { Modal, Button, Form, Input, Avatar } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { Modal, Button, Form, Input } from "antd";
 import { useAppDispatch } from "../redux/hooks";
 import { getInviteCode } from "../redux/reducers/class.reducer";
 import { useNavigate } from "react-router-dom";
@@ -39,6 +38,7 @@ const JoinClassModal = (props: PropType) => {
       .then(() => {
         console.log("f")
         navigate(`/dashboard/classes/${values.classCode}`)
+        setIsModalJoinOpen(false)
       })
       .catch(() => {
         toast.error("Join class failed! try again later");

@@ -8,6 +8,8 @@ import {
   Form,
   Empty,
   Modal,
+  InputNumber,
+  Select,
 } from "antd";
 import {
   InfoOutlined,
@@ -15,13 +17,14 @@ import {
   UserOutlined,
   CopyOutlined,
 } from "@ant-design/icons";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "../redux/hooks";
 import {
   editClassTheme,
+  getClassAllReviews,
   getDetailClass,
   inviteToClassByEmail,
 } from "../redux/reducers/class.reducer";
@@ -35,6 +38,7 @@ import { ClassType, Review } from "../types/classroom";
 
 import PostCard from "./PostCard";
 import ClassNewEditModal from "./ClassNewEditModal";
+import axios from "axios";
 
 const { TextArea } = Input;
 
@@ -46,27 +50,7 @@ interface PropType {
   detailClass: ClassType | null;
 }
 
-// const postList: Post[] = [
-//   {
-//     id: 1,
-//     name: "sadboiz phu nhuan",
-//     content:
-//       "She had been an angel for coming up on 10 years and in all that time nobody had told her this was possible. The fact that it could ever happen never even entered her mind. Yet there she stood, with the undeniable evidence sitting on the ground before her. Angels could lose their wings.",
-//     time: "15:52",
-//     comments: [],
-//   },
-//   {
-//     id: 2,
-//     name: "your memory",
-//     content:
-//       "He had disappointed himself more than anyone else. That wasn't to say that he hadn't disappointed others. The fact was that he had disappointed a lot of people who were close to him. The fact that they were disappointed in him was something that made him even more disappointed in himself. Yet here he was, about to do the exact same things that had caused all the disappointment in the first place because he didn't know what else to do.",
-//     time: "8:35",
-//     comments: [],
-//   },
-// ];
-
 const DetailClassNews = (props: PropType) => {
-  const location = useLocation();
 
   const getUrl = () => {
     const url = window.location.href.split("/")
@@ -100,8 +84,36 @@ const DetailClassNews = (props: PropType) => {
   );
 
   //==================== Post form
-  const onFinish = (values: any) => {
-    console.log(values);
+  const onFinish = async (values: any) => {
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/exam/${values.examId}/review`,
+        {
+          expectationPoint: values.expectedPoint,
+          explaination: values.desc,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      toast.success(
+        "Create Request successfully"
+      );
+      // console.log(response.data)
+      await dispatchAsync(getClassAllReviews(Number(classId)));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.log(error)
+      toast.error(
+        "Can't create review request right now! try again later!"
+      );
+    }
     form.resetFields();
     setOpenCreateNoti(false);
   };
@@ -178,6 +190,49 @@ const DetailClassNews = (props: PropType) => {
       }
 
       form.resetFields();
+    }
+  };
+
+  type Options = {
+    value: string;
+    label: string;
+  }
+
+  const [examOptions, setExamOptions] = useState<Options[]>([]);
+
+  const getClassGrade = async () => {
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/classes/${detailClass?.id}/grades`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      // console.log(response.data)
+      const options: Options[] = []
+      for (let i = 0; i < response.data.length; i++) {
+        if (response.data[i].exams) {
+          for (let j = 0; j < response.data[i].exams.length; j++) {
+            options.push({
+              value: response.data[i].exams[j].id,
+              label: response.data[i].exams[j].name,
+            })
+          }
+        }
+      }
+      setExamOptions(options)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.log(error)
+      toast.error(
+        "Can not see grade structure for now! Please try again later"
+      );
     }
   };
 
@@ -333,13 +388,14 @@ const DetailClassNews = (props: PropType) => {
                 }`}
               hoverable
               onClick={() => {
+                getClassGrade();
                 setOpenCreateNoti(true);
               }}
             >
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-5">
                   <Avatar size={50} icon={<UserOutlined />} />
-                  <p>Create notification for your classrooms</p>
+                  <p>Create new review request</p>
                 </div>
                 <div className="text-2xl">
                   <MdOutlineAddToPhotos />
@@ -353,14 +409,43 @@ const DetailClassNews = (props: PropType) => {
             >
               <div className="flex flex-col gap-5">
                 <Form form={form} name="post-form" onFinish={onFinish}>
-                  <Form.Item name="post" rules={[{ required: true }]}>
+                  <Form.Item
+                    name="examId"
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Please select an option!',
+                      },
+                    ]}
+                  >
+                    <Select
+                      options={examOptions}
+                      className={`${isDarkMode
+                        ? "bg-zinc-800 hover:bg-zinc-900"
+                        : "bg-gray-100 hover:bg-gray-200"
+                        }`}
+                      placeholder="Enter choose exam to review"
+                    />
+                  </Form.Item>
+                  <Form.Item name="expectedPoint" rules={[{ required: true }]}>
+                    <InputNumber
+                      min={1} max={10}
+
+                      className={`${isDarkMode
+                        ? "bg-zinc-800 hover:bg-zinc-900"
+                        : "bg-gray-100 hover:bg-gray-200"
+                        } w-full`}
+                      placeholder="Enter you expected point"
+                    />
+                  </Form.Item>
+                  <Form.Item name="desc" rules={[{ required: true }]}>
                     <TextArea
                       className={`${isDarkMode
                         ? "bg-zinc-800 hover:bg-zinc-900"
                         : "bg-gray-100 hover:bg-gray-200"
                         }`}
                       rows={4}
-                      placeholder="Notify something new for your classroom"
+                      placeholder="Description"
                     />
                   </Form.Item>
 
@@ -389,7 +474,7 @@ const DetailClassNews = (props: PropType) => {
           <div className="mt-5 w-[100%] flex flex-col gap-5">
             {reviews.length !== 0 ? (
               reviews.map((review) => {
-                return <PostCard key={review.id} review={review} />;
+                return <PostCard key={review.id} review={review} classId={classId} />;
               })
             ) : (
               <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />

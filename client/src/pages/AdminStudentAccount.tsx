@@ -1,28 +1,44 @@
-import { Button, Form, Input, InputNumber, Popconfirm, Space, Table, Typography } from "antd";
-import { ColumnsType } from "antd/es/table";
+import { Button, Form, Input, InputNumber, Popconfirm, Table, Typography } from "antd";
+import axios from "axios";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 interface PropType {
   isDarkMode: boolean;
   colorBgContainer: string;
 }
 
-interface DataType {
+interface UserData {
   key: string;
   order: number;
   accountId: number;
   studentId: string;
+  username: string;
   name: string;
-  editable?: boolean;
+  email: string;
+  status: string;
+  rawData: ResponseUser;
 }
 
+interface ResponseUser {
+  id: number;
+  studentId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  account: {
+    username: string;
+    status: string;
+  }
+}
 
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   editing: boolean;
   dataIndex: string;
   title: any;
   inputType: "number" | "text";
-  record: DataType;
+  record: UserData;
   index: number;
   children: React.ReactNode;
 }
@@ -61,10 +77,10 @@ const EditableCell: React.FC<EditableCellProps> = ({
   );
 };
 
-const data: DataType[] = []
-
 const AdminStudentAccount = (props: PropType) => {
   const { isDarkMode } = props;
+
+  const [data, setData] = useState([])
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -73,9 +89,9 @@ const AdminStudentAccount = (props: PropType) => {
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState("");
 
-  const isEditing = (record: DataType) => record.key === editingKey;
+  const isEditing = (record: UserData) => record.key === editingKey;
 
-  const edit = (record: Partial<DataType> & { key: React.Key }) => {
+  const edit = (record: Partial<UserData> & { key: React.Key }) => {
     form.setFieldsValue({ order: "", id: "", name: "", grades: "", ...record });
     setEditingKey(record.key);
   };
@@ -84,9 +100,50 @@ const AdminStudentAccount = (props: PropType) => {
     setEditingKey("");
   };
 
-  const save = async (key: React.Key) => {
+  useEffect(() => {
+    const getAllUser = async () => {
+      try {
+        const accessToken = localStorage
+          .getItem("accessToken")
+          ?.toString()
+          .replace(/^"(.*)"$/, "$1");
+
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/user`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        const rawData = response.data.filter((user: ResponseUser) => (user.role != "ADMIN" && user.role != "TEACHER"))
+        const mapUserData = rawData.map((user: ResponseUser, index: number) => {
+          return ({
+            key: index + 1,
+            order: index + 1,
+            accountId: user.id,
+            studentId: user.studentId,
+            username: user.account.username,
+            name: user.firstName + " " + user.lastName,
+            email: user.email,
+            status: user.account.status,
+            rawData: user
+          })
+        })
+        setData(mapUserData)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        toast.error(
+          "Cannot get users data right now! Try again later!"
+        );
+      }
+    }
+    getAllUser();
+  }, [])
+
+  const save = async () => {
     // try {
-    //   const row = (await form.validateFields()) as DataType;
+    //   const row = (await form.validateFields()) as UserData;
 
     //   const newData = [...data];
     //   const index = newData.findIndex((item) => key === item.key);
@@ -118,7 +175,7 @@ const AdminStudentAccount = (props: PropType) => {
     },
     {
       title: "Account Id",
-      dataIndex: "accoutnId",
+      dataIndex: "accountId",
       key: "accountId",
       editable: false,
       render: (text: any) => <p>{text}</p>,
@@ -139,14 +196,14 @@ const AdminStudentAccount = (props: PropType) => {
     {
       title: "Actions",
       dataIndex: "actions",
-      render: (_: any, record: DataType) => {
+      render: (_: any, record: UserData) => {
         const editable = isEditing(record);
         return (
           <div className="flex gap-5">
             {editable ? (
               <span>
                 <Typography.Link
-                  onClick={() => save(record.key)}
+                  onClick={() => save()}
                   style={{ marginRight: 8 }}
                 >
                   Save
@@ -164,28 +221,6 @@ const AdminStudentAccount = (props: PropType) => {
                 Edit
               </Button>
             )}
-
-            {/* <Button
-              type="primary"
-              danger
-              onClick={() => {
-                if (confirm("Are you sure to delete this student?") == true) {
-                  // setData(
-                  //   data.filter((r) => {
-                  //     return r.key !== record.key;
-                  //   })
-                  // );
-
-                  // setContentList(
-                  //   contentList.filter((c) => {
-                  //     return c["#"] !== record.key;
-                  //   })
-                  // );
-                }
-              }}
-            >
-              Delete
-            </Button> */}
           </div>
         );
       },
@@ -198,7 +233,7 @@ const AdminStudentAccount = (props: PropType) => {
     }
     return {
       ...col,
-      onCell: (record: DataType) => ({
+      onCell: (record: UserData) => ({
         record,
         inputType: col.dataIndex === "age" ? "number" : "text",
         dataIndex: col.dataIndex,
@@ -207,30 +242,6 @@ const AdminStudentAccount = (props: PropType) => {
       }),
     };
   });
-
-  const data: readonly any[] = [
-    {
-      key: "1",
-      order: 1,
-      accountId: String(32),
-      studentId: 2113,
-      name: "HS A",
-    },
-    {
-      key: "2",
-      order: 2,
-      accountId: "33",
-      studentId: 2123,
-      name: "HS B",
-    },
-    {
-      key: "3",
-      order: 3,
-      accountId: "35",
-      studentId: 2114,
-      name: "HS C",
-    },
-  ]
 
 
   return (

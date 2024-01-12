@@ -72,7 +72,7 @@ const ContentTable = (props: PropType) => {
 
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState("");
-
+  console.log(data)
   useEffect(() => {
     if (contentList.length !== 0) {
       const newData = contentList.map((student: any) => {

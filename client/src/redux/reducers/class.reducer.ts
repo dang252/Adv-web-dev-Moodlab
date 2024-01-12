@@ -287,8 +287,17 @@ export const getClassAllGrades = createAsyncThunk(
 
   async (classId: number, thunkAPI) => {
     try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/classes/${classId}/points`
+        `${import.meta.env.VITE_API_URL}/classes/${classId}/points`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
       );
 
       return response.data;
@@ -305,8 +314,53 @@ export const getClassAllReviews = createAsyncThunk(
 
   async (classId: number, thunkAPI) => {
     try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/classes/${classId}/reviews`
+        `${import.meta.env.VITE_API_URL}/classes/${classId}/reviews`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      const reviews = [...response.data.reviews]
+      reviews.sort(function (a, b) {
+        return -(a.id - b.id) || a.name.localeCompare(b.name);
+      });
+      // return reviews;
+      // console.log(reviews)
+      return { ...response.data, reviews: reviews }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const postClassReview = createAsyncThunk(
+  "class/getClassAllReviews",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+  async (req: { classId: number, expectationPoint: number, explaination: string }, thunkAPI) => {
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/classes/${req.classId}/reviews`,
+        {
+          expectationPoint: req.expectationPoint,
+          explaination: req.explaination,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
       );
 
       return response.data;
@@ -316,6 +370,7 @@ export const getClassAllReviews = createAsyncThunk(
     }
   }
 );
+
 
 const classReducer = createReducer(initialState, (builder) => {
   builder

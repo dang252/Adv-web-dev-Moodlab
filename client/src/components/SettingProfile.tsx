@@ -2,15 +2,16 @@ import { Card, Avatar, Col, Row, Form, Input, Button } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { IoLogoOctocat } from "react-icons/io";
 import { store } from "../redux/store";
-import { UserState } from "../redux/reducers/user.reducer";
+import { UserState, getUser, putUser } from "../redux/reducers/user.reducer";
+import { useAppDispatch } from "../redux/hooks";
+import { toast } from "react-toastify";
 
 type FieldType = {
   username?: string;
-  name?: string;
+  firstname?: string;
+  lastname?: string;
   email?: string;
-  phone?: string;
-  newPassword?: string;
-  confirm?: string;
+  studentId?: string;
 };
 
 const layout = {
@@ -37,15 +38,29 @@ const tailLayout = {
 };
 
 const SettingProfile = () => {
-  const onFinish = (values: any) => {
-    console.log("Success:", values);
+
+  const user: UserState = store.getState().persisted.users
+
+  const dispatchAsync = useAppDispatch()
+
+  const onFinish = async (values: any) => {
+    try {
+      await dispatchAsync(putUser({
+        ...values,
+        userId: user.userId
+      })).unwrap();
+      await dispatchAsync(getUser()).unwrap();
+      toast.success("Update user profile successfully!")
+    }
+    catch (error) {
+      console.log("update profile error: ", error)
+      toast.error("Can't update user info right now! Please try again later!")
+    }
   };
 
   const onFinishFailed = (errorInfo: any) => {
     console.log("Failed:", errorInfo);
   };
-
-  const user: UserState = store.getState().persisted.users
 
   return (
     <div className="w-[100%] 2xl:w-[70%] mx-auto flex flex-col items-center">
@@ -81,14 +96,15 @@ const SettingProfile = () => {
                   </Col>
                 </Row>
 
-                <Row>
-                  <Col span={10}>
-                    <p className="font-bold">Phone:</p>
-                  </Col>
-                  <Col span={12}>
-                    <p>099999999</p>
-                  </Col>
-                </Row>
+                {user && user.role == "student" &&
+                  <Row>
+                    <Col span={10}>
+                      <p className="font-bold">Student Id:</p>
+                    </Col>
+                    <Col span={12}>
+                      <p>{user.studentId}</p>
+                    </Col>
+                  </Row>}
               </div>
             </div>
             <div className="flex flex-col justify-center items-center gap-5 mx-auto xl:mx-0 text-blue-500">
@@ -105,12 +121,13 @@ const SettingProfile = () => {
           onFinishFailed={onFinishFailed}
           autoComplete="off"
           initialValues={{
-            name: user.firstname + " " + user.lastname,
+            firstname: user.firstname,
+            lastname: user.lastname,
             email: user.email,
-            phone: "019999999",
+            studentId: user.studentId,
             username: user.username,
-            newPassword: "123",
-            confirm: "123",
+            // newPassword: "123",
+            // confirm: "123",
           }}
           {...layout}
         >
@@ -119,9 +136,17 @@ const SettingProfile = () => {
           </p>
 
           <Form.Item<FieldType>
-            label="Name"
-            name="name"
-            rules={[{ required: true, message: "Please input your name!" }]}
+            label="First Name"
+            name="firstname"
+            rules={[{ required: true, message: "Please input your firstname!" }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item<FieldType>
+            label="Last Name"
+            name="lastname"
+            rules={[{ required: true, message: "Please input your lastname!" }]}
           >
             <Input />
           </Form.Item>
@@ -134,13 +159,15 @@ const SettingProfile = () => {
             <Input />
           </Form.Item>
 
-          <Form.Item<FieldType>
-            label="Phone"
-            name="phone"
-            rules={[{ required: true, message: "Please input your phone!" }]}
-          >
-            <Input />
-          </Form.Item>
+          {user && user.role == "STUDENT" &&
+            <Form.Item<FieldType>
+              label="Student Id"
+              name="studentId"
+              rules={[{ required: true, message: "Please input your phone!" }]}
+            >
+              <Input />
+            </Form.Item>
+          }
 
           <Form.Item<FieldType>
             label="Username"
@@ -148,39 +175,6 @@ const SettingProfile = () => {
             rules={[{ required: true, message: "Please input your username!" }]}
           >
             <Input />
-          </Form.Item>
-
-          <Form.Item<FieldType>
-            label="New Password"
-            name="newPassword"
-            rules={[{ required: true, message: "Please input your password!" }]}
-          >
-            <Input.Password />
-          </Form.Item>
-
-          <Form.Item
-            name="confirm"
-            label="Confirm Password"
-            dependencies={["newPassword"]}
-            hasFeedback
-            rules={[
-              {
-                required: true,
-                message: "Please confirm your new password!",
-              },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (!value || getFieldValue("newPassword") === value) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(
-                    new Error("The new password that you entered do not match!")
-                  );
-                },
-              }),
-            ]}
-          >
-            <Input.Password />
           </Form.Item>
 
           <Form.Item {...tailLayout}>

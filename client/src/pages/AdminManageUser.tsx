@@ -118,6 +118,10 @@ const AdminManageUser = (props: PropType) => {
     }
   }
 
+  // const adminId = useSelector<RootState, number>(
+  //   (state) => state.persisted.users.userId
+  // )
+
   useEffect(() => {
     const getAllUser = async () => {
       try {
@@ -134,7 +138,8 @@ const AdminManageUser = (props: PropType) => {
             },
           }
         );
-        const mapDataType = response.data.map((user: ResponseUser, index: number) => {
+        const rawData = response.data.filter((user: ResponseUser) => user.role != "ADMIN")
+        const mapDataType = rawData.map((user: ResponseUser, index: number) => {
           return ({
             key: index + 1,
             order: index + 1,
@@ -145,7 +150,6 @@ const AdminManageUser = (props: PropType) => {
             rawData: user
           })
         })
-        console.log("map data", mapDataType)
         setData(mapDataType)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
@@ -159,33 +163,35 @@ const AdminManageUser = (props: PropType) => {
 
   const columns: ColumnsType<UserData> = [
     {
-      title: "#",
-      dataIndex: "order",
-      key: "order",
-      render: (text) => <p>{text}</p>,
-    },
-    {
       title: "Account ID",
       dataIndex: "accountId",
       key: "accountId",
+      sorter: (a, b) => a.accountId - b.accountId,
+      sortDirections: ['ascend', 'descend'],
       render: (text) => <p>{text}</p>,
     },
     {
       title: "Username",
       dataIndex: "username",
       key: "username",
+      sorter: (a, b) => ('' + a.username).localeCompare(b.username),
+      sortDirections: ['ascend', 'descend'],
       render: (text) => <p>{text}</p>,
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
+      sorter: (a, b) => ('' + a.email).localeCompare(b.email),
+      sortDirections: ['ascend', 'descend'],
       render: (text) => <p>{text}</p>,
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
+      sorter: (a, b) => ('' + a.status).localeCompare(b.status),
+      sortDirections: ['ascend', 'descend'],
       render: (text) => <p>{text}</p>,
     },
     {

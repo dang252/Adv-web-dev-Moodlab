@@ -15,12 +15,14 @@ import axios from "axios";
 export interface UserState {
   currentId: string; // id for state action
   userId: number;
+  studentId: string;
   username: string;
   email: string;
   password: string;
   firstname: string;
   lastname: string;
   role: string;
+  notification: any[];
   isDarkMode: boolean;
   isLoading: boolean; // global variable
   isError: boolean; // global variable
@@ -113,6 +115,47 @@ export const getUser = createAsyncThunk(
   }
 );
 
+export const putUser = createAsyncThunk(
+  "user/put_user",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async (data: {
+    userId: number;
+    username?: string;
+    firstname?: string;
+    lastname?: string;
+    email?: string;
+    studentId?: string;
+  }, thunkAPI) => {
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/user`,
+        {
+          user_id: data.userId,
+          first_name: data.firstname,
+          last_name: data.lastname,
+          status: "ACTIVED",
+          student_id: data.studentId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          }
+        }
+      );
+      return data
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+
 export const refresh = createAsyncThunk(
   "user/refresh",
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -135,6 +178,33 @@ export const refresh = createAsyncThunk(
         }
       );
       return response.data
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const getAllNotification = createAsyncThunk(
+  "class/getAllNotification",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+  async (_, thunkAPI) => {
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/notification`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      return response.data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error);
@@ -180,12 +250,14 @@ export const stopLoad = () => ({
 const initialState: UserState = {
   currentId: "",
   userId: NaN,
+  studentId: "",
   username: "",
   email: "",
   password: "",
   firstname: "",
   lastname: "",
   role: "",
+  notification: [],
   isDarkMode: false,
   isLoading: false,
   isError: false,
@@ -226,6 +298,11 @@ const userReducer = createReducer(initialState, (builder) => {
     })
     .addCase(getUser.rejected, () => {
     })
+    .addCase(getAllNotification.fulfilled, (state, action) => {
+      if (action.payload) {
+        state.notification = action.payload
+      }
+    })
     .addCase(getUser.fulfilled, (state, action) => {
       // console.log("payload", action.payload)
       if (action.payload) {
@@ -233,6 +310,7 @@ const userReducer = createReducer(initialState, (builder) => {
         state.firstname = action.payload.firstName;
         state.email = action.payload.email;
         state.role = action.payload.role;
+        state.studentId = action.payload.studentId;
       }
     })
     .addCase(refresh.pending, () => {

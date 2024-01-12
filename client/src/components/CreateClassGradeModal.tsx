@@ -11,9 +11,10 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 
 import { Button, Form, Input, Row, Col, InputNumber } from "antd";
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 
 import { MdDragIndicator } from "react-icons/md";
+import { toast } from "react-toastify";
 
 interface PropType {
   fields: any[];
@@ -64,7 +65,24 @@ const CreateClassGradeModal = (props: PropType) => {
     }
   };
 
+  const checkRemovableField = (name: string) => {
+    if (fields) {
+      for (let i = 0; i < fields.length; i++) {
+        if (fields[i].name == name && fields[i].exams && fields[i].exams?.length != 0) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
   const handleRemoveFeild = (name: string) => {
+    if (!checkRemovableField(name)) {
+      toast.error("Can't delete this grade column!");
+      return;
+    }
+    console.log("cont to del")
     if (fields.length === 0) setCurrentIndex(null);
 
     if (currentIndex !== null && currentIndex > 0) {
@@ -118,21 +136,26 @@ const CreateClassGradeModal = (props: PropType) => {
         <Col xs={{ span: 7 }} md={{ span: 5 }} xxl={{ span: 4 }}>
           <Form.Item>
             <div className="flex justify-end gap-3">
-              <MinusCircleOutlined
-                onClick={() => {
-                  console.log("DELETE", name);
-                  handleRemoveFeild(name);
-                }}
-              />
               <Button
+                danger
                 type="primary"
                 htmlType="button"
                 onClick={() => {
-                  console.log("FINALIZE", name);
+                  // console.log("DELETE", name);
+                  handleRemoveFeild(name);
+                }}
+              >
+                Remove
+              </Button>
+              {/* <Button
+                type="primary"
+                htmlType="button"
+                onClick={() => {
+                  // console.log("FINALIZE", name);
                 }}
               >
                 Finalize
-              </Button>
+              </Button> */}
             </div>
           </Form.Item>
         </Col>
@@ -148,9 +171,8 @@ const CreateClassGradeModal = (props: PropType) => {
     ({ items }: any) => {
       return (
         <div
-          className={`px-2 py-4 mb-5 border border-solid rounded-md max-h-[300px] overflow-y-auto overflow-x-hidden ${
-            isDarkMode ? "border-zinc-700" : "border-zinc-300"
-          }`}
+          className={`px-2 py-4 mb-5 border border-solid rounded-md max-h-[300px] overflow-y-auto overflow-x-hidden ${isDarkMode ? "border-zinc-700" : "border-zinc-300"
+            }`}
         >
           {items.length !== 0 &&
             items[0] != undefined &&

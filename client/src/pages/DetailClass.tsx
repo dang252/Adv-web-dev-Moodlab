@@ -20,6 +20,8 @@ import DetailClassMembers from "../components/DetailClassMembers";
 import DetailClassGrades from "../components/DetailClassGrades";
 
 import { ClassType } from "../types/classroom";
+import DetailClassGradesStudent from "../components/DetailClassGradesStudent";
+import { getAllNotification } from "../redux/reducers/user.reducer";
 
 interface PropType {
   isDarkMode: boolean;
@@ -31,7 +33,6 @@ const DetailClass = (props: PropType) => {
 
   const params = useParams();
   const { inviteCode } = params;
-  console.log("inv code", inviteCode);
 
   const dispatchAsync = useAppDispatch();
 
@@ -92,33 +93,29 @@ const DetailClass = (props: PropType) => {
 
   useEffect(() => {
     const handleGetClassAllGrades = async (classId: number) => {
-      console.log("GRADES:", classId);
-      await dispatchAsync(getClassAllGrades(3));
+      // console.log("GRADES:", classId);
+      await dispatchAsync(getClassAllGrades(classId));
+    };
+
+    const handleGetClassAllReviews = async (classId: number) => {
+      // console.log("REVIEWS:", classId);
+      await dispatchAsync(getClassAllReviews(classId));
+    };
+
+    const handleGetNotification = async () => {
+      // console.log("REVIEWS:", classId);
+      await dispatchAsync(getAllNotification());
     };
 
     if (detailClass?.id) {
       handleGetClassAllGrades(detailClass.id);
+      handleGetClassAllReviews(detailClass.id);
+      handleGetNotification();
     }
+
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [detailClass]);
-
-  useEffect(() => {
-    const handleGetClassAllGrades = async (classId: number) => {
-      console.log("REVIEWS:", classId);
-      await dispatchAsync(getClassAllReviews(3));
-    };
-
-    if (detailClass?.id) {
-      handleGetClassAllGrades(detailClass.id);
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [detailClass]);
-
-  const onChange = (key: string) => {
-    console.log(key);
-  };
 
   const studentItems: TabsProps["items"] = [
     {
@@ -130,6 +127,11 @@ const DetailClass = (props: PropType) => {
       key: "2",
       label: "Members",
       children: <DetailClassMembers />,
+    },
+    {
+      key: "3",
+      label: "Grades",
+      children: <DetailClassGradesStudent />,
     },
   ];
 
@@ -169,7 +171,7 @@ const DetailClass = (props: PropType) => {
           <Tabs
             defaultActiveKey="1"
             items={USER_ROLE === "TEACHER" ? teacherItems : studentItems}
-            onChange={onChange}
+            // onChange={onChange}
             className="w-[100%]"
           // indicatorSize={(origin) => origin - 16}
           />

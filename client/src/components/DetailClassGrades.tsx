@@ -66,23 +66,31 @@ const templateDownloadItems: MenuProps["items"] = [
   },
 ];
 
-const getFieldContentByIdLength = (source: any[], fieldId: number) => {
-  return source.filter((content) => {
-    return content.fieldId === fieldId;
-  }).length;
-};
-
 const findMaxExamGrades = (data: any[]) => {
-  let max = data[0].length;
+  let max = data[0];
 
   for (let i = 0; i < data.length; ++i) {
-    if (data[i].length > max) {
+    if (data[i].length > max.length) {
       max = data[i];
     }
   }
 
   return max;
 };
+
+// const findMaxExamGrades = (data: any[]) => {
+//   let max = data[0].length;
+//   let maxElement: any = data[0];
+
+//   for (let i = 0; i < data.length; ++i) {
+//     if (data[i].length > max) {
+//       max = data[i].length;
+//       maxElement = data[i];
+//     }
+//   }
+
+//   return maxElement;
+// };
 
 const getExamPoint = (examName: string, studentGrades: any[]) => {
   for (let i = 0; i < studentGrades.length; ++i) {
@@ -92,13 +100,14 @@ const getExamPoint = (examName: string, studentGrades: any[]) => {
   return null;
 };
 
+
 const DetailClassGrades = () => {
   const [form] = Form.useForm();
   const [createDetailContentForm] = Form.useForm();
 
   const [showCreateGrade, setShowCreateGrade] = useState<boolean>(true);
 
-  const [fieldsContents, setFieldsContents] = useState<any[]>([]);
+  // const [fieldsContents, setFieldsContents] = useState<any[]>([]);
   const [createFieldContentModal, setCreateFieldContentModal] = useState(false);
   const [targetField, setTargetField] = useState<any>(null);
 
@@ -129,36 +138,34 @@ const DetailClassGrades = () => {
     (state) => state.classes.detailClassGrades
   );
 
+  const getClassGrade = async () => {
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/classes/${detailClass?.id}/grades`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      setFields(response.data);
+      setFormFields(response.data);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(
+        "Can not see grade structure for now! Please try again later"
+      );
+    }
+  };
+
   //load grade on enter
   useEffect(() => {
-    const getClassGradeStructure = async () => {
-      try {
-        const accessToken = localStorage
-          .getItem("accessToken")
-          ?.toString()
-          .replace(/^"(.*)"$/, "$1");
-
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/classes/${detailClass?.id}/grades`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-        console.log(response.data)
-        setFields(response.data);
-        setFormFields(response.data);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        toast.error(
-          "Can not see grade structure for now! Please try again later"
-        );
-      }
-    };
-
-    setFields(data);
-    getClassGradeStructure();
+    // setFields(data);
+    getClassGrade();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -172,11 +179,11 @@ const DetailClassGrades = () => {
         return grade.student.points;
       });
 
-      const examName = findMaxExamGrades(points).map((value: any) => {
+      const examName = findMaxExamGrades(points)?.map((value: any) => {
         return value.exam.name;
       });
 
-      examName.map((name: string) => {
+      examName?.map((name: string) => {
         headingData.push(name);
       });
 
@@ -251,7 +258,7 @@ const DetailClassGrades = () => {
       return value.exam.name;
     });
 
-    examName.map((exam: any) => {
+    examName?.map((exam: any) => {
       columnsData.push({
         header: exam,
         key: exam,
@@ -317,12 +324,10 @@ const DetailClassGrades = () => {
           },
         }
       );
-
-      setFields(formFields);
-
       if (formFields.length === 0) toast.success("Create grades successfully");
       if (formFields.length !== 0) toast.success("Update grades successfully");
 
+      getClassGrade()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setFormFields(fields);
@@ -334,24 +339,33 @@ const DetailClassGrades = () => {
   };
 
   const handleCreateGradeOk = async (values: any) => {
-    const { grades } = values;
-    const data = [];
+    if (confirm("Commit all the change you made?") == true) {
+      const { grades } = values;
+      const data = [];
 
-    for (let i = 0; i < formFields.length; ++i) {
-      if (formFields[i].key !== undefined) {
-        const formField = { ...grades[formFields[i].key], position: i };
-        data.push(formField);
-      } else {
-        const formField = { ...formFields[i], gradeCompositionId: formFields[i].id, position: i };
-        data.push(formField);
+      for (let i = 0; i < formFields.length; ++i) {
+        if (formFields[i].key !== undefined) {
+          const formField = { ...grades[formFields[i].key], position: i };
+          data.push(formField);
+        } else {
+          const formField = { ...grades[formFields[i].name], gradeCompositionId: formFields[i].id, position: i, exams: [...formFields[i].exams] };
+          data.push(formField);
+        }
       }
+      console.log(data);
+      updateClassGradeStructure(data);
     }
-    console.log(data);
-    updateClassGradeStructure(data);
-    // setFields(data);
   };
 
   //==================== Create Field Content
+  const creatAbleFieldContent = (field: any) => {
+    if (field?.id == null) {
+      toast.error("Can't create Exam for this grade column! Please save first!")
+      return false;
+    }
+    return true;
+  }
+
   const showCreateFieldContentModal = () => {
     setCreateFieldContentModal(true);
   };
@@ -360,20 +374,10 @@ const DetailClassGrades = () => {
     setCreateFieldContentModal(false);
   };
 
+  //create new exam
   const onCreateContentFinish = (values: any) => {
     const { name, datePicker } = values;
-
-    // const date = datePicker.$M + "/" + datePicker.$D + "/" + datePicker.$y;
-    // // +
-    // // "-" +
-    // // datePicker.$H +
-    // // ":" +
-    // // datePicker.$m +
-    // // ":" +
-    // // datePicker.$s;
-
-    // console.log(datePicker.format("YYYY-MM-DDTHH:mm:ss.SSS[Z]"))
-    const newFieldContent = {
+    const newExamContent = {
       id: NaN,
       gradeCompositionId: targetField?.id,
       name: name,
@@ -381,29 +385,14 @@ const DetailClassGrades = () => {
       isFinalized: false,
     };
 
-    console.log(newFieldContent);
+    console.log(newExamContent);
 
-    const fieldCopy = targetField
+    const fieldCopy = { ...targetField }
 
-    fieldCopy.exams = [...fieldCopy.exams, newFieldContent];
-    //update fields
-    const nextFields = fields.map((field) => {
-      if (field.id == fieldCopy.id) {
-        return fieldCopy;
-      }
-      return field
-    })
-    setFields(nextFields)
-    //update form fields
-    const nextFormFields = formFields.map((field) => {
-      if (field.id == fieldCopy.id) {
-        return fieldCopy;
-      }
-      return field
-    })
-    setFormFields(nextFormFields)
+    fieldCopy.exams = [...fieldCopy.exams, newExamContent];
+    syncUpdateField(fieldCopy)
 
-    setFieldsContents([...fieldsContents, newFieldContent]);
+    // setFieldsContents([...fieldsContents, newFieldContent]);
     setCreateFieldContentModal(false);
     form.resetFields();
   };
@@ -558,6 +547,7 @@ const DetailClassGrades = () => {
         }
       );
       toast.success("Save data successfully");
+      setIsSaveData(true);
     }
     catch (error) {
       toast.error("Cannot save right now! try again later!");
@@ -597,7 +587,7 @@ const DetailClassGrades = () => {
       const url = window.URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = `${targetField.name}.xlsx`;
+      anchor.download = `${targetContent?.name}.xlsx`;
       anchor.click();
       window.URL.revokeObjectURL(url);
     });
@@ -607,17 +597,18 @@ const DetailClassGrades = () => {
     const { id, name, grades } = values;
     let key = null;
 
-    if (contentList.length === 0) key = 1;
-    if (contentList.length !== 0) key = contentList.length + 1;
+    if (data.length === 0) key = 1;
+    if (data.length !== 0) key = data.length + 1;
 
     const newDetail = {
-      "#": key,
-      ID: Number(id),
-      Name: name,
-      Grades: Number(grades),
+      key: key,
+      id: Number(id),
+      name: name,
+      grades: Number(grades),
     };
+    console.log("new detail", newDetail)
 
-    setContentList([...contentList, newDetail]);
+    setData([...data, newDetail]);
 
     createDetailContentForm.resetFields();
 
@@ -628,6 +619,55 @@ const DetailClassGrades = () => {
     console.log("Failed:", errorInfo);
   };
 
+  const syncUpdateField = (modifiedField: any) => {
+    const nextFields = fields.map((field) => {
+      if (field.id == modifiedField.id) {
+        return modifiedField;
+      }
+      return field
+    })
+    //update form fields
+    const nextFormFields = formFields.map((field) => {
+      if (field.id == modifiedField.id) {
+        return modifiedField;
+      }
+      return field
+    })
+    setFormFields(nextFormFields)
+    setFields(nextFields)
+  }
+
+  const onFinalize = (field: any, examId: number) => {
+    if (confirm("Are you sure to finalize this exam? This mean student in this class can see the result!") == true) {
+      const fieldCopy = { ...field };
+      fieldCopy.exams = fieldCopy.exams.map(
+        (exam: any) => {
+          if (exam.id != examId)
+            return exam
+          else {
+            return { ...exam, isFinalized: true }
+          }
+        }
+      )
+      syncUpdateField(fieldCopy)
+    }
+  }
+
+  const onDeleteExam = (field: any, examId: number) => {
+    if (
+      confirm(
+        "Are you sure to delete this content?"
+      ) == true
+    ) {
+      const fieldCopy = { ...field };
+      fieldCopy.exams = fieldCopy.exams.filter(
+        (exam: any) => {
+          return exam.id != examId
+        }
+      )
+      syncUpdateField(fieldCopy)
+    }
+  }
   return (
     <div className="w-[100%] md:w-[80%] 2xl:w-[70%] mx-auto flex flex-col items-center">
       <Modal
@@ -798,7 +838,7 @@ const DetailClassGrades = () => {
 
             <Button
               onClick={() => {
-                setIsSaveData(true);
+                // setIsSaveData(true);
                 handleSaveDetailContentData(Number(targetContent?.id));
               }}
             >
@@ -893,19 +933,10 @@ const DetailClassGrades = () => {
           danger
           onClick={() => {
             setShowAllGrades(true);
-            // console.log(grades);
           }}
         >
           View All Grades
         </Button>
-        {/* <Button
-          icon={<DownloadOutlined />}
-          onClick={() => {
-            handleDownloadGradesTemplate(SHEET_STUDENTS_GRADES_COLUMN);
-          }}
-        >
-          Download Grades Template
-        </Button> */}
         <Dropdown menu={templateDownloadMenuProps}>
           <Button>
             <Space>
@@ -958,8 +989,10 @@ const DetailClassGrades = () => {
                         <Button
                           type="primary"
                           onClick={() => {
-                            showCreateFieldContentModal();
-                            setTargetField(field);
+                            if (creatAbleFieldContent(field)) {
+                              showCreateFieldContentModal();
+                              setTargetField(field);
+                            }
                           }}
                         >
                           Add
@@ -986,7 +1019,12 @@ const DetailClassGrades = () => {
                                     <Button
                                       type="primary"
                                       onClick={() => {
-                                        showModifyContentModal(content);
+                                        if (!isNaN(content?.id)) {
+                                          showModifyContentModal(content);
+                                        }
+                                        else {
+                                          toast.error("Cant modify now! Please save first")
+                                        }
                                       }}
                                     >
                                       Modify
@@ -994,40 +1032,7 @@ const DetailClassGrades = () => {
                                     <div
                                       className="flex items-center hover:text-blue-500 hover:cursor-pointer"
                                       onClick={() => {
-                                        if (
-                                          confirm(
-                                            "Are you sure to delete this content?"
-                                          ) == true
-                                        ) {
-                                          const fieldCopy = field;
-                                          fieldCopy.exams = fieldCopy.exams.filter(
-                                            (exam: any) => {
-                                              return exam.id != content.id
-                                            }
-                                          )
-                                          const nextFields = fields.map((field) => {
-                                            if (field.id == fieldCopy.id) {
-                                              return fieldCopy;
-                                            }
-                                            return field
-                                          })
-                                          //update form fields
-                                          const nextFormFields = formFields.map((field) => {
-                                            if (field.id == fieldCopy.id) {
-                                              return fieldCopy;
-                                            }
-                                            return field
-                                          })
-                                          setFormFields(nextFormFields)
-                                          setFields(nextFields)
-                                          const result = fieldsContents.filter(
-                                            (field) => {
-                                              return field.id !== content.id;
-                                            }
-                                          );
-
-                                          setFieldsContents(result);
-                                        }
+                                        onDeleteExam(field, content.id)
                                       }}
                                     >
                                       <MdDelete size={25} />
@@ -1036,7 +1041,30 @@ const DetailClassGrades = () => {
                                 }
                                 style={{ width: 280 }}
                               >
-                                <p>Due: {content?.dueDate}</p>
+                                <div className="flex items-center justify-between">
+                                  <p>Due: {content?.dueDate.substring(0, 10)}</p>
+                                  {
+                                    content?.isFinalized
+                                      ?
+                                      <Button
+                                        type="primary"
+                                        htmlType="button"
+                                        disabled
+                                        ghost
+                                      >
+                                        Finalized
+                                      </Button>
+                                      : <Button
+                                        type="primary"
+                                        htmlType="button"
+                                        onClick={() => {
+                                          onFinalize(field, content.id)
+                                        }}
+                                      >
+                                        Finalize
+                                      </Button>
+                                  }
+                                </div>
                               </Card>
                             );
                           }

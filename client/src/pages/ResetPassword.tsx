@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { RootState } from "../redux/store";
 import { Layout, theme, Form, Input, Button } from "antd";
@@ -55,7 +55,7 @@ const ResetPassword = (props: PropType) => {
 
   const params = useParams();
 
-  console.log(params);
+  const navigate = useNavigate();
 
   const isDarkMode = useSelector<RootState, boolean>(
     (state) => state.persisted.users.isDarkMode
@@ -81,6 +81,7 @@ const ResetPassword = (props: PropType) => {
         }
       );
       toast.success("Reset password successfully! Redirect to Login!");
+      navigate('/login')
     }
     catch (err: any) {
       toast.error("Can't reset password! please try again later!");

@@ -11,6 +11,7 @@ interface ClassData {
   name: string;
   inviteCode: string;
   status: string;
+  classId: number;
   rawData: RawClassData
 }
 
@@ -136,6 +137,7 @@ const AdminManageClass = (props: PropType) => {
             teacherName: classInfo.teacherId,
             inviteCode: classInfo.inviteCode,
             status: classInfo.status,
+            classId: classInfo.id,
             rawData: classInfo
           })
         })
@@ -151,22 +153,34 @@ const AdminManageClass = (props: PropType) => {
   }, [])
 
   const columns: ColumnsType<ClassData> = [
+    // {
+    //   title: "#",
+    //   dataIndex: "order",
+    //   key: "order",
+    //   render: (text) => <p>{text}</p>,
+    // },
     {
-      title: "#",
-      dataIndex: "order",
-      key: "order",
+      title: "Class Id",
+      dataIndex: "classId",
+      key: "classId",
+      sorter: (a, b) => a.classId - b.classId,
+      sortDirections: ['ascend', 'descend'],
       render: (text) => <p>{text}</p>,
     },
     {
       title: "Code",
       dataIndex: "code",
       key: "code",
+      sorter: (a, b) => ('' + a.code).localeCompare(b.code),
+      sortDirections: ['ascend', 'descend'],
       render: (text) => <p>{text}</p>,
     },
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
+      sorter: (a, b) => ('' + a.name).localeCompare(b.name),
+      sortDirections: ['ascend', 'descend'],
       render: (text) => <p>{text}</p>,
     },
     {
@@ -179,6 +193,8 @@ const AdminManageClass = (props: PropType) => {
       title: "Status",
       dataIndex: "status",
       key: "status",
+      sorter: (a, b) => ('' + a.status).localeCompare(b.status),
+      sortDirections: ['ascend', 'descend'],
       render: (text) => <p>{text}</p>,
     },
     {

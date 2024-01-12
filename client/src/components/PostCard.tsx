@@ -9,17 +9,20 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 
 import { Review } from "../types/classroom";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { getClassAllReviews } from "../redux/reducers/class.reducer";
+import { useAppDispatch } from "../redux/hooks";
 
 interface PropType {
   review: Review;
+  classId: number | undefined
 }
 
 const { TextArea } = Input;
 
 const PostCard = (props: PropType) => {
-  const { review } = props;
-
-  console.log(review);
+  const { review, classId } = props;
 
   const [form] = Form.useForm();
 
@@ -42,9 +45,36 @@ const PostCard = (props: PropType) => {
     (state) => state.persisted.users.isDarkMode
   );
 
-  const onFinish = (values: any) => {
-    console.log(values);
+  const dispatchAsync = useAppDispatch();
+
+  const onFinish = async (values: any) => {
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/review/${review.id}/comment`,
+        {
+          content: values.content,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      // console.log(response.data)
+      await dispatchAsync(getClassAllReviews(Number(classId)));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.log(error)
+      toast.error(
+        "Can't comment right now! try again later!"
+      );
+    }
     form.resetFields();
+    // setOpenCreateNoti(false);
   };
 
   return (
@@ -65,9 +95,8 @@ const PostCard = (props: PropType) => {
         </div>
         <Dropdown menu={{ items: postOptionItems }} trigger={["click"]}>
           <div
-            className={`w-[30px] h-[30px] flex justify-center items-center rounded-full hover:cursor-pointer ${
-              isDarkMode ? "hover:bg-zinc-600" : "hover:bg-gray-200"
-            }`}
+            className={`w-[30px] h-[30px] flex justify-center items-center rounded-full hover:cursor-pointer ${isDarkMode ? "hover:bg-zinc-600" : "hover:bg-gray-200"
+              }`}
           >
             <SlOptionsVertical />
           </div>
@@ -103,15 +132,14 @@ const PostCard = (props: PropType) => {
           </div>
           <Form form={form} name={`post-form-${review.id}`} onFinish={onFinish}>
             <Form.Item
-              name={`post-form-${review.id}`}
+              name={`content`}
               rules={[{ required: true }]}
             >
               <TextArea
-                className={`${
-                  isDarkMode
-                    ? "bg-zinc-800 hover:bg-zinc-900"
-                    : "bg-gray-100 hover:bg-gray-200"
-                }`}
+                className={`${isDarkMode
+                  ? "bg-zinc-800 hover:bg-zinc-900"
+                  : "bg-gray-100 hover:bg-gray-200"
+                  }`}
                 rows={4}
                 placeholder="Add you comment here..."
               />
