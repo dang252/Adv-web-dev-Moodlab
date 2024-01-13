@@ -119,7 +119,7 @@ const PostCard = (props: PropType) => {
             <div>
               {review.comments?.map((comment) => {
                 return (
-                  <div key={uuidv4()} className="flex gap-3 items-center">
+                  <div key={uuidv4()} className="flex gap-3 items-center mt-6">
                     <Avatar size={50} icon={<UserOutlined />} />
                     <div className="flex flex-col gap-1">
                       <p>Teacher: {comment.userId}</p>
