@@ -2,9 +2,10 @@ import { Card, Avatar, Col, Row, Form, Input, Button } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { IoLogoOctocat } from "react-icons/io";
 import { store } from "../redux/store";
-import { UserState, getUser, putUser } from "../redux/reducers/user.reducer";
+import { UserState, getUser, logoutAccount, putUser } from "../redux/reducers/user.reducer";
 import { useAppDispatch } from "../redux/hooks";
 import { toast } from "react-toastify";
+import { useEffect } from "react";
 
 type FieldType = {
   username?: string;
@@ -43,11 +44,25 @@ const SettingProfile = () => {
 
   const dispatchAsync = useAppDispatch()
 
+  useEffect(() => {
+    const refetchUser = async () => {
+      try {
+        await dispatchAsync(getUser()).unwrap();
+      }
+      catch (error) {
+        toast.error("Failed to get User Info!")
+        dispatchAsync(logoutAccount()).unwrap()
+      }
+    }
+
+    refetchUser();
+
+  }, [dispatchAsync])
+
   const onFinish = async (values: any) => {
     try {
       await dispatchAsync(putUser({
-        ...values,
-        userId: user.userId
+        ...values
       })).unwrap();
       await dispatchAsync(getUser()).unwrap();
       toast.success("Update user profile successfully!")
@@ -96,15 +111,25 @@ const SettingProfile = () => {
                   </Col>
                 </Row>
 
-                {user && user.role == "student" &&
-                  <Row>
-                    <Col span={10}>
-                      <p className="font-bold">Student Id:</p>
-                    </Col>
-                    <Col span={12}>
-                      <p>{user.studentId}</p>
-                    </Col>
-                  </Row>}
+                {
+                  user && (user.role == "STUDENT"
+                    ? <Row>
+                      <Col span={10}>
+                        <p className="font-bold">Student Id:</p>
+                      </Col>
+                      <Col span={12}>
+                        <p>{user.studentId}</p>
+                      </Col>
+                    </Row>
+                    : <Row>
+                      <Col span={10}>
+                        <p className="font-bold">Role:</p>
+                      </Col>
+                      <Col span={12}>
+                        <p>{user.role}</p>
+                      </Col>
+                    </Row>)
+                }
               </div>
             </div>
             <div className="flex flex-col justify-center items-center gap-5 mx-auto xl:mx-0 text-blue-500">
@@ -163,19 +188,11 @@ const SettingProfile = () => {
             <Form.Item<FieldType>
               label="Student Id"
               name="studentId"
-              rules={[{ required: true, message: "Please input your phone!" }]}
+              rules={[{ required: true, message: "Please input your student id!" }]}
             >
               <Input />
             </Form.Item>
           }
-
-          <Form.Item<FieldType>
-            label="Username"
-            name="username"
-            rules={[{ required: true, message: "Please input your username!" }]}
-          >
-            <Input />
-          </Form.Item>
 
           <Form.Item {...tailLayout}>
             <Button type="primary" htmlType="submit">

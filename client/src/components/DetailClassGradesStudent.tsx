@@ -36,6 +36,8 @@ const DetailClassGradesStudent = () => {
   const [excelData, setExcelData] = useState<any[]>([]);
 
   const [fields, setFields] = useState<any[]>([]);
+  const [overall, setOverall] = useState<number>(NaN);
+  const [showOverall, setShowOverall] = useState<boolean>(false);
 
   const isDarkMode = useSelector<RootState, boolean | undefined>(
     (state) => state.persisted.users.isDarkMode
@@ -45,6 +47,48 @@ const DetailClassGradesStudent = () => {
     (state) => state.classes.detailClass
   );
 
+  const getClassAllGrades = async () => {
+    try {
+      const accessToken = localStorage
+        .getItem("accessToken")
+        ?.toString()
+        .replace(/^"(.*)"$/, "$1");
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/classes/${detailClass?.id}/points`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      // console.log(response.data)
+      setOverall(response.data?.overall)
+      return response.data;
+    } catch (error: any) {
+      console.log("error", error)
+    }
+  }
+
+  const calcOverall = (data: any) => {
+    let isAllFinalize: boolean = true;
+    if (data.length != 0) {
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].exams && data[i].exams.length != 0) {
+          for (let j = 0; j < data[i].exams.length; j++) {
+            if (data[i].exams[j].isFinalized == false) {
+              isAllFinalize = false;
+            }
+          }
+        } else {
+          isAllFinalize = false;
+        }
+      }
+    }
+    else {
+      isAllFinalize = false;
+    }
+    setShowOverall(isAllFinalize);
+  }
   const getClassGradeStructure = async () => {
     try {
       const accessToken = localStorage
@@ -60,7 +104,8 @@ const DetailClassGradesStudent = () => {
           },
         }
       );
-      console.log("get class all grades structure", response.data)
+      // console.log("get class all grades structure", response.data)
+      calcOverall(response.data);
       setFields(response.data);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -74,6 +119,7 @@ const DetailClassGradesStudent = () => {
   useEffect(() => {
     // setFields(data);
     getClassGradeStructure();
+    getClassAllGrades();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -205,6 +251,7 @@ const DetailClassGradesStudent = () => {
           />
         </div>
       </Drawer>
+      {!isNaN(overall) && showOverall && <div className="text-3xl font-semibold"> Final grade: {overall.toFixed(2)}</div>}
       <div className="mt-10 mb-[50px] w-[100%] pb-4 overflow-auto">
         {(fields.length === 0 || fields[0] == undefined) && (
           <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />

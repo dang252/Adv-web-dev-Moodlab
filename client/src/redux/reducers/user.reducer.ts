@@ -119,7 +119,7 @@ export const putUser = createAsyncThunk(
   "user/put_user",
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (data: {
-    userId: number;
+    userId?: number;
     username?: string;
     firstname?: string;
     lastname?: string;
@@ -132,15 +132,17 @@ export const putUser = createAsyncThunk(
         ?.toString()
         .replace(/^"(.*)"$/, "$1");
 
+      const sendeddata: any = {
+        first_name: data.firstname,
+        last_name: data.lastname,
+        status: "ACTIVED",
+        student_id: data.studentId,
+      }
+      if (data.userId) sendeddata["user_id"] = data.userId
+
       await axios.put(
         `${import.meta.env.VITE_API_URL}/user`,
-        {
-          user_id: data.userId,
-          first_name: data.firstname,
-          last_name: data.lastname,
-          status: "ACTIVED",
-          student_id: data.studentId,
-        },
+        sendeddata,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
