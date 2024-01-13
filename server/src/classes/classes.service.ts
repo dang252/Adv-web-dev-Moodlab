@@ -824,6 +824,7 @@ export class ClassesService {
                         select: {
                           name: true,
                           scale: true,
+                          classId: true,
                         },
                       },
                     },
@@ -841,29 +842,42 @@ export class ClassesService {
         (student) => student.student.role !== 'TEACHER',
       );
 
-      for (const points of listPoints) {
+      listPoints = listPoints.filter((points) =>
+        points.student.points.some(
+          (point) => point.exam.gradeComposition.classId.toString() === classId,
+        ),
+      );
+
+      for (let points of listPoints) {
         let totalPoint = 0;
         let prevGrade = '';
         let prevScale = 1;
         let prevNumberOfPoints = 0;
         let compositions = [];
+
+        points.student.points = points.student.points.filter(
+          (point) => point.exam.gradeComposition.classId.toString() === classId,
+        );
+
         points.student.points.forEach(async (point) => {
-          if (point.exam.gradeComposition.name != prevGrade) {
-            compositions.push({
-              grade: prevGrade,
-              scale: prevScale,
-              totalPoint: totalPoint,
-              numberOfPoints: prevNumberOfPoints,
-            });
+          if (point.exam.gradeComposition.classId.toString() == classId) {
+            if (point.exam.gradeComposition.name != prevGrade) {
+              compositions.push({
+                grade: prevGrade,
+                scale: prevScale,
+                totalPoint: totalPoint,
+                numberOfPoints: prevNumberOfPoints,
+              });
 
-            totalPoint = 0;
-            prevGrade = point.exam.gradeComposition.name;
-            prevScale = point.exam.gradeComposition.scale;
-            prevNumberOfPoints = 0;
+              totalPoint = 0;
+              prevGrade = point.exam.gradeComposition.name;
+              prevScale = point.exam.gradeComposition.scale;
+              prevNumberOfPoints = 0;
+            }
+
+            totalPoint += point.point;
+            prevNumberOfPoints++;
           }
-
-          totalPoint += point.point;
-          prevNumberOfPoints++;
         });
 
         compositions.push({

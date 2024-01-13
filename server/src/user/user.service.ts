@@ -127,9 +127,21 @@ export class UserService {
             lastName: userInfo.last_name || user.lastName,
           },
         });
+        console.log(
+          "[API PUT /user] Update user's info: first_name = " +
+            userInfo.first_name +
+            '; last_name = ' +
+            userInfo.last_name,
+        );
       }
 
       // update student's id
+      console.log(
+        "[API PUT /user] Update student's id: userId = " +
+          userInfo.user_id +
+          '; studentId = ' +
+          userInfo.student_id,
+      );
       if (userInfo.student_id != null) {
         await this.prisma.user.update({
           where: {
@@ -142,6 +154,12 @@ export class UserService {
       }
 
       // for admin to change status of account
+      console.log(
+        "[API PUT /user] Admin update account's status: userId = " +
+          userInfo.user_id +
+          '; status = ' +
+          userInfo.status,
+      );
       if (userInfo.user_id != null && this.isUserStatus(userInfo.status)) {
         if (userRole == 'ADMIN') {
           if (userInfo.status != '') {
@@ -154,6 +172,9 @@ export class UserService {
               },
             });
           }
+          console.log(
+            '[API PUT /user] Get account by user_id to update status successfully',
+          );
 
           if (userInfo.student_id != '') {
             await this.prisma.user.update({
@@ -165,6 +186,9 @@ export class UserService {
               },
             });
           }
+          console.log(
+            '[API PUT /user] Get user by user_id to update student_id successfully',
+          );
         } else {
           return res.status(HttpStatus.FORBIDDEN).send(HTTP_MSG_FORBIDDEN);
         }
